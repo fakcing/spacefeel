@@ -123,13 +123,13 @@ export default function DetailTabs({ item, cast }: DetailTabsProps) {
               {item.vote_count > 0 && (
                 <div>
                   <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-subtle)' }}>{t('voteCount')}</p>
-                  <p style={{ color: 'var(--color-text)' }}>{item.vote_count.toLocaleString()}</p>
+                  <p style={{ color: 'var(--color-text)' }}>{item.vote_count.toLocaleString('en-US')}</p>
                 </div>
               )}
               {item.budget && item.budget > 0 ? (
                 <div>
                   <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-subtle)' }}>{t('budget')}</p>
-                  <p style={{ color: 'var(--color-text)' }}>${item.budget.toLocaleString()}</p>
+                  <p style={{ color: 'var(--color-text)' }}>${item.budget.toLocaleString('en-US')}</p>
                 </div>
               ) : null}
             </div>

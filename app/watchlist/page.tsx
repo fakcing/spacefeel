@@ -1,16 +1,35 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Bookmark } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useWatchlistStore } from '@/store/watchlistStore'
+import { WatchlistItem } from '@/types/tmdb'
 import MediaCard from '@/components/cards/MediaCard'
 import { Movie, TVShow } from '@/types/tmdb'
+
+interface EnrichedItem extends WatchlistItem {
+  title: string
+}
 
 export default function WatchlistPage() {
   const { items } = useWatchlistStore()
   const t = useTranslations('watchlistPage')
+  const [enriched, setEnriched] = useState<EnrichedItem[]>([])
+
+  useEffect(() => {
+    if (!items.length) { setEnriched([]); return }
+    Promise.all(
+      items.map(async (item) => {
+        const data = await fetch(
+          `/api/media-detail?id=${item.id}&type=${item.media_type}`
+        ).then(r => r.json())
+        return { ...item, title: data.title || '' }
+      })
+    ).then(setEnriched)
+  }, [items])
 
   return (
     <div className="min-h-screen pt-20 px-4 md:px-8 max-w-7xl mx-auto">
@@ -40,7 +59,7 @@ export default function WatchlistPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-          {items.map((item) => {
+          {enriched.map((item) => {
             const mediaItem = {
               id: item.id,
               ...(item.media_type === 'movie'

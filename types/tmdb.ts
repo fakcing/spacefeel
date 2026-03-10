@@ -73,7 +73,6 @@ export interface TMDBResponse<T> {
 
 export interface WatchlistItem {
   id: number
-  title: string
   poster_path: string | null
   media_type: 'movie' | 'tv'
   vote_average: number

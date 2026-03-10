@@ -13,7 +13,7 @@ export default function Rating({ value, count, size = 14 }: RatingProps) {
       <span className="text-sm font-semibold">{value.toFixed(1)}</span>
       <span className="text-xs text-[var(--text-muted)]">/ 10</span>
       {count !== undefined && (
-        <span className="text-xs text-[var(--text-muted)] ml-1">({count.toLocaleString()})</span>
+        <span className="text-xs text-[var(--text-muted)] ml-1">({count.toLocaleString('en-US')})</span>
       )}
     </div>
   )

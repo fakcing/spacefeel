@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Bebas_Neue } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
@@ -10,7 +10,13 @@ import PageTransition from '@/components/layout/PageTransition'
 import ScrollToTop from '@/components/ui/ScrollToTop'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '900'] })
+const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '900'], variable: '--font-inter' })
+
+const bebasNeue = Bebas_Neue({
+  subsets: ['latin'],
+  weight: '400',
+  variable: '--font-bebas',
+})
 
 export const metadata: Metadata = {
   title: 'spacefeel',
@@ -29,8 +35,8 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const messages = await getMessages()
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${bebasNeue.variable}`}>
+      <body className={inter.variable} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <NextIntlClientProvider messages={messages}>
             <Navbar />

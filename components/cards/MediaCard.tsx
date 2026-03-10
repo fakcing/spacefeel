@@ -23,7 +23,6 @@ export default function MediaCard({ item, mediaType }: MediaCardProps) {
 
   const watchlistItem: WatchlistItem = {
     id: item.id,
-    title: title || '',
     poster_path: item.poster_path,
     media_type: mediaType,
     vote_average: item.vote_average,

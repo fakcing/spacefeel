@@ -154,8 +154,8 @@ export default function Navbar() {
           <motion.span
             whileTap={{ scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 400, damping: 20 }}
-            className="text-xl font-black uppercase tracking-[0.2em]"
-            style={{ color: 'var(--color-text)' }}
+            className="text-3xl tracking-[0.15em]"
+            style={{ color: 'var(--color-text)', fontFamily: 'var(--font-bebas), sans-serif' }}
           >
             SPACEFEEL
           </motion.span>
