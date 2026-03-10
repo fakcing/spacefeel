@@ -29,7 +29,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/10 mt-6 pt-6 flex items-center justify-between">
-          <p className="text-xs text-white/30">© 2025 spacefeel. All rights reserved.</p>
+          <p className="text-xs text-white/30">© 2026 spacefeel. All rights reserved.</p>
           <a
             href="https://github.com/fakcing"
             target="_blank"

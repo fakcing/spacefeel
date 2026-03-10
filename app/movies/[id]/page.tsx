@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { fetchMovieDetail, fetchCredits, fetchVideos, fetchSimilar } from '@/lib/tmdb'
 import DetailHero from '@/components/detail/DetailHero'
-import CastRow from '@/components/detail/CastRow'
+import DetailTabs from '@/components/detail/DetailTabs'
 import TrailerModal from '@/components/detail/TrailerModal'
 import SimilarSection from '@/components/detail/SimilarSection'
 import { Movie } from '@/types/tmdb'
@@ -28,8 +28,7 @@ export default async function MovieDetailPage({ params }: { params: { id: string
         <div className="max-w-7xl mx-auto">
           <div className="px-4 md:px-12 py-8 grid md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
-              <h2 className="text-xl font-semibold tracking-tight mb-3 text-[var(--text-primary)]">Overview</h2>
-              <p className="text-[var(--text-muted)] leading-relaxed">{movie.overview}</p>
+              <DetailTabs item={movie} cast={credits.cast} />
             </div>
             {trailer && (
               <div>
@@ -38,7 +37,6 @@ export default async function MovieDetailPage({ params }: { params: { id: string
               </div>
             )}
           </div>
-          {credits.cast.length > 0 && <CastRow cast={credits.cast} />}
           <SimilarSection items={similar.results as Movie[]} mediaType="movie" />
         </div>
       </div>

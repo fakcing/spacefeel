@@ -13,6 +13,8 @@ export interface Movie {
   runtime?: number
   tagline?: string
   status?: string
+  original_language?: string
+  budget?: number
 }
 
 export interface TVShow {
@@ -31,6 +33,8 @@ export interface TVShow {
   number_of_episodes?: number
   tagline?: string
   status?: string
+  original_language?: string
+  budget?: number
 }
 
 export interface Genre {

@@ -14,9 +14,6 @@ interface CarouselSectionProps {
   viewAllHref?: string
 }
 
-const CARD_WIDTH = 192
-const GAP = 12
-
 export default function CarouselSection({
   title,
   subtitle,
@@ -24,25 +21,18 @@ export default function CarouselSection({
   mediaType,
   viewAllHref,
 }: CarouselSectionProps) {
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const trackRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
+  const maxIndex = Math.max(0, items.length - 6)
 
   const scrollNext = () => {
-    const next = currentIndex + 1
-    if (next > items.length - 5) return
-    setCurrentIndex(next)
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft = next * (CARD_WIDTH + GAP)
-    }
+    if (currentIndex >= maxIndex) return
+    setCurrentIndex((prev) => prev + 1)
   }
 
   const scrollPrev = () => {
-    const prev = currentIndex - 1
-    if (prev < 0) return
-    setCurrentIndex(prev)
-    if (scrollRef.current) {
-      scrollRef.current.scrollLeft = prev * (CARD_WIDTH + GAP)
-    }
+    if (currentIndex <= 0) return
+    setCurrentIndex((prev) => prev - 1)
   }
 
   return (
@@ -69,18 +59,24 @@ export default function CarouselSection({
         {/* Right: page counter + arrows */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-white/40 mr-1">
-            {currentIndex + 1} / {Math.max(1, items.length - 4)}
+            {currentIndex + 1} / {items.length}
           </span>
           <button
             onClick={scrollPrev}
-            className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.15] flex items-center justify-center transition-colors"
+            disabled={currentIndex <= 0}
+            className={`w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.15] flex items-center justify-center transition-colors ${
+              currentIndex <= 0 ? 'opacity-30 cursor-not-allowed' : ''
+            }`}
             aria-label="Scroll left"
           >
             <ChevronLeft size={16} />
           </button>
           <button
             onClick={scrollNext}
-            className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.15] flex items-center justify-center transition-colors"
+            disabled={currentIndex >= maxIndex}
+            className={`w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.15] flex items-center justify-center transition-colors ${
+              currentIndex >= maxIndex ? 'opacity-30 cursor-not-allowed' : ''
+            }`}
             aria-label="Scroll right"
           >
             <ChevronRight size={16} />
@@ -88,15 +84,21 @@ export default function CarouselSection({
         </div>
       </div>
 
-      <div
-        ref={scrollRef}
-        className="flex gap-3 overflow-x-auto scrollbar-hide items-start px-1 py-3 -mx-1 -my-3"
-      >
-        {items.map((item) => (
-          <div key={item.id} className="w-48 min-w-[192px] flex-shrink-0 flex-grow-0">
-            <MediaCard item={item} mediaType={mediaType} />
-          </div>
-        ))}
+      <div className="overflow-hidden py-3 -my-3">
+        <div
+          ref={trackRef}
+          className="flex gap-3 transition-transform duration-300 ease-out"
+          style={{ transform: `translateX(calc(-${currentIndex} * (100% / 6 + 2px)))` }}
+        >
+          {items.map((item) => (
+            <div
+              key={item.id}
+              className="w-[calc((100%-60px)/6)] min-w-[calc((100%-60px)/6)] flex-shrink-0 flex-grow-0"
+            >
+              <MediaCard item={item} mediaType={mediaType} />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   )

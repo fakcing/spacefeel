@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
@@ -17,7 +18,8 @@ interface MediaCardProps {
 export default function MediaCard({ item, mediaType }: MediaCardProps) {
   const title = 'title' in item ? item.title : item.name
   const year = ('release_date' in item ? item.release_date : item.first_air_date)?.slice(0, 4) || ''
-  const poster = getPoster(item.poster_path)
+  const poster = getPoster(item.poster_path, 'w342')
+  const [imgError, setImgError] = useState(false)
 
   const watchlistItem: WatchlistItem = {
     id: item.id,
@@ -34,8 +36,15 @@ export default function MediaCard({ item, mediaType }: MediaCardProps) {
     <Link href={href}>
       <div className="group cursor-pointer overflow-visible">
         <div className="relative w-full aspect-[2/3] rounded-xl overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-[1.03] group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
-          {poster ? (
-            <Image src={poster} fill className="object-cover" alt={title || 'Media'} sizes="180px" />
+          {poster && !imgError ? (
+            <Image
+              src={poster}
+              fill
+              className="object-cover"
+              alt={title || 'Media'}
+              sizes="(max-width: 768px) 33vw, 16vw"
+              onError={() => setImgError(true)}
+            />
           ) : (
             <div className="w-full h-full bg-white/[0.08] flex items-center justify-center">
               <Film size={32} className="text-white/20" />

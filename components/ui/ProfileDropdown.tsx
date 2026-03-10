@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from 'next-themes'
-import { User, ChevronUp, Check } from 'lucide-react'
+import { User, ChevronUp, Check, Sun, Moon, Monitor } from 'lucide-react'
 import { useSettingsStore } from '@/store/settingsStore'
 
 const LANGUAGES = [
@@ -17,9 +17,9 @@ const LANGUAGES = [
 ]
 
 const themes = [
-  { value: 'light',  label: '☀️ Light' },
-  { value: 'dark',   label: '🌙 Dark' },
-  { value: 'system', label: '💻 System' },
+  { value: 'light',  label: 'Light',  Icon: Sun },
+  { value: 'dark',   label: 'Dark',   Icon: Moon },
+  { value: 'system', label: 'System', Icon: Monitor },
 ]
 
 export default function ProfileDropdown() {
@@ -44,6 +44,12 @@ export default function ProfileDropdown() {
   }, [])
 
   const selectedLang = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0]
+
+  const handleLanguageChange = (lang: typeof LANGUAGES[0]) => {
+    setLanguage(lang.code)
+    document.documentElement.lang = lang.code
+    setLangOpen(false)
+  }
 
   return (
     <div ref={ref} className="relative">
@@ -75,7 +81,6 @@ export default function ProfileDropdown() {
             {/* Language */}
             <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Language</p>
             <div className="relative">
-              {/* Trigger */}
               <button
                 onClick={() => setLangOpen((v) => !v)}
                 className="w-full flex items-center justify-between bg-white/[0.08] border border-white/10 rounded-xl px-3 py-2.5 hover:bg-white/[0.12] transition-colors"
@@ -90,7 +95,6 @@ export default function ProfileDropdown() {
                 />
               </button>
 
-              {/* Options */}
               <AnimatePresence>
                 {langOpen && (
                   <motion.div
@@ -103,7 +107,7 @@ export default function ProfileDropdown() {
                     {LANGUAGES.map((lang) => (
                       <button
                         key={lang.code}
-                        onClick={() => { setLanguage(lang.code); setLangOpen(false) }}
+                        onClick={() => handleLanguageChange(lang)}
                         className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/[0.08] transition-colors"
                       >
                         <div className="flex items-center gap-2.5">
@@ -125,19 +129,20 @@ export default function ProfileDropdown() {
             {/* Theme */}
             <p className="text-xs text-white/40 uppercase tracking-wider mb-2">Theme</p>
             <div className="flex flex-col gap-1">
-              {themes.map((t) => {
-                const isActive = mounted && theme === t.value
+              {themes.map(({ value, label, Icon }) => {
+                const isActive = mounted && theme === value
                 return (
                   <button
-                    key={t.value}
-                    onClick={() => setTheme(t.value)}
-                    className={`w-full rounded-xl py-2 px-3 text-sm text-left transition-all ${
+                    key={value}
+                    onClick={() => setTheme(value)}
+                    className={`w-full rounded-xl py-2 px-3 text-sm text-left transition-all flex items-center gap-2 ${
                       isActive
                         ? 'bg-white/15 border border-white/25 text-white font-medium'
                         : 'bg-white/[0.05] border border-white/[0.08] text-white/60 hover:bg-white/10'
                     }`}
                   >
-                    {t.label}
+                    <Icon size={15} />
+                    {label}
                   </button>
                 )
               })}

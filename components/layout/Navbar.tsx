@@ -103,6 +103,7 @@ export default function Navbar() {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [isOpen, setIsOpen] = useState(false)
+  const [isFocused, setIsFocused] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
 
   const handleMouseEnter = (label: string) => {
@@ -201,13 +202,15 @@ export default function Navbar() {
 
           {/* Inline search with dropdown */}
           <div ref={containerRef} className="relative">
-            <div className="flex items-center bg-white/5 border border-white/10 rounded-xl px-3 py-2 gap-2 w-48 md:w-64 h-9">
+            <div className={`flex items-center bg-white/5 border rounded-xl px-3 py-2 gap-2 w-48 md:w-64 h-9 transition-all duration-200 ${isFocused ? "border-white/40 shadow-[0_0_0_1px_rgba(255,255,255,0.15)]" : "border-white/10"}`}>
               <Search size={14} className="text-white/40 flex-shrink-0" />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search..."
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setIsFocused(false)}
                 className="bg-transparent text-sm text-white placeholder:text-white/30 outline-none w-full"
               />
               {query && (
