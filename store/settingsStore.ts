@@ -11,7 +11,7 @@ interface SettingsStore {
 export const useSettingsStore = create<SettingsStore>()(
   persist(
     (set) => ({
-      language: 'English',
+      language: 'en',
       setLanguage: (language) => set({ language }),
       isLoggedIn: false,
       setIsLoggedIn: (v) => set({ isLoggedIn: v }),

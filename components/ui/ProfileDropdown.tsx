@@ -3,17 +3,17 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from 'next-themes'
-import { User, ChevronDown, Check } from 'lucide-react'
+import { User, ChevronUp, Check } from 'lucide-react'
 import { useSettingsStore } from '@/store/settingsStore'
 
-const languages = [
-  { code: 'English',    flag: '🇺🇸', label: 'English' },
-  { code: 'Ukrainian',  flag: '🇺🇦', label: 'Ukrainian' },
-  { code: 'German',     flag: '🇩🇪', label: 'German' },
-  { code: 'French',     flag: '🇫🇷', label: 'French' },
-  { code: 'Japanese',   flag: '🇯🇵', label: 'Japanese' },
-  { code: 'Korean',     flag: '🇰🇷', label: 'Korean' },
-  { code: 'Spanish',    flag: '🇪🇸', label: 'Spanish' },
+const LANGUAGES = [
+  { code: 'en', label: 'English',   badge: 'US' },
+  { code: 'uk', label: 'Ukrainian', badge: 'UA' },
+  { code: 'de', label: 'German',    badge: 'DE' },
+  { code: 'fr', label: 'French',    badge: 'FR' },
+  { code: 'ja', label: 'Japanese',  badge: 'JP' },
+  { code: 'ko', label: 'Korean',    badge: 'KR' },
+  { code: 'es', label: 'Spanish',   badge: 'ES' },
 ]
 
 const themes = [
@@ -43,7 +43,7 @@ export default function ProfileDropdown() {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const selectedLang = languages.find((l) => l.code === language) || languages[0]
+  const selectedLang = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0]
 
   return (
     <div ref={ref} className="relative">
@@ -78,15 +78,15 @@ export default function ProfileDropdown() {
               {/* Trigger */}
               <button
                 onClick={() => setLangOpen((v) => !v)}
-                className="w-full flex items-center justify-between bg-white/[0.08] border border-white/10 rounded-xl py-2.5 px-3 text-sm text-white transition-colors hover:bg-white/[0.12]"
+                className="w-full flex items-center justify-between bg-white/[0.08] border border-white/10 rounded-xl px-3 py-2.5 hover:bg-white/[0.12] transition-colors"
               >
-                <span className="flex items-center gap-2">
-                  <span>{selectedLang.flag}</span>
-                  <span>{selectedLang.label}</span>
-                </span>
-                <ChevronDown
+                <div className="flex items-center gap-2.5">
+                  <span className="text-[10px] font-bold text-white/50 w-5">{selectedLang.badge}</span>
+                  <span className="text-sm text-white">{selectedLang.label}</span>
+                </div>
+                <ChevronUp
                   size={14}
-                  className={`text-white/40 transition-transform ${langOpen ? 'rotate-180' : ''}`}
+                  className={`text-white/40 transition-transform ${langOpen ? '' : 'rotate-180'}`}
                 />
               </button>
 
@@ -98,21 +98,18 @@ export default function ProfileDropdown() {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
                     transition={{ duration: 0.15 }}
-                    className="absolute left-0 right-0 top-full mt-1 bg-[#1a1a1a] border border-white/10 rounded-xl overflow-hidden z-10 shadow-xl"
+                    className="absolute left-0 right-0 top-full mt-1 bg-[#1a1a1a] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50"
                   >
-                    {languages.map((lang) => (
+                    {LANGUAGES.map((lang) => (
                       <button
                         key={lang.code}
-                        onClick={() => {
-                          setLanguage(lang.code)
-                          setLangOpen(false)
-                        }}
-                        className="w-full flex items-center justify-between px-3 py-2 text-sm text-white hover:bg-white/[0.08] transition-colors"
+                        onClick={() => { setLanguage(lang.code); setLangOpen(false) }}
+                        className="w-full flex items-center justify-between px-3 py-2.5 hover:bg-white/[0.08] transition-colors"
                       >
-                        <span className="flex items-center gap-2">
-                          <span>{lang.flag}</span>
-                          <span>{lang.label}</span>
-                        </span>
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-[10px] font-bold text-white/40 w-5">{lang.badge}</span>
+                          <span className="text-sm text-white/80">{lang.label}</span>
+                        </div>
                         {language === lang.code && (
                           <Check size={14} className="text-white/60" />
                         )}
