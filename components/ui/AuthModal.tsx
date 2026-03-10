@@ -49,13 +49,16 @@ export default function AuthModal() {
 
             {/* Logo */}
             <div className="flex flex-col items-center mb-6">
-              <span
-                className="text-3xl tracking-[0.15em]"
-                style={{ color: 'var(--color-text)', fontFamily: 'var(--font-bebas), sans-serif' }}
-              >
-                SPACEFEEL
-              </span>
-              <p className="text-sm text-[var(--color-text-muted)] mt-1">Sign in to continue</p>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="52" height="52">
+                <rect width="32" height="32" rx="6" fill="#0d0d0d"/>
+                <text
+                  x="16" y="23"
+                  fontFamily="Inter, Arial Black, system-ui, sans-serif"
+                  fontSize="28" fontWeight="900"
+                  fill="white" textAnchor="middle"
+                >s</text>
+              </svg>
+              <p className="text-sm text-[var(--color-text-muted)] mt-3">Sign in to continue</p>
             </div>
 
             {/* Google button */}
