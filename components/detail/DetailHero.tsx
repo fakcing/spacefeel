@@ -61,6 +61,7 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
             fill
             className="object-cover"
             priority
+            quality={85}
             sizes="100vw"
           />
         )}
@@ -78,6 +79,7 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
                 alt={title || ''}
                 fill
                 className="object-cover"
+                priority
                 sizes="160px"
               />
             )}
