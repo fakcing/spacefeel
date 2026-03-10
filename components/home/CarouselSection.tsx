@@ -14,7 +14,8 @@ interface CarouselSectionProps {
   viewAllHref?: string
 }
 
-const CARD_WIDTH = 180 + 12 // card width + gap-3
+const CARD_WIDTH = 192
+const GAP = 12
 
 export default function CarouselSection({
   title,
@@ -26,18 +27,22 @@ export default function CarouselSection({
   const scrollRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
 
-  const maxIndex = Math.max(0, items.length - 5)
-
   const scrollNext = () => {
-    const next = Math.min(currentIndex + 1, maxIndex)
+    const next = currentIndex + 1
+    if (next > items.length - 5) return
     setCurrentIndex(next)
-    scrollRef.current?.scrollTo({ left: next * CARD_WIDTH, behavior: 'smooth' })
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = next * (CARD_WIDTH + GAP)
+    }
   }
 
   const scrollPrev = () => {
-    const prev = Math.max(currentIndex - 1, 0)
+    const prev = currentIndex - 1
+    if (prev < 0) return
     setCurrentIndex(prev)
-    scrollRef.current?.scrollTo({ left: prev * CARD_WIDTH, behavior: 'smooth' })
+    if (scrollRef.current) {
+      scrollRef.current.scrollLeft = prev * (CARD_WIDTH + GAP)
+    }
   }
 
   return (
@@ -64,7 +69,7 @@ export default function CarouselSection({
         {/* Right: page counter + arrows */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-white/40 mr-1">
-            {currentIndex + 1} / {items.length - 4}
+            {currentIndex + 1} / {Math.max(1, items.length - 4)}
           </span>
           <button
             onClick={scrollPrev}
@@ -85,10 +90,10 @@ export default function CarouselSection({
 
       <div
         ref={scrollRef}
-        className="flex gap-3 overflow-x-auto scroll-smooth scrollbar-hide pb-2"
+        className="flex gap-3 overflow-x-auto scrollbar-hide items-start px-1 py-3 -mx-1 -my-3"
       >
         {items.map((item) => (
-          <div key={item.id} className="min-w-[calc(20%-10px)] w-[calc(20%-10px)] flex-shrink-0 flex-grow-0">
+          <div key={item.id} className="w-48 min-w-[192px] flex-shrink-0 flex-grow-0">
             <MediaCard item={item} mediaType={mediaType} />
           </div>
         ))}
