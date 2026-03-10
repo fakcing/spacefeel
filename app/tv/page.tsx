@@ -4,7 +4,6 @@ import { TVShow, TMDBResponse } from '@/types/tmdb'
 import MediaCard from '@/components/cards/MediaCard'
 import Pagination from '@/components/ui/Pagination'
 
-export const dynamic = 'force-dynamic'
 
 const categories = [
   { value: 'trending',     label: 'Trending' },

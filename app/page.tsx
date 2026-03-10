@@ -24,53 +24,76 @@ function CarouselSkeleton() {
   )
 }
 
-export const dynamic = 'force-dynamic'
+async function HeroSection() {
+  const r = await fetchTrending('movie')
+  const movies = r.results.slice(0, 5) as Movie[]
+  return <HeroBanner movies={movies} />
+}
+
+async function TrendingMoviesCarousel({ title }: { title: string }) {
+  const r = await fetchTrending('movie')
+  return <CarouselSection title={title} items={r.results.slice(0, 20) as Movie[]} mediaType="movie" viewAllHref="/movies?category=trending" />
+}
+
+async function PopularTVCarousel({ title }: { title: string }) {
+  const r = await fetchPopular('tv')
+  return <CarouselSection title={title} items={r.results.slice(0, 20) as TVShow[]} mediaType="tv" viewAllHref="/tv?category=popular" />
+}
+
+async function TopRatedMoviesCarousel({ title }: { title: string }) {
+  const r = await fetchTopRated('movie')
+  return <CarouselSection title={title} items={r.results.slice(0, 20) as Movie[]} mediaType="movie" viewAllHref="/movies?category=top_rated" />
+}
+
+async function TrendingAnimeCarousel({ title }: { title: string }) {
+  const r = await fetchAnime('trending')
+  return <CarouselSection title={title} items={r.results.slice(0, 20) as TVShow[]} mediaType="tv" viewAllHref="/anime?category=trending" />
+}
+
+async function AiringTodayCarousel({ title }: { title: string }) {
+  const r = await fetchAiringToday()
+  return <CarouselSection title={title} items={r.results.slice(0, 20) as TVShow[]} mediaType="tv" viewAllHref="/tv?category=airing_today" />
+}
+
+async function TopRatedAnimeCarousel({ title }: { title: string }) {
+  const r = await fetchAnime('top_rated')
+  return <CarouselSection title={title} items={r.results.slice(0, 20) as TVShow[]} mediaType="tv" viewAllHref="/anime?category=top_rated" />
+}
+
+async function FamilyCartoonsCarousel({ title }: { title: string }) {
+  const r = await fetchCartoons('family')
+  return <CarouselSection title={title} items={r.results.slice(0, 20) as TVShow[]} mediaType="tv" viewAllHref="/cartoons?category=family" />
+}
 
 export default async function HomePage() {
   const t = await getTranslations('home')
 
-  const [
-    trendingMovies,
-    popularTV,
-    topRatedMovies,
-    trendingAnime,
-    airingToday,
-    topRatedAnime,
-    familyCartoons,
-  ] = await Promise.all([
-    fetchTrending('movie').then((r) => r.results.slice(0, 20) as Movie[]),
-    fetchPopular('tv').then((r) => r.results.slice(0, 20) as TVShow[]),
-    fetchTopRated('movie').then((r) => r.results.slice(0, 20) as Movie[]),
-    fetchAnime('trending').then((r) => r.results.slice(0, 20) as TVShow[]),
-    fetchAiringToday().then((r) => r.results.slice(0, 20) as TVShow[]),
-    fetchAnime('top_rated').then((r) => r.results.slice(0, 20) as TVShow[]),
-    fetchCartoons('family').then((r) => r.results.slice(0, 20) as TVShow[]),
-  ])
-
   return (
     <div>
-      <HeroBanner movies={trendingMovies.slice(0, 5)} />
+      <Suspense fallback={<div className="w-full h-[75vh] shimmer" />}>
+        <HeroSection />
+      </Suspense>
       <div className="pt-8 space-y-2">
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title={t('trendingMovies')} items={trendingMovies} mediaType="movie" viewAllHref="/movies?category=trending" />
+          <TrendingMoviesCarousel title={t('trendingMovies')} />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title={t('popularTVShows')} items={popularTV} mediaType="tv" viewAllHref="/tv?category=popular" />
+          <PopularTVCarousel title={t('popularTVShows')} />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title={t('topRatedMovies')} items={topRatedMovies} mediaType="movie" viewAllHref="/movies?category=top_rated" />
+          <TopRatedMoviesCarousel title={t('topRatedMovies')} />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title={t('trendingAnime')} items={trendingAnime} mediaType="tv" viewAllHref="/anime?category=trending" />
+          <TrendingAnimeCarousel title={t('trendingAnime')} />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title={t('airingToday')} items={airingToday} mediaType="tv" viewAllHref="/tv?category=airing_today" />
+          <AiringTodayCarousel title={t('airingToday')} />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title={t('topRatedAnime')} items={topRatedAnime} mediaType="tv" viewAllHref="/anime?category=top_rated" />
+          <TopRatedAnimeCarousel title={t('topRatedAnime')} />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title={t('familyCartoons')} items={familyCartoons} mediaType="tv" viewAllHref="/cartoons?category=family" />
+          <FamilyCartoonsCarousel title={t('familyCartoons')} />
         </Suspense>
       </div>
     </div>

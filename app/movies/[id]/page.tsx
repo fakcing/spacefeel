@@ -6,7 +6,6 @@ import TrailerModal from '@/components/detail/TrailerModal'
 import SimilarSection from '@/components/detail/SimilarSection'
 import { Movie } from '@/types/tmdb'
 
-export const dynamic = 'force-dynamic'
 
 export default async function MovieDetailPage({ params }: { params: { id: string } }) {
   const id = parseInt(params.id)
