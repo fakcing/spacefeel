@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "movies": "Filme",
+    "tvShows": "Serien",
+    "anime": "Anime",
+    "cartoons": "Zeichentrick",
+    "watchlist": "Merkliste"
+  },
+  "home": {
+    "trendingMovies": "Trendfilme",
+    "popularTVShows": "Beliebte Serien",
+    "topRatedMovies": "Bestbewertete Filme",
+    "trendingAnime": "Trend-Anime",
+    "airingToday": "Heute im TV",
+    "topRatedAnime": "Bestbewerteter Anime",
+    "familyCartoons": "Familienzeichentrick",
+    "viewAll": "Alle anzeigen"
+  },
+  "detail": {
+    "overview": "Übersicht",
+    "cast": "Besetzung",
+    "details": "Details",
+    "playNow": "Jetzt abspielen",
+    "watchlist": "Merkliste",
+    "inWatchlist": "Auf der Merkliste",
+    "trailer": "Trailer",
+    "status": "Status",
+    "releaseDate": "Erscheinungsdatum",
+    "runtime": "Laufzeit",
+    "seasons": "Staffeln",
+    "language": "Originalsprache",
+    "voteCount": "Bewertungen",
+    "budget": "Budget"
+  },
+  "search": {
+    "placeholder": "Suchen...",
+    "tvShow": "Serie",
+    "movie": "Film"
+  },
+  "watchlistPage": {
+    "title": "Meine Merkliste",
+    "empty": "Ihre Merkliste ist leer",
+    "browse": "Filme durchsuchen"
+  },
+  "profile": {
+    "account": "Konto",
+    "login": "Anmelden",
+    "logout": "Abmelden",
+    "language": "Sprache",
+    "theme": "Design",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "system": "System"
+  },
+  "footer": {
+    "rights": "© 2026 spacefeel. Alle Rechte vorbehalten."
+  },
+  "notFound": {
+    "title": "Dieser Titel existiert nicht in unserem Universum",
+    "subtitle": "Die gesuchte Seite ist in den Weltraum gedriftet.",
+    "back": "Zurück zur Startseite"
+  },
+  "hero": {
+    "playNow": "Jetzt abspielen",
+    "details": "Details"
+  },
+  "dropdown": {
+    "trendingMovies": "Trendfilme",
+    "popular": "Beliebt",
+    "upcoming": "Demnächst",
+    "nowPlaying": "Jetzt im Kino",
+    "topRated": "Bestbewertet",
+    "discover": "Entdecken",
+    "trendingShows": "Trend-Serien",
+    "onTheAir": "Im TV",
+    "airingToday": "Heute",
+    "trendingAnime": "Trend-Anime",
+    "upcomingSeason": "Neue Staffel",
+    "airingNow": "Läuft jetzt",
+    "familyPicks": "Für die Familie",
+    "newReleases": "Neuerscheinungen",
+    "classics": "Klassiker",
+    "trendingMoviesDesc": "Was alle schauen",
+    "popularDesc": "Gerade sehr beliebt",
+    "upcomingDesc": "Bald im Kino",
+    "nowPlayingDesc": "Aktuell im Kino",
+    "topRatedDesc": "Bestbewertet aller Zeiten",
+    "discoverDesc": "Alle Filme entdecken",
+    "trendingShowsDesc": "Meist diskutierte Serien",
+    "popularShowsDesc": "Fans Favoriten jetzt",
+    "topRatedShowsDesc": "Von Kritikern gelobte Serien",
+    "onTheAirDesc": "Läuft gerade im TV",
+    "airingTodayDesc": "Episoden heute",
+    "discoverShowsDesc": "Alle Serien entdecken"
+  }
+}

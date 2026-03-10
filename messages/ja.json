@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "movies": "映画",
+    "tvShows": "ドラマ",
+    "anime": "アニメ",
+    "cartoons": "アニメーション",
+    "watchlist": "リスト"
+  },
+  "home": {
+    "trendingMovies": "トレンド映画",
+    "popularTVShows": "人気ドラマ",
+    "topRatedMovies": "高評価映画",
+    "trendingAnime": "トレンドアニメ",
+    "airingToday": "本日放送",
+    "topRatedAnime": "高評価アニメ",
+    "familyCartoons": "ファミリー向けアニメ",
+    "viewAll": "すべて見る"
+  },
+  "detail": {
+    "overview": "概要",
+    "cast": "キャスト",
+    "details": "詳細",
+    "playNow": "再生",
+    "watchlist": "リストに追加",
+    "inWatchlist": "リスト済み",
+    "trailer": "予告編",
+    "status": "ステータス",
+    "releaseDate": "公開日",
+    "runtime": "上映時間",
+    "seasons": "シーズン数",
+    "language": "原語",
+    "voteCount": "評価数",
+    "budget": "予算"
+  },
+  "search": {
+    "placeholder": "検索...",
+    "tvShow": "ドラマ",
+    "movie": "映画"
+  },
+  "watchlistPage": {
+    "title": "マイリスト",
+    "empty": "リストは空です",
+    "browse": "映画を探す"
+  },
+  "profile": {
+    "account": "アカウント",
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "language": "言語",
+    "theme": "テーマ",
+    "light": "ライト",
+    "dark": "ダーク",
+    "system": "システム"
+  },
+  "footer": {
+    "rights": "© 2026 spacefeel. 全著作権所有。"
+  },
+  "notFound": {
+    "title": "このタイトルは私たちの宇宙には存在しません",
+    "subtitle": "お探しのページは宇宙の彼方へ漂流してしまいました。",
+    "back": "ホームに戻る"
+  },
+  "hero": {
+    "playNow": "再生",
+    "details": "詳細"
+  },
+  "dropdown": {
+    "trendingMovies": "トレンド映画",
+    "popular": "人気",
+    "upcoming": "近日公開",
+    "nowPlaying": "上映中",
+    "topRated": "高評価",
+    "discover": "発見",
+    "trendingShows": "トレンドドラマ",
+    "onTheAir": "放送中",
+    "airingToday": "本日放送",
+    "trendingAnime": "トレンドアニメ",
+    "upcomingSeason": "新シーズン",
+    "airingNow": "放映中",
+    "familyPicks": "家族向け",
+    "newReleases": "新着",
+    "classics": "クラシック",
+    "trendingMoviesDesc": "みんなが見ている",
+    "popularDesc": "今最も人気",
+    "upcomingDesc": "まもなく公開",
+    "nowPlayingDesc": "現在上映中",
+    "topRatedDesc": "歴代最高評価",
+    "discoverDesc": "すべての映画を探索",
+    "trendingShowsDesc": "最も話題のシリーズ",
+    "popularShowsDesc": "ファンのお気に入り",
+    "topRatedShowsDesc": "批評家絶賛のシリーズ",
+    "onTheAirDesc": "現在放送中",
+    "airingTodayDesc": "今日のエピソード",
+    "discoverShowsDesc": "すべてのドラマを探索"
+  }
+}

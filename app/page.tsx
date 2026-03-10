@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import { getTranslations } from 'next-intl/server'
 import HeroBanner from '@/components/home/HeroBanner'
 import CarouselSection from '@/components/home/CarouselSection'
 import SkeletonCard from '@/components/ui/SkeletonCard'
@@ -26,6 +27,8 @@ function CarouselSkeleton() {
 export const dynamic = 'force-dynamic'
 
 export default async function HomePage() {
+  const t = await getTranslations('home')
+
   const [
     trendingMovies,
     popularTV,
@@ -49,25 +52,25 @@ export default async function HomePage() {
       <HeroBanner movies={trendingMovies.slice(0, 5)} />
       <div className="pt-8 space-y-2">
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title="Trending Movies" items={trendingMovies} mediaType="movie" viewAllHref="/movies?category=trending" />
+          <CarouselSection title={t('trendingMovies')} items={trendingMovies} mediaType="movie" viewAllHref="/movies?category=trending" />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title="Popular TV Shows" items={popularTV} mediaType="tv" viewAllHref="/tv?category=popular" />
+          <CarouselSection title={t('popularTVShows')} items={popularTV} mediaType="tv" viewAllHref="/tv?category=popular" />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title="Top Rated Movies" items={topRatedMovies} mediaType="movie" viewAllHref="/movies?category=top_rated" />
+          <CarouselSection title={t('topRatedMovies')} items={topRatedMovies} mediaType="movie" viewAllHref="/movies?category=top_rated" />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title="Trending Anime" items={trendingAnime} mediaType="tv" viewAllHref="/anime?category=trending" />
+          <CarouselSection title={t('trendingAnime')} items={trendingAnime} mediaType="tv" viewAllHref="/anime?category=trending" />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title="Airing Today" items={airingToday} mediaType="tv" viewAllHref="/tv?category=airing_today" />
+          <CarouselSection title={t('airingToday')} items={airingToday} mediaType="tv" viewAllHref="/tv?category=airing_today" />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title="Top Rated Anime" items={topRatedAnime} mediaType="tv" viewAllHref="/anime?category=top_rated" />
+          <CarouselSection title={t('topRatedAnime')} items={topRatedAnime} mediaType="tv" viewAllHref="/anime?category=top_rated" />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <CarouselSection title="Family Cartoons" items={familyCartoons} mediaType="tv" viewAllHref="/cartoons?category=family" />
+          <CarouselSection title={t('familyCartoons')} items={familyCartoons} mediaType="tv" viewAllHref="/cartoons?category=family" />
         </Suspense>
       </div>
     </div>

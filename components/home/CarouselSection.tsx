@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { MediaItem } from '@/types/tmdb'
 import MediaCard from '@/components/cards/MediaCard'
 
@@ -23,7 +24,9 @@ export default function CarouselSection({
 }: CarouselSectionProps) {
   const trackRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const maxIndex = Math.max(0, items.length - 6)
+  const totalCards = items.length
+  const maxIndex = Math.max(0, totalCards - 6)
+  const t = useTranslations('home')
 
   const scrollNext = () => {
     if (currentIndex >= maxIndex) return
@@ -45,12 +48,15 @@ export default function CarouselSection({
           {subtitle && <p className="text-xs text-[var(--text-muted)]">{subtitle}</p>}
           {viewAllHref && (
             <>
-              <span className="text-white/20">|</span>
+              <span style={{ color: 'var(--color-border-strong)' }}>|</span>
               <Link
                 href={viewAllHref}
-                className="text-sm text-white/50 hover:text-white transition-colors"
+                className="text-sm transition-colors"
+                style={{ color: 'var(--color-text-muted)' }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}
               >
-                View All
+                {t('viewAll')}
               </Link>
             </>
           )}
@@ -58,15 +64,16 @@ export default function CarouselSection({
 
         {/* Right: page counter + arrows */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-white/40 mr-1">
-            {currentIndex + 1} / {items.length}
+          <span className="text-sm mr-1" style={{ color: 'var(--color-text-subtle)' }}>
+            {currentIndex + 1} / {totalCards}
           </span>
           <button
             onClick={scrollPrev}
             disabled={currentIndex <= 0}
-            className={`w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.15] flex items-center justify-center transition-colors ${
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
               currentIndex <= 0 ? 'opacity-30 cursor-not-allowed' : ''
             }`}
+            style={{ backgroundColor: 'var(--color-overlay)' }}
             aria-label="Scroll left"
           >
             <ChevronLeft size={16} />
@@ -74,9 +81,10 @@ export default function CarouselSection({
           <button
             onClick={scrollNext}
             disabled={currentIndex >= maxIndex}
-            className={`w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.15] flex items-center justify-center transition-colors ${
+            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
               currentIndex >= maxIndex ? 'opacity-30 cursor-not-allowed' : ''
             }`}
+            style={{ backgroundColor: 'var(--color-overlay)' }}
             aria-label="Scroll right"
           >
             <ChevronRight size={16} />

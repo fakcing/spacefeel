@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Play, Info } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Movie } from '@/types/tmdb'
 import { getBackdrop } from '@/lib/tmdb'
 
@@ -19,6 +20,7 @@ export default function HeroBanner({ movies }: HeroBannerProps) {
   const [progress, setProgress] = useState(0)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const progressRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const t = useTranslations('hero')
 
   const startTimers = () => {
     if (intervalRef.current) clearInterval(intervalRef.current)
@@ -123,7 +125,7 @@ export default function HeroBanner({ movies }: HeroBannerProps) {
                   className="flex items-center gap-2 bg-white text-black font-semibold rounded-full px-8 py-3 hover:bg-white/90 transition-colors"
                 >
                   <Play size={18} fill="black" />
-                  Play Now
+                  {t('playNow')}
                 </Link>
               </motion.div>
               <motion.div whileTap={{ scale: 0.96 }}>
@@ -132,7 +134,7 @@ export default function HeroBanner({ movies }: HeroBannerProps) {
                   className="flex items-center gap-2 bg-white/10 backdrop-blur border border-white/20 text-white rounded-full px-8 py-3 hover:bg-white/20 transition-colors"
                 >
                   <Info size={18} />
-                  Details
+                  {t('details')}
                 </Link>
               </motion.div>
             </motion.div>

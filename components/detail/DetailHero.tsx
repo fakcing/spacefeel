@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { Play, Plus, BookmarkCheck } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Movie, TVShow, WatchlistItem } from '@/types/tmdb'
 import { getBackdrop, getPoster } from '@/lib/tmdb'
 import Badge from '@/components/ui/Badge'
@@ -16,6 +17,7 @@ interface DetailHeroProps {
 }
 
 export default function DetailHero({ item, mediaType }: DetailHeroProps) {
+  const t = useTranslations('detail')
   const title = 'title' in item ? item.title : item.name
   const year = ('release_date' in item ? item.release_date : item.first_air_date)?.slice(0, 4) || ''
   const extra =
@@ -23,7 +25,7 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
       ? `${item.runtime} min`
       : 'number_of_seasons' in item && item.number_of_seasons
       ? `${item.number_of_seasons} Season${item.number_of_seasons !== 1 ? 's' : ''}${
-          item.number_of_episodes ? ` · ${item.number_of_episodes} Episodes` : ''
+          item.number_of_episodes ? ` \u00b7 ${item.number_of_episodes} Episodes` : ''
         }`
       : null
 
@@ -102,7 +104,7 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
           <div className="flex items-center gap-3">
             <button className="flex items-center gap-2 bg-white text-black font-semibold rounded-full px-6 py-2.5 hover:bg-white/90 transition-colors text-sm">
               <Play size={16} fill="black" />
-              Play Now
+              {t('playNow')}
             </button>
             <button
               onClick={handleWatchlist}
@@ -113,9 +115,9 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
               }`}
             >
               {isBookmarked ? (
-                <><BookmarkCheck size={16} /> In Watchlist</>
+                <><BookmarkCheck size={16} /> {t('inWatchlist')}</>
               ) : (
-                <><Plus size={16} /> Watchlist</>
+                <><Plus size={16} /> {t('watchlist')}</>
               )}
             </button>
           </div>

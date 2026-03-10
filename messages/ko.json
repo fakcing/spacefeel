@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "home": "홈",
+    "movies": "영화",
+    "tvShows": "드라마",
+    "anime": "애니메이션",
+    "cartoons": "만화",
+    "watchlist": "목록"
+  },
+  "home": {
+    "trendingMovies": "트렌딩 영화",
+    "popularTVShows": "인기 드라마",
+    "topRatedMovies": "최고 평점 영화",
+    "trendingAnime": "트렌딩 애니",
+    "airingToday": "오늘 방영",
+    "topRatedAnime": "최고 평점 애니",
+    "familyCartoons": "가족 만화",
+    "viewAll": "전체 보기"
+  },
+  "detail": {
+    "overview": "개요",
+    "cast": "출연진",
+    "details": "상세정보",
+    "playNow": "재생",
+    "watchlist": "목록에 추가",
+    "inWatchlist": "목록에 있음",
+    "trailer": "예고편",
+    "status": "상태",
+    "releaseDate": "개봉일",
+    "runtime": "상영시간",
+    "seasons": "시즌 수",
+    "language": "원어",
+    "voteCount": "평가 수",
+    "budget": "예산"
+  },
+  "search": {
+    "placeholder": "검색...",
+    "tvShow": "드라마",
+    "movie": "영화"
+  },
+  "watchlistPage": {
+    "title": "내 목록",
+    "empty": "목록이 비어 있습니다",
+    "browse": "영화 탐색"
+  },
+  "profile": {
+    "account": "계정",
+    "login": "로그인",
+    "logout": "로그아웃",
+    "language": "언어",
+    "theme": "테마",
+    "light": "라이트",
+    "dark": "다크",
+    "system": "시스템"
+  },
+  "footer": {
+    "rights": "© 2026 spacefeel. 모든 권리 보유."
+  },
+  "notFound": {
+    "title": "이 타이틀은 우리 우주에 존재하지 않습니다",
+    "subtitle": "찾고 있는 페이지가 심우주로 표류해 버렸습니다.",
+    "back": "홈으로 돌아가기"
+  },
+  "hero": {
+    "playNow": "재생",
+    "details": "상세정보"
+  },
+  "dropdown": {
+    "trendingMovies": "트렌딩 영화",
+    "popular": "인기",
+    "upcoming": "개봉 예정",
+    "nowPlaying": "현재 상영",
+    "topRated": "최고 평점",
+    "discover": "탐색",
+    "trendingShows": "트렌딩 드라마",
+    "onTheAir": "방영 중",
+    "airingToday": "오늘 방영",
+    "trendingAnime": "트렌딩 애니",
+    "upcomingSeason": "새 시즌",
+    "airingNow": "지금 방영",
+    "familyPicks": "가족용",
+    "newReleases": "신작",
+    "classics": "클래식",
+    "trendingMoviesDesc": "모두가 보는 영화",
+    "popularDesc": "지금 가장 인기",
+    "upcomingDesc": "곧 개봉 예정",
+    "nowPlayingDesc": "현재 극장 상영",
+    "topRatedDesc": "역대 최고 평점",
+    "discoverDesc": "모든 영화 탐색",
+    "trendingShowsDesc": "가장 화제의 시리즈",
+    "popularShowsDesc": "팬들의 최애",
+    "topRatedShowsDesc": "비평가들의 극찬",
+    "onTheAirDesc": "현재 방영 중",
+    "airingTodayDesc": "오늘의 에피소드",
+    "discoverShowsDesc": "모든 드라마 탐색"
+  }
+}

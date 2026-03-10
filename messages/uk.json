@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "home": "Головна",
+    "movies": "Фільми",
+    "tvShows": "Серіали",
+    "anime": "Аніме",
+    "cartoons": "Мультфільми",
+    "watchlist": "Список"
+  },
+  "home": {
+    "trendingMovies": "У тренді",
+    "popularTVShows": "Популярні серіали",
+    "topRatedMovies": "Топ фільмів",
+    "trendingAnime": "Популярне аніме",
+    "airingToday": "Сьогодні в ефірі",
+    "topRatedAnime": "Топ аніме",
+    "familyCartoons": "Сімейні мультфільми",
+    "viewAll": "Всі"
+  },
+  "detail": {
+    "overview": "Опис",
+    "cast": "Актори",
+    "details": "Деталі",
+    "playNow": "Дивитись",
+    "watchlist": "До списку",
+    "inWatchlist": "У списку",
+    "trailer": "Трейлер",
+    "status": "Статус",
+    "releaseDate": "Дата виходу",
+    "runtime": "Тривалість",
+    "seasons": "Сезонів",
+    "language": "Мова оригіналу",
+    "voteCount": "Оцінок",
+    "budget": "Бюджет"
+  },
+  "search": {
+    "placeholder": "Пошук...",
+    "tvShow": "Серіал",
+    "movie": "Фільм"
+  },
+  "watchlistPage": {
+    "title": "Мій список",
+    "empty": "Ваш список порожній",
+    "browse": "Дивитись фільми"
+  },
+  "profile": {
+    "account": "Акаунт",
+    "login": "Увійти",
+    "logout": "Вийти",
+    "language": "Мова",
+    "theme": "Тема",
+    "light": "Світла",
+    "dark": "Темна",
+    "system": "Системна"
+  },
+  "footer": {
+    "rights": "© 2026 spacefeel. Всі права захищені."
+  },
+  "notFound": {
+    "title": "Цього тайтлу не існує в нашому всесвіті",
+    "subtitle": "Сторінка, яку ви шукаєте, загубилась у відкритому космосі.",
+    "back": "На головну"
+  },
+  "hero": {
+    "playNow": "Дивитись",
+    "details": "Детальніше"
+  },
+  "dropdown": {
+    "trendingMovies": "У тренді",
+    "popular": "Популярне",
+    "upcoming": "Незабаром",
+    "nowPlaying": "Зараз у кіно",
+    "topRated": "Топ рейтингу",
+    "discover": "Відкрити",
+    "trendingShows": "Серіали в тренді",
+    "onTheAir": "В ефірі",
+    "airingToday": "Сьогодні",
+    "trendingAnime": "Аніме в тренді",
+    "upcomingSeason": "Новий сезон",
+    "airingNow": "Зараз іде",
+    "familyPicks": "Для сім'ї",
+    "newReleases": "Новинки",
+    "classics": "Класика",
+    "trendingMoviesDesc": "Всі це дивляться",
+    "popularDesc": "Найпопулярніше зараз",
+    "upcomingDesc": "Незабаром у кінотеатрах",
+    "nowPlayingDesc": "Зараз у кінотеатрах",
+    "topRatedDesc": "Найкращі за весь час",
+    "discoverDesc": "Всі фільми",
+    "trendingShowsDesc": "Найобговорюваніші серіали",
+    "popularShowsDesc": "Улюблені серіали зараз",
+    "topRatedShowsDesc": "Відзначені критиками серіали",
+    "onTheAirDesc": "Зараз в ефірі",
+    "airingTodayDesc": "Епізоди сьогодні",
+    "discoverShowsDesc": "Всі серіали"
+  }
+}

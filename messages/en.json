@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "home": "Home",
+    "movies": "Movies",
+    "tvShows": "TV Shows",
+    "anime": "Anime",
+    "cartoons": "Cartoons",
+    "watchlist": "Watchlist"
+  },
+  "home": {
+    "trendingMovies": "Trending Movies",
+    "popularTVShows": "Popular TV Shows",
+    "topRatedMovies": "Top Rated Movies",
+    "trendingAnime": "Trending Anime",
+    "airingToday": "Airing Today",
+    "topRatedAnime": "Top Rated Anime",
+    "familyCartoons": "Family Cartoons",
+    "viewAll": "View All"
+  },
+  "detail": {
+    "overview": "Overview",
+    "cast": "Cast",
+    "details": "Details",
+    "playNow": "Play Now",
+    "watchlist": "Watchlist",
+    "inWatchlist": "In Watchlist",
+    "trailer": "Trailer",
+    "status": "Status",
+    "releaseDate": "Release Date",
+    "runtime": "Runtime",
+    "seasons": "Seasons",
+    "language": "Original Language",
+    "voteCount": "Vote Count",
+    "budget": "Budget"
+  },
+  "search": {
+    "placeholder": "Search...",
+    "tvShow": "TV Show",
+    "movie": "Movie"
+  },
+  "watchlistPage": {
+    "title": "My Watchlist",
+    "empty": "Your watchlist is empty",
+    "browse": "Browse Movies"
+  },
+  "profile": {
+    "account": "Account",
+    "login": "Login",
+    "logout": "Logout",
+    "language": "Language",
+    "theme": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "footer": {
+    "rights": "© 2026 spacefeel. All rights reserved."
+  },
+  "notFound": {
+    "title": "This title doesn't exist in our universe",
+    "subtitle": "The page you're looking for has drifted into deep space.",
+    "back": "Back to Home"
+  },
+  "hero": {
+    "playNow": "Play Now",
+    "details": "Details"
+  },
+  "dropdown": {
+    "trendingMovies": "Trending Movies",
+    "popular": "Popular",
+    "upcoming": "Upcoming",
+    "nowPlaying": "Now Playing",
+    "topRated": "Top Rated",
+    "discover": "Discover",
+    "trendingShows": "Trending Shows",
+    "onTheAir": "On The Air",
+    "airingToday": "Airing Today",
+    "trendingAnime": "Trending Anime",
+    "upcomingSeason": "Upcoming Season",
+    "airingNow": "Airing Now",
+    "familyPicks": "Family Picks",
+    "newReleases": "New Releases",
+    "classics": "Classics",
+    "trendingMoviesDesc": "What everyone is watching",
+    "popularDesc": "Most popular right now",
+    "upcomingDesc": "Coming soon to theaters",
+    "nowPlayingDesc": "Currently in theaters",
+    "topRatedDesc": "Highest rated of all time",
+    "discoverDesc": "Explore all movies",
+    "trendingShowsDesc": "Most talked about series",
+    "popularShowsDesc": "Fan favorites right now",
+    "topRatedShowsDesc": "Critically acclaimed series",
+    "onTheAirDesc": "Currently broadcasting",
+    "airingTodayDesc": "Episodes airing today",
+    "discoverShowsDesc": "Explore all TV shows"
+  }
+}

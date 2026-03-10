@@ -4,10 +4,8 @@ import { useState } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { User } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { Movie, TVShow, Person } from '@/types/tmdb'
-
-const TABS = ['Overview', 'Cast', 'Details'] as const
-type Tab = typeof TABS[number]
 
 interface DetailTabsProps {
   item: Movie | TVShow
@@ -15,7 +13,12 @@ interface DetailTabsProps {
 }
 
 export default function DetailTabs({ item, cast }: DetailTabsProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('Overview')
+  const t = useTranslations('detail')
+
+  const TABS = [t('overview'), t('cast'), t('details')] as const
+  type Tab = typeof TABS[number]
+
+  const [activeTab, setActiveTab] = useState<Tab>(TABS[0])
 
   const releaseDate = 'release_date' in item ? item.release_date : item.first_air_date
   const runtime = 'runtime' in item ? item.runtime : undefined
@@ -29,11 +32,18 @@ export default function DetailTabs({ item, cast }: DetailTabsProps) {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-xl text-sm font-medium transition-colors ${
+            className="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
+            style={
               activeTab === tab
-                ? 'bg-white text-black'
-                : 'text-white/50 hover:text-white hover:bg-white/[0.08]'
-            }`}
+                ? { backgroundColor: 'var(--color-text)', color: 'var(--color-bg)' }
+                : { color: 'var(--color-text-muted)' }
+            }
+            onMouseEnter={(e) => {
+              if (activeTab !== tab) e.currentTarget.style.backgroundColor = 'var(--color-overlay)'
+            }}
+            onMouseLeave={(e) => {
+              if (activeTab !== tab) e.currentTarget.style.backgroundColor = ''
+            }}
           >
             {tab}
           </button>
@@ -49,11 +59,11 @@ export default function DetailTabs({ item, cast }: DetailTabsProps) {
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.2 }}
         >
-          {activeTab === 'Overview' && (
+          {activeTab === TABS[0] && (
             <p className="text-[var(--text-muted)] leading-relaxed">{item.overview}</p>
           )}
 
-          {activeTab === 'Cast' && (
+          {activeTab === TABS[1] && (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
               {cast.slice(0, 12).map((person) => (
                 <div key={`${person.id}-${person.character}`} className="flex items-center gap-3">
@@ -66,60 +76,60 @@ export default function DetailTabs({ item, cast }: DetailTabsProps) {
                       alt={person.name}
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full bg-white/10 flex-shrink-0 flex items-center justify-center">
-                      <User size={20} className="text-white/30" />
+                    <div className="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center" style={{ backgroundColor: 'var(--color-overlay)' }}>
+                      <User size={20} style={{ color: 'var(--color-text-subtle)' }} />
                     </div>
                   )}
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-white truncate">{person.name}</p>
-                    <p className="text-xs text-white/50 truncate">{person.character}</p>
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>{person.name}</p>
+                    <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>{person.character}</p>
                   </div>
                 </div>
               ))}
             </div>
           )}
 
-          {activeTab === 'Details' && (
+          {activeTab === TABS[2] && (
             <div className="grid grid-cols-2 gap-4 text-sm">
               {item.status && (
                 <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Status</p>
-                  <p className="text-white">{item.status}</p>
+                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-subtle)' }}>{t('status')}</p>
+                  <p style={{ color: 'var(--color-text)' }}>{item.status}</p>
                 </div>
               )}
               {releaseDate && (
                 <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Release Date</p>
-                  <p className="text-white">{releaseDate}</p>
+                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-subtle)' }}>{t('releaseDate')}</p>
+                  <p style={{ color: 'var(--color-text)' }}>{releaseDate}</p>
                 </div>
               )}
               {runtime ? (
                 <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Runtime</p>
-                  <p className="text-white">{runtime} min</p>
+                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-subtle)' }}>{t('runtime')}</p>
+                  <p style={{ color: 'var(--color-text)' }}>{runtime} min</p>
                 </div>
               ) : seasons ? (
                 <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Seasons</p>
-                  <p className="text-white">{seasons} season{seasons !== 1 ? 's' : ''}</p>
+                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-subtle)' }}>{t('seasons')}</p>
+                  <p style={{ color: 'var(--color-text)' }}>{seasons} season{seasons !== 1 ? 's' : ''}</p>
                 </div>
               ) : null}
               {item.original_language && (
                 <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Original Language</p>
-                  <p className="text-white uppercase">{item.original_language}</p>
+                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-subtle)' }}>{t('language')}</p>
+                  <p className="uppercase" style={{ color: 'var(--color-text)' }}>{item.original_language}</p>
                 </div>
               )}
               {item.vote_count > 0 && (
                 <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Vote Count</p>
-                  <p className="text-white">{item.vote_count.toLocaleString()}</p>
+                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-subtle)' }}>{t('voteCount')}</p>
+                  <p style={{ color: 'var(--color-text)' }}>{item.vote_count.toLocaleString()}</p>
                 </div>
               )}
               {item.budget && item.budget > 0 ? (
                 <div>
-                  <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Budget</p>
-                  <p className="text-white">${item.budget.toLocaleString()}</p>
+                  <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-subtle)' }}>{t('budget')}</p>
+                  <p style={{ color: 'var(--color-text)' }}>${item.budget.toLocaleString()}</p>
                 </div>
               ) : null}
             </div>

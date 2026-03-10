@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "movies": "Films",
+    "tvShows": "Séries",
+    "anime": "Anime",
+    "cartoons": "Dessins animés",
+    "watchlist": "Ma liste"
+  },
+  "home": {
+    "trendingMovies": "Films tendance",
+    "popularTVShows": "Séries populaires",
+    "topRatedMovies": "Films les mieux notés",
+    "trendingAnime": "Anime tendance",
+    "airingToday": "Diffusé aujourd'hui",
+    "topRatedAnime": "Anime les mieux notés",
+    "familyCartoons": "Dessins animés familiaux",
+    "viewAll": "Tout voir"
+  },
+  "detail": {
+    "overview": "Synopsis",
+    "cast": "Distribution",
+    "details": "Détails",
+    "playNow": "Regarder",
+    "watchlist": "Ma liste",
+    "inWatchlist": "Dans ma liste",
+    "trailer": "Bande-annonce",
+    "status": "Statut",
+    "releaseDate": "Date de sortie",
+    "runtime": "Durée",
+    "seasons": "Saisons",
+    "language": "Langue originale",
+    "voteCount": "Votes",
+    "budget": "Budget"
+  },
+  "search": {
+    "placeholder": "Rechercher...",
+    "tvShow": "Série",
+    "movie": "Film"
+  },
+  "watchlistPage": {
+    "title": "Ma liste",
+    "empty": "Votre liste est vide",
+    "browse": "Parcourir les films"
+  },
+  "profile": {
+    "account": "Compte",
+    "login": "Connexion",
+    "logout": "Déconnexion",
+    "language": "Langue",
+    "theme": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système"
+  },
+  "footer": {
+    "rights": "© 2026 spacefeel. Tous droits réservés."
+  },
+  "notFound": {
+    "title": "Ce titre n'existe pas dans notre univers",
+    "subtitle": "La page que vous cherchez a dérivé dans l'espace.",
+    "back": "Retour à l'accueil"
+  },
+  "hero": {
+    "playNow": "Regarder",
+    "details": "Détails"
+  },
+  "dropdown": {
+    "trendingMovies": "Films tendance",
+    "popular": "Populaire",
+    "upcoming": "À venir",
+    "nowPlaying": "En salle",
+    "topRated": "Les mieux notés",
+    "discover": "Découvrir",
+    "trendingShows": "Séries tendance",
+    "onTheAir": "En diffusion",
+    "airingToday": "Aujourd'hui",
+    "trendingAnime": "Anime tendance",
+    "upcomingSeason": "Nouvelle saison",
+    "airingNow": "Diffusé maintenant",
+    "familyPicks": "En famille",
+    "newReleases": "Nouveautés",
+    "classics": "Classiques",
+    "trendingMoviesDesc": "Ce que tout le monde regarde",
+    "popularDesc": "Le plus populaire en ce moment",
+    "upcomingDesc": "Bientôt au cinéma",
+    "nowPlayingDesc": "Actuellement au cinéma",
+    "topRatedDesc": "Les mieux notés de tous les temps",
+    "discoverDesc": "Explorer tous les films",
+    "trendingShowsDesc": "Les séries les plus discutées",
+    "popularShowsDesc": "Les favorites des fans",
+    "topRatedShowsDesc": "Séries acclamées par la critique",
+    "onTheAirDesc": "Actuellement en diffusion",
+    "airingTodayDesc": "Épisodes diffusés aujourd'hui",
+    "discoverShowsDesc": "Explorer toutes les séries"
+  }
+}

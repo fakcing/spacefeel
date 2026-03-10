@@ -3,18 +3,20 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Bookmark } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { useWatchlistStore } from '@/store/watchlistStore'
 import MediaCard from '@/components/cards/MediaCard'
 import { Movie, TVShow } from '@/types/tmdb'
 
 export default function WatchlistPage() {
   const { items } = useWatchlistStore()
+  const t = useTranslations('watchlistPage')
 
   return (
     <div className="min-h-screen pt-20 px-4 md:px-8 max-w-7xl mx-auto">
       <div className="flex items-center gap-3 mb-8">
         <Bookmark size={28} />
-        <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">My Watchlist</h1>
+        <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">{t('title')}</h1>
       </div>
 
       {items.length === 0 ? (
@@ -25,7 +27,7 @@ export default function WatchlistPage() {
           >
             <Bookmark size={96} className="text-[var(--text-muted)] opacity-20 mb-6" />
           </motion.div>
-          <h2 className="text-xl font-semibold text-[var(--text-muted)] mb-2">Your watchlist is empty</h2>
+          <h2 className="text-xl font-semibold text-[var(--text-muted)] mb-2">{t('empty')}</h2>
           <p className="text-sm text-[var(--text-muted)] mb-8 opacity-60">
             Start adding movies and shows you want to watch
           </p>
@@ -33,7 +35,7 @@ export default function WatchlistPage() {
             href="/movies"
             className="bg-white text-black font-semibold rounded-full px-8 py-3 hover:bg-white/90 transition-colors"
           >
-            Browse Movies
+            {t('browse')}
           </Link>
         </div>
       ) : (

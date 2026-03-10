@@ -1,0 +1,97 @@
+{
+  "nav": {
+    "home": "Главная",
+    "movies": "Фильмы",
+    "tvShows": "Сериалы",
+    "anime": "Аниме",
+    "cartoons": "Мультфильмы",
+    "watchlist": "Список"
+  },
+  "home": {
+    "trendingMovies": "В тренде",
+    "popularTVShows": "Популярные сериалы",
+    "topRatedMovies": "Топ фильмов",
+    "trendingAnime": "Популярное аниме",
+    "airingToday": "Сегодня в эфире",
+    "topRatedAnime": "Топ аниме",
+    "familyCartoons": "Семейные мультфильмы",
+    "viewAll": "Все"
+  },
+  "detail": {
+    "overview": "Описание",
+    "cast": "Актёры",
+    "details": "Детали",
+    "playNow": "Смотреть",
+    "watchlist": "В список",
+    "inWatchlist": "В списке",
+    "trailer": "Трейлер",
+    "status": "Статус",
+    "releaseDate": "Дата выхода",
+    "runtime": "Длительность",
+    "seasons": "Сезонов",
+    "language": "Язык оригинала",
+    "voteCount": "Оценок",
+    "budget": "Бюджет"
+  },
+  "search": {
+    "placeholder": "Поиск...",
+    "tvShow": "Сериал",
+    "movie": "Фильм"
+  },
+  "watchlistPage": {
+    "title": "Мой список",
+    "empty": "Ваш список пуст",
+    "browse": "Смотреть фильмы"
+  },
+  "profile": {
+    "account": "Аккаунт",
+    "login": "Войти",
+    "logout": "Выйти",
+    "language": "Язык",
+    "theme": "Тема",
+    "light": "Светлая",
+    "dark": "Тёмная",
+    "system": "Системная"
+  },
+  "footer": {
+    "rights": "© 2026 spacefeel. Все права защищены."
+  },
+  "notFound": {
+    "title": "Этого тайтла не существует в нашей вселенной",
+    "subtitle": "Страница, которую вы ищете, затерялась в открытом космосе.",
+    "back": "На главную"
+  },
+  "hero": {
+    "playNow": "Смотреть",
+    "details": "Подробнее"
+  },
+  "dropdown": {
+    "trendingMovies": "В тренде",
+    "popular": "Популярное",
+    "upcoming": "Скоро",
+    "nowPlaying": "Сейчас в кино",
+    "topRated": "Топ рейтинга",
+    "discover": "Открыть",
+    "trendingShows": "Сериалы в тренде",
+    "onTheAir": "В эфире",
+    "airingToday": "Сегодня",
+    "trendingAnime": "Аниме в тренде",
+    "upcomingSeason": "Новый сезон",
+    "airingNow": "Сейчас идёт",
+    "familyPicks": "Для семьи",
+    "newReleases": "Новинки",
+    "classics": "Классика",
+    "trendingMoviesDesc": "Все смотрят это",
+    "popularDesc": "Самое популярное сейчас",
+    "upcomingDesc": "Скоро в кинотеатрах",
+    "nowPlayingDesc": "Сейчас в кинотеатрах",
+    "topRatedDesc": "Лучшие за всё время",
+    "discoverDesc": "Все фильмы",
+    "trendingShowsDesc": "Самые обсуждаемые сериалы",
+    "popularShowsDesc": "Любимые сериалы прямо сейчас",
+    "topRatedShowsDesc": "Признанные критиками сериалы",
+    "onTheAirDesc": "Сейчас в эфире",
+    "airingTodayDesc": "Эпизоды сегодня",
+    "discoverShowsDesc": "Все сериалы"
+  }
+}
