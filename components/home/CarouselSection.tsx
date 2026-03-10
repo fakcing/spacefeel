@@ -25,7 +25,8 @@ export default function CarouselSection({
   const trackRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const totalCards = items.length
-  const maxIndex = Math.max(0, totalCards - 6)
+  const visibleCount = 6
+  const maxIndex = Math.max(0, totalCards - visibleCount)
   const t = useTranslations('home')
 
   const scrollNext = () => {
@@ -64,7 +65,7 @@ export default function CarouselSection({
 
         {/* Right: page counter + arrows */}
         <div className="flex items-center gap-2">
-          <span className="text-sm mr-1" style={{ color: 'var(--color-text-subtle)' }}>
+          <span className="text-sm text-[var(--color-text-muted)]">
             {currentIndex + 1} / {totalCards}
           </span>
           <button

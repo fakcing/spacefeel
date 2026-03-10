@@ -1,9 +1,7 @@
 export default function Loading() {
   return (
     <div className="min-h-screen">
-      {/* Backdrop skeleton */}
       <div className="relative w-full h-[56vw] max-h-[600px] shimmer" />
-      {/* Content skeleton */}
       <div className="max-w-7xl mx-auto px-4 md:px-8 -mt-32 relative z-10 pb-16">
         <div className="flex gap-8">
           <div className="hidden md:block w-52 flex-shrink-0 aspect-[2/3] rounded-2xl shimmer" />
