@@ -4,6 +4,8 @@ import { persist } from 'zustand/middleware'
 interface SettingsStore {
   language: string
   setLanguage: (language: string) => void
+  isLoggedIn: boolean
+  setIsLoggedIn: (v: boolean) => void
 }
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -11,6 +13,8 @@ export const useSettingsStore = create<SettingsStore>()(
     (set) => ({
       language: 'English',
       setLanguage: (language) => set({ language }),
+      isLoggedIn: false,
+      setIsLoggedIn: (v) => set({ isLoggedIn: v }),
     }),
     { name: 'spacefeel-settings' }
   )

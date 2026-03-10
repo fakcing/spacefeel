@@ -1,13 +1,13 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   House, Film, Tv2, Sword, Wand2, Bookmark, Search, ChevronDown,
   TrendingUp, Heart, Calendar, Play, Star, Compass, Radio,
-  Sparkles, Clock, Users, X,
+  Sparkles, Clock, Users,
 } from 'lucide-react'
 import ProfileDropdown from '@/components/ui/ProfileDropdown'
 
@@ -93,10 +93,8 @@ export default function Navbar() {
   const pathname = usePathname()
   const router = useRouter()
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
-  const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const handleMouseEnter = (label: string) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
@@ -107,37 +105,20 @@ export default function Navbar() {
     timeoutRef.current = setTimeout(() => setActiveDropdown(null), 150)
   }
 
-  const openSearch = () => {
-    setSearchOpen(true)
-    setTimeout(() => searchInputRef.current?.focus(), 50)
-  }
-
-  const closeSearch = () => {
-    setSearchOpen(false)
-    setSearchQuery('')
-  }
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
-      closeSearch()
-    }
-  }
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') closeSearch() }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [])
-
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 h-14 bg-[var(--bg-primary)] border-b border-[var(--border)]">
       <div className="max-w-7xl mx-auto px-4 md:px-8 h-full flex items-center justify-between">
 
         {/* Logo */}
-        <Link href="/" className="font-semibold tracking-tight text-lg flex-shrink-0">
-          <span className="text-white">space</span><span className="text-white/50">feel</span>
+        <Link href="/" className="flex items-center gap-2 select-none flex-shrink-0">
+          <motion.span
+            className="text-xl font-bold tracking-tighter"
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+          >
+            <span className="text-white">space</span>
+            <span className="text-white/40">feel</span>
+          </motion.span>
         </Link>
 
         {/* Nav links */}
@@ -176,57 +157,36 @@ export default function Navbar() {
           })}
         </div>
 
-        {/* Right: search + watchlist + profile */}
+        {/* Right: search bar + watchlist + profile */}
         <div className="flex items-center gap-2">
-          {/* Search */}
-          <form onSubmit={handleSearchSubmit} className="flex items-center">
-            <AnimatePresence mode="wait">
-              {searchOpen ? (
-                <motion.div
-                  key="search-open"
-                  initial={{ width: 32, opacity: 0 }}
-                  animate={{ width: 224, opacity: 1 }}
-                  exit={{ width: 32, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  className="flex items-center bg-white/10 border border-white/15 rounded-full px-3 overflow-hidden"
-                >
-                  <Search size={14} className="text-white/40 flex-shrink-0" />
-                  <input
-                    ref={searchInputRef}
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search..."
-                    className="flex-1 bg-transparent text-sm text-white placeholder-white/30 outline-none px-2 py-1.5"
-                  />
-                  <button type="button" onClick={closeSearch} className="text-white/40 hover:text-white flex-shrink-0">
-                    <X size={14} />
-                  </button>
-                </motion.div>
-              ) : (
-                <motion.button
-                  key="search-closed"
-                  type="button"
-                  onClick={openSearch}
-                  className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
-                  aria-label="Search"
-                >
-                  <Search size={18} />
-                </motion.button>
-              )}
-            </AnimatePresence>
-          </form>
+          {/* Search input bar */}
+          <div className="flex items-center bg-white/5 border border-white/10 rounded-xl px-3 py-2 gap-2 w-48 md:w-64 h-9">
+            <Search size={14} className="text-white/40 flex-shrink-0" />
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="bg-transparent text-sm text-white placeholder:text-white/30 outline-none w-full"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchQuery.trim()) {
+                  router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+                  setSearchQuery('')
+                }
+              }}
+            />
+          </div>
 
-          {/* Watchlist */}
+          {/* Watchlist icon button */}
           <Link
             href="/watchlist"
-            className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+            className="w-9 h-9 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
             aria-label="Watchlist"
           >
-            <Bookmark size={18} />
+            <Bookmark size={16} className="text-white/70" />
           </Link>
 
-          {/* Profile */}
+          {/* Profile icon button */}
           <ProfileDropdown />
         </div>
       </div>

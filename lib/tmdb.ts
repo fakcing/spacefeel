@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { Movie, TVShow, Credits, Video, TMDBResponse } from '@/types/tmdb'
 
 const BASE_URL = 'https://api.themoviedb.org/3'
@@ -21,67 +22,67 @@ async function tmdbFetch<T>(endpoint: string, params: Record<string, string> = {
   return res.json()
 }
 
-export async function fetchTrending(type: 'movie' | 'tv' | 'all' = 'all', page = 1): Promise<TMDBResponse<Movie | TVShow>> {
+export const fetchTrending = cache(async (type: 'movie' | 'tv' | 'all' = 'all', page = 1): Promise<TMDBResponse<Movie | TVShow>> => {
   return tmdbFetch<TMDBResponse<Movie | TVShow>>(`/trending/${type}/week`, { page: String(page) })
-}
+})
 
-export async function fetchPopular(type: 'movie' | 'tv', page = 1): Promise<TMDBResponse<Movie | TVShow>> {
+export const fetchPopular = cache(async (type: 'movie' | 'tv', page = 1): Promise<TMDBResponse<Movie | TVShow>> => {
   return tmdbFetch<TMDBResponse<Movie | TVShow>>(`/${type}/popular`, { page: String(page) })
-}
+})
 
-export async function fetchTopRated(type: 'movie' | 'tv', page = 1): Promise<TMDBResponse<Movie | TVShow>> {
+export const fetchTopRated = cache(async (type: 'movie' | 'tv', page = 1): Promise<TMDBResponse<Movie | TVShow>> => {
   return tmdbFetch<TMDBResponse<Movie | TVShow>>(`/${type}/top_rated`, { page: String(page) })
-}
+})
 
-export async function fetchUpcoming(page = 1): Promise<TMDBResponse<Movie>> {
+export const fetchUpcoming = cache(async (page = 1): Promise<TMDBResponse<Movie>> => {
   return tmdbFetch<TMDBResponse<Movie>>('/movie/upcoming', { page: String(page) })
-}
+})
 
-export async function fetchNowPlaying(page = 1): Promise<TMDBResponse<Movie>> {
+export const fetchNowPlaying = cache(async (page = 1): Promise<TMDBResponse<Movie>> => {
   return tmdbFetch<TMDBResponse<Movie>>('/movie/now_playing', { page: String(page) })
-}
+})
 
-export async function fetchAiringToday(page = 1): Promise<TMDBResponse<TVShow>> {
+export const fetchAiringToday = cache(async (page = 1): Promise<TMDBResponse<TVShow>> => {
   return tmdbFetch<TMDBResponse<TVShow>>('/tv/airing_today', { page: String(page) })
-}
+})
 
-export async function fetchOnTheAir(page = 1): Promise<TMDBResponse<TVShow>> {
+export const fetchOnTheAir = cache(async (page = 1): Promise<TMDBResponse<TVShow>> => {
   return tmdbFetch<TMDBResponse<TVShow>>('/tv/on_the_air', { page: String(page) })
-}
+})
 
-export async function fetchMovieDetail(id: number): Promise<Movie> {
+export const fetchMovieDetail = cache(async (id: number): Promise<Movie> => {
   return tmdbFetch<Movie>(`/movie/${id}`)
-}
+})
 
-export async function fetchTVDetail(id: number): Promise<TVShow> {
+export const fetchTVDetail = cache(async (id: number): Promise<TVShow> => {
   return tmdbFetch<TVShow>(`/tv/${id}`)
-}
+})
 
-export async function fetchCredits(type: 'movie' | 'tv', id: number): Promise<Credits> {
+export const fetchCredits = cache(async (type: 'movie' | 'tv', id: number): Promise<Credits> => {
   return tmdbFetch<Credits>(`/${type}/${id}/credits`)
-}
+})
 
-export async function fetchVideos(type: 'movie' | 'tv', id: number): Promise<{ results: Video[] }> {
+export const fetchVideos = cache(async (type: 'movie' | 'tv', id: number): Promise<{ results: Video[] }> => {
   return tmdbFetch<{ results: Video[] }>(`/${type}/${id}/videos`)
-}
+})
 
-export async function fetchSimilar(type: 'movie' | 'tv', id: number): Promise<TMDBResponse<Movie | TVShow>> {
+export const fetchSimilar = cache(async (type: 'movie' | 'tv', id: number): Promise<TMDBResponse<Movie | TVShow>> => {
   return tmdbFetch<TMDBResponse<Movie | TVShow>>(`/${type}/${id}/similar`)
-}
+})
 
-export async function fetchDiscover(type: 'movie' | 'tv', params: Record<string, string> = {}): Promise<TMDBResponse<Movie | TVShow>> {
+export const fetchDiscover = cache(async (type: 'movie' | 'tv', params: Record<string, string> = {}): Promise<TMDBResponse<Movie | TVShow>> => {
   return tmdbFetch<TMDBResponse<Movie | TVShow>>(`/discover/${type}`, params)
-}
+})
 
-export async function fetchSearch(query: string, page = 1): Promise<TMDBResponse<(Movie | TVShow) & { media_type?: string }>> {
+export const fetchSearch = cache(async (query: string, page = 1): Promise<TMDBResponse<(Movie | TVShow) & { media_type?: string }>> => {
   return tmdbFetch<TMDBResponse<(Movie | TVShow) & { media_type?: string }>>('/search/multi', {
     query,
     page: String(page),
   })
-}
+})
 
 // Anime: always enforces animation genre + anime keyword — never mixes in other content
-export async function fetchAnime(category = 'trending', page = 1): Promise<TMDBResponse<TVShow>> {
+export const fetchAnime = cache(async (category = 'trending', page = 1): Promise<TMDBResponse<TVShow>> => {
   const base: Record<string, string> = {
     with_genres: '16',
     with_keywords: '210024',
@@ -102,10 +103,10 @@ export async function fetchAnime(category = 'trending', page = 1): Promise<TMDBR
     default:
       return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
   }
-}
+})
 
 // Cartoons: always enforces animation + family genre + English origin — excludes anime
-export async function fetchCartoons(category = 'trending', page = 1): Promise<TMDBResponse<TVShow>> {
+export const fetchCartoons = cache(async (category = 'trending', page = 1): Promise<TMDBResponse<TVShow>> => {
   const base: Record<string, string> = {
     with_genres: '16,10751',
     with_original_language: 'en',
@@ -128,4 +129,4 @@ export async function fetchCartoons(category = 'trending', page = 1): Promise<TM
     default:
       return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
   }
-}
+})
