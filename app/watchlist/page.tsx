@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Bookmark } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { useWatchlistStore } from '@/store/watchlistStore'
 import { WatchlistItem } from '@/types/tmdb'
 import MediaCard from '@/components/cards/MediaCard'
@@ -17,6 +17,7 @@ interface EnrichedItem extends WatchlistItem {
 export default function WatchlistPage() {
   const { items } = useWatchlistStore()
   const t = useTranslations('watchlistPage')
+  const locale = useLocale()
   const [enriched, setEnriched] = useState<EnrichedItem[]>([])
 
   useEffect(() => {
@@ -24,12 +25,12 @@ export default function WatchlistPage() {
     Promise.all(
       items.map(async (item) => {
         const data = await fetch(
-          `/api/media-detail?id=${item.id}&type=${item.media_type}`
+          `/api/media-detail?id=${item.id}&type=${item.media_type}&locale=${locale}`
         ).then(r => r.json())
         return { ...item, title: data.title || '' }
       })
     ).then(setEnriched)
-  }, [items])
+  }, [items, locale])
 
   return (
     <div className="min-h-screen pt-20 px-4 md:px-8 max-w-7xl mx-auto">

@@ -48,7 +48,7 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
   }
 
   const backdrop = getBackdrop(item.backdrop_path)
-  const poster = getPoster(item.poster_path)
+  const poster = getPoster(item.poster_path, 'w342')
 
   return (
     <>

@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { Person } from '@/types/tmdb'
-import { getPoster } from '@/lib/tmdbImages'
+import { getAvatar } from '@/lib/tmdbImages'
 
 interface CastRowProps {
   cast: Person[]
@@ -12,7 +12,7 @@ export default function CastRow({ cast }: CastRowProps) {
       <h2 className="text-xl font-semibold tracking-tight mb-4 text-[var(--text-primary)]">Cast</h2>
       <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
         {cast.slice(0, 24).map((person) => {
-          const photo = getPoster(person.profile_path, 'w185')
+          const photo = getAvatar(person.profile_path)
           return (
             <div key={`${person.id}-${person.character}`} className="flex-shrink-0 text-center w-16">
               <div className="relative w-16 h-16 rounded-full overflow-hidden mb-2 group">
@@ -23,6 +23,7 @@ export default function CastRow({ cast }: CastRowProps) {
                     fill
                     className="object-cover"
                     sizes="64px"
+                    loading="lazy"
                   />
                 ) : (
                   <div className="w-full h-full bg-white/10" />

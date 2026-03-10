@@ -98,8 +98,12 @@ export default function HeroBanner({ movies }: HeroBannerProps) {
               animate={{ clipPath: 'inset(0% 0 0 0)' }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.6 }}
+              style={{ overflow: 'visible' }}
             >
-              <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-white mb-4 drop-shadow-2xl">
+              <h1
+                className="text-5xl md:text-6xl font-bold tracking-tight text-white mb-4 drop-shadow-2xl"
+                style={{ lineHeight: '1.15', paddingBottom: '0.1em', overflow: 'visible' }}
+              >
                 {movie.title}
               </h1>
             </motion.div>

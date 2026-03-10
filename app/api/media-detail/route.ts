@@ -5,8 +5,9 @@ import { getTmdbLanguage } from '@/lib/tmdbLanguage'
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get('id')
   const type = req.nextUrl.searchParams.get('type')
+  const localeParam = req.nextUrl.searchParams.get('locale')
   const cookieStore = cookies()
-  const locale = cookieStore.get('locale')?.value ?? 'en'
+  const locale = localeParam || cookieStore.get('locale')?.value || 'en'
   const language = getTmdbLanguage(locale)
 
   const res = await fetch(
