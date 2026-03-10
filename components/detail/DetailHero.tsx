@@ -31,18 +31,23 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
     release_date: ('release_date' in item ? item.release_date : item.first_air_date) || '',
   }
 
+  const backdrop = getBackdrop(item.backdrop_path)
+  const poster = getPoster(item.poster_path)
+
   return (
     <>
       {/* Backdrop */}
       <div className="relative w-full h-[65vh] overflow-hidden">
-        <Image
-          src={getBackdrop(item.backdrop_path)}
-          alt={title || ''}
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
+        {backdrop && (
+          <Image
+            src={backdrop}
+            alt={title || ''}
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
       </div>
@@ -51,13 +56,15 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
       <div className="max-w-7xl mx-auto px-4 md:px-12 -mt-24 relative z-10 flex gap-8 items-end pb-8">
         <div className="hidden sm:block flex-shrink-0 w-40 rounded-2xl overflow-hidden shadow-2xl">
           <div className="relative aspect-[2/3]">
-            <Image
-              src={getPoster(item.poster_path)}
-              alt={title || ''}
-              fill
-              className="object-cover"
-              sizes="160px"
-            />
+            {poster && (
+              <Image
+                src={poster}
+                alt={title || ''}
+                fill
+                className="object-cover"
+                sizes="160px"
+              />
+            )}
           </div>
         </div>
         <div className="flex-1 min-w-0 pb-2">

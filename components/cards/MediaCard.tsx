@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
+import { Film } from 'lucide-react'
 import { Movie, TVShow, WatchlistItem } from '@/types/tmdb'
 import { getPoster } from '@/lib/tmdb'
 
@@ -31,26 +32,24 @@ export default function MediaCard({ item, mediaType }: MediaCardProps) {
     <Link href={`/${mediaType}/${item.id}`}>
       <div className="group cursor-pointer">
         <div className="relative w-full aspect-[2/3] rounded-xl overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-[1.03] group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
-          <Image
-            src={poster}
-            alt={title || 'Media'}
-            fill
-            className="object-cover"
-            sizes="180px"
-          />
+          {poster ? (
+            <Image src={poster} fill className="object-cover" alt={title || 'Media'} sizes="180px" />
+          ) : (
+            <div className="w-full h-full bg-white/[0.08] flex items-center justify-center">
+              <Film size={32} className="text-white/20" />
+            </div>
+          )}
 
           {/* Always-visible bottom gradient */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
 
-          {/* Rating pill — bottom left, above title */}
-          <div className="absolute bottom-10 left-2 bg-black/70 backdrop-blur-sm rounded-full px-2.5 py-1 text-xs font-semibold text-white">
-            {item.vote_average > 0 ? item.vote_average.toFixed(1) : 'N/A'}
-          </div>
-
-          {/* Title + year — inside image at bottom */}
-          <div className="absolute bottom-2 left-2 right-2">
+          {/* Rating + title + year — inside image at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 p-2">
+            <div className="inline-flex items-center bg-black/70 backdrop-blur-sm rounded-full px-2 py-0.5 text-xs font-semibold text-white mb-1">
+              {item.vote_average > 0 ? item.vote_average.toFixed(1) : 'N/A'}
+            </div>
             <p className="text-sm font-semibold text-white truncate leading-tight">{title}</p>
-            <p className="text-xs text-white/60 mt-0.5">{year}</p>
+            <p className="text-xs text-white/60">{year}</p>
           </div>
 
           {/* Bookmark button — top right */}

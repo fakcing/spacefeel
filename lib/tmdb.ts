@@ -6,11 +6,11 @@ const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
 
 export const IMG_BASE = 'https://image.tmdb.org/t/p'
 
-export const getPoster = (path: string | null, size = 'w500'): string =>
-  path ? `${IMG_BASE}/${size}${path}` : '/placeholder.jpg'
+export const getPoster = (path: string | null, size = 'w500'): string | null =>
+  path ? `${IMG_BASE}/${size}${path}` : null
 
-export const getBackdrop = (path: string | null, size = 'w1280'): string =>
-  path ? `${IMG_BASE}/${size}${path}` : '/placeholder-backdrop.jpg'
+export const getBackdrop = (path: string | null, size = 'w1280'): string | null =>
+  path ? `${IMG_BASE}/${size}${path}` : null
 
 async function tmdbFetch<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
   const url = new URL(`${BASE_URL}${endpoint}`)

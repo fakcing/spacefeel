@@ -14,8 +14,7 @@ interface CarouselSectionProps {
   viewAllHref?: string
 }
 
-const CARD_WIDTH = 192 // 180px card + 12px gap (gap-3)
-const VISIBLE_CARDS = 5
+const CARD_WIDTH = 180 + 12 // card width + gap-3
 
 export default function CarouselSection({
   title,
@@ -25,17 +24,20 @@ export default function CarouselSection({
   viewAllHref,
 }: CarouselSectionProps) {
   const scrollRef = useRef<HTMLDivElement>(null)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentIndex, setCurrentIndex] = useState(0)
 
-  const totalPages = Math.max(1, Math.ceil(items.length / VISIBLE_CARDS))
+  const maxIndex = Math.max(0, items.length - 5)
 
-  const scroll = (amount: number) => {
-    scrollRef.current?.scrollBy({ left: amount, behavior: 'smooth' })
+  const scrollNext = () => {
+    const next = Math.min(currentIndex + 1, maxIndex)
+    setCurrentIndex(next)
+    scrollRef.current?.scrollTo({ left: next * CARD_WIDTH, behavior: 'smooth' })
   }
 
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    const el = e.currentTarget
-    setCurrentPage(Math.round(el.scrollLeft / CARD_WIDTH) + 1)
+  const scrollPrev = () => {
+    const prev = Math.max(currentIndex - 1, 0)
+    setCurrentIndex(prev)
+    scrollRef.current?.scrollTo({ left: prev * CARD_WIDTH, behavior: 'smooth' })
   }
 
   return (
@@ -62,17 +64,17 @@ export default function CarouselSection({
         {/* Right: page counter + arrows */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-white/40 mr-1">
-            {currentPage} / {totalPages}
+            {currentIndex + 1} / {items.length - 4}
           </span>
           <button
-            onClick={() => scroll(-320)}
+            onClick={scrollPrev}
             className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.15] flex items-center justify-center transition-colors"
             aria-label="Scroll left"
           >
             <ChevronLeft size={16} />
           </button>
           <button
-            onClick={() => scroll(320)}
+            onClick={scrollNext}
             className="w-8 h-8 rounded-full bg-white/[0.08] hover:bg-white/[0.15] flex items-center justify-center transition-colors"
             aria-label="Scroll right"
           >
@@ -83,11 +85,10 @@ export default function CarouselSection({
 
       <div
         ref={scrollRef}
-        onScroll={handleScroll}
         className="flex gap-3 overflow-x-auto scroll-smooth scrollbar-hide pb-2"
       >
         {items.map((item) => (
-          <div key={item.id} className="min-w-[160px] md:min-w-[180px] flex-shrink-0">
+          <div key={item.id} className="min-w-[calc(20%-10px)] w-[calc(20%-10px)] flex-shrink-0 flex-grow-0">
             <MediaCard item={item} mediaType={mediaType} />
           </div>
         ))}
