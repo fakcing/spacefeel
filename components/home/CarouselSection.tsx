@@ -66,7 +66,7 @@ export default function CarouselSection({
         {/* Right: page counter + arrows */}
         <div className="flex items-center gap-2">
           <span className="text-sm text-[var(--color-text-muted)]">
-            {currentIndex + 1} / {totalCards}
+            {currentIndex + 1} / {maxIndex + 1}
           </span>
           <button
             onClick={scrollPrev}
