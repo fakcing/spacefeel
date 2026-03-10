@@ -1,0 +1,131 @@
+import { Movie, TVShow, Credits, Video, TMDBResponse } from '@/types/tmdb'
+
+const BASE_URL = 'https://api.themoviedb.org/3'
+const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
+
+export const IMG_BASE = 'https://image.tmdb.org/t/p'
+
+export const getPoster = (path: string | null, size = 'w500'): string =>
+  path ? `${IMG_BASE}/${size}${path}` : '/placeholder.jpg'
+
+export const getBackdrop = (path: string | null, size = 'w1280'): string =>
+  path ? `${IMG_BASE}/${size}${path}` : '/placeholder-backdrop.jpg'
+
+async function tmdbFetch<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
+  const url = new URL(`${BASE_URL}${endpoint}`)
+  url.searchParams.set('api_key', API_KEY || '')
+  url.searchParams.set('language', 'en-US')
+  Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))
+  const res = await fetch(url.toString(), { next: { revalidate: 3600 } })
+  if (!res.ok) throw new Error(`TMDB error: ${res.status}`)
+  return res.json()
+}
+
+export async function fetchTrending(type: 'movie' | 'tv' | 'all' = 'all', page = 1): Promise<TMDBResponse<Movie | TVShow>> {
+  return tmdbFetch<TMDBResponse<Movie | TVShow>>(`/trending/${type}/week`, { page: String(page) })
+}
+
+export async function fetchPopular(type: 'movie' | 'tv', page = 1): Promise<TMDBResponse<Movie | TVShow>> {
+  return tmdbFetch<TMDBResponse<Movie | TVShow>>(`/${type}/popular`, { page: String(page) })
+}
+
+export async function fetchTopRated(type: 'movie' | 'tv', page = 1): Promise<TMDBResponse<Movie | TVShow>> {
+  return tmdbFetch<TMDBResponse<Movie | TVShow>>(`/${type}/top_rated`, { page: String(page) })
+}
+
+export async function fetchUpcoming(page = 1): Promise<TMDBResponse<Movie>> {
+  return tmdbFetch<TMDBResponse<Movie>>('/movie/upcoming', { page: String(page) })
+}
+
+export async function fetchNowPlaying(page = 1): Promise<TMDBResponse<Movie>> {
+  return tmdbFetch<TMDBResponse<Movie>>('/movie/now_playing', { page: String(page) })
+}
+
+export async function fetchAiringToday(page = 1): Promise<TMDBResponse<TVShow>> {
+  return tmdbFetch<TMDBResponse<TVShow>>('/tv/airing_today', { page: String(page) })
+}
+
+export async function fetchOnTheAir(page = 1): Promise<TMDBResponse<TVShow>> {
+  return tmdbFetch<TMDBResponse<TVShow>>('/tv/on_the_air', { page: String(page) })
+}
+
+export async function fetchMovieDetail(id: number): Promise<Movie> {
+  return tmdbFetch<Movie>(`/movie/${id}`)
+}
+
+export async function fetchTVDetail(id: number): Promise<TVShow> {
+  return tmdbFetch<TVShow>(`/tv/${id}`)
+}
+
+export async function fetchCredits(type: 'movie' | 'tv', id: number): Promise<Credits> {
+  return tmdbFetch<Credits>(`/${type}/${id}/credits`)
+}
+
+export async function fetchVideos(type: 'movie' | 'tv', id: number): Promise<{ results: Video[] }> {
+  return tmdbFetch<{ results: Video[] }>(`/${type}/${id}/videos`)
+}
+
+export async function fetchSimilar(type: 'movie' | 'tv', id: number): Promise<TMDBResponse<Movie | TVShow>> {
+  return tmdbFetch<TMDBResponse<Movie | TVShow>>(`/${type}/${id}/similar`)
+}
+
+export async function fetchDiscover(type: 'movie' | 'tv', params: Record<string, string> = {}): Promise<TMDBResponse<Movie | TVShow>> {
+  return tmdbFetch<TMDBResponse<Movie | TVShow>>(`/discover/${type}`, params)
+}
+
+export async function fetchSearch(query: string, page = 1): Promise<TMDBResponse<(Movie | TVShow) & { media_type?: string }>> {
+  return tmdbFetch<TMDBResponse<(Movie | TVShow) & { media_type?: string }>>('/search/multi', {
+    query,
+    page: String(page),
+  })
+}
+
+// Anime: always enforces animation genre + anime keyword — never mixes in other content
+export async function fetchAnime(category = 'trending', page = 1): Promise<TMDBResponse<TVShow>> {
+  const base: Record<string, string> = {
+    with_genres: '16',
+    with_keywords: '210024',
+    page: String(page),
+  }
+  switch (category) {
+    case 'trending':
+      return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
+    case 'popular':
+      return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
+    case 'top_rated':
+      return tmdbFetch('/discover/tv', { ...base, sort_by: 'vote_average.desc', 'vote_count.gte': '200' })
+    case 'upcoming':
+      return tmdbFetch('/discover/tv', { ...base, sort_by: 'first_air_date.desc' })
+    case 'airing':
+      return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc', status: '0' })
+    case 'discover':
+    default:
+      return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
+  }
+}
+
+// Cartoons: always enforces animation + family genre + English origin — excludes anime
+export async function fetchCartoons(category = 'trending', page = 1): Promise<TMDBResponse<TVShow>> {
+  const base: Record<string, string> = {
+    with_genres: '16,10751',
+    with_original_language: 'en',
+    page: String(page),
+  }
+  switch (category) {
+    case 'trending':
+      return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
+    case 'popular':
+      return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
+    case 'top_rated':
+      return tmdbFetch('/discover/tv', { ...base, sort_by: 'vote_average.desc', 'vote_count.gte': '100' })
+    case 'family':
+      return tmdbFetch('/discover/tv', { ...base, sort_by: 'vote_average.desc' })
+    case 'new':
+      return tmdbFetch('/discover/tv', { ...base, sort_by: 'first_air_date.desc' })
+    case 'classics':
+      return tmdbFetch('/discover/tv', { ...base, 'first_air_date.lte': '2000-01-01', sort_by: 'vote_average.desc' })
+    case 'discover':
+    default:
+      return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
+  }
+}
