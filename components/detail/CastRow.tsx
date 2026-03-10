@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { Person } from '@/types/tmdb'
-import { getPoster } from '@/lib/tmdb'
+import { getPoster } from '@/lib/tmdbImages'
 
 interface CastRowProps {
   cast: Person[]

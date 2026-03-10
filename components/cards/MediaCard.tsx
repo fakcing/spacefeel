@@ -6,7 +6,7 @@ import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import { Film } from 'lucide-react'
 import { Movie, TVShow, WatchlistItem } from '@/types/tmdb'
-import { getPoster } from '@/lib/tmdb'
+import { getPoster } from '@/lib/tmdbImages'
 
 const BookmarkButton = dynamic(() => import('@/components/ui/BookmarkButton'), { ssr: false })
 

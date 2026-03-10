@@ -11,7 +11,6 @@ import {
   TrendingUp, Heart, Calendar, Play, Star, Compass, Radio,
   Sparkles, Clock, Users, X,
 } from 'lucide-react'
-import { fetchSearch } from '@/lib/tmdb'
 import { Movie, TVShow } from '@/types/tmdb'
 import ProfileDropdown from '@/components/ui/ProfileDropdown'
 
@@ -128,8 +127,8 @@ export default function Navbar() {
     }
     const timeout = setTimeout(async () => {
       try {
-        const data = await fetchSearch(query)
-        setResults((data.results as SearchResult[]).slice(0, 8))
+        const data = await fetch(`/api/search?q=${encodeURIComponent(query)}`).then(r => r.json())
+        setResults((data.results as SearchResult[]).slice(0, 8) ?? [])
         setIsOpen(true)
       } catch {
         setResults([])
@@ -151,15 +150,14 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 md:px-8 h-full flex items-center justify-between">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 select-none flex-shrink-0">
-          <motion.div whileTap={{ scale: 0.95 }} transition={{ type: 'spring', stiffness: 400, damping: 20 }}>
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--color-text)' }}>
-              <span className="text-sm font-black" style={{ color: 'var(--color-bg)' }}>S</span>
-            </div>
-          </motion.div>
-          <motion.span className="text-2xl font-black tracking-tighter" whileTap={{ scale: 0.97 }}>
-            <span style={{ color: 'var(--color-text)' }}>space</span>
-            <span style={{ color: 'var(--color-text-muted)' }}>feel</span>
+        <Link href="/" className="flex items-center select-none flex-shrink-0">
+          <motion.span
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+            className="text-xl font-black uppercase tracking-[0.2em]"
+            style={{ color: 'var(--color-text)' }}
+          >
+            SPACEFEEL
           </motion.span>
         </Link>
 

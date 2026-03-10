@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Play, Info } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Movie } from '@/types/tmdb'
-import { getBackdrop } from '@/lib/tmdb'
+import { getBackdrop } from '@/lib/tmdbImages'
 
 interface HeroBannerProps {
   movies: Movie[]

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { User, ChevronUp, Check, Sun, Moon, Monitor } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { useSettingsStore } from '@/store/settingsStore'
 
 const LANGUAGES = [
@@ -24,10 +24,14 @@ export default function ProfileDropdown() {
   const [mounted, setMounted] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const { theme, setTheme } = useTheme()
-  const { language } = useSettingsStore()
+  const locale = useLocale()
+  const { setLanguage } = useSettingsStore()
   const t = useTranslations('profile')
 
+  const currentLanguage = LANGUAGES.find((l) => l.code === locale) ?? LANGUAGES[0]
+
   useEffect(() => { setMounted(true) }, [])
+  useEffect(() => { setLanguage(locale) }, [locale, setLanguage])
 
   const themes = [
     { value: 'light',  label: t('light'),  Icon: Sun },
@@ -46,10 +50,9 @@ export default function ProfileDropdown() {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
-  const selectedLang = LANGUAGES.find((l) => l.code === language) || LANGUAGES[0]
-
-  const handleLanguageChange = (lang: typeof LANGUAGES[0]) => {
+  const handleLanguageChange = async (lang: typeof LANGUAGES[0]) => {
     document.cookie = `locale=${lang.code};path=/;max-age=31536000`
+    await fetch('/api/revalidate-locale', { method: 'POST' })
     window.location.reload()
   }
 
@@ -91,8 +94,8 @@ export default function ProfileDropdown() {
                 style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
               >
                 <div className="flex items-center gap-2.5">
-                  <span className="text-[10px] font-bold w-5" style={{ color: 'var(--color-text-subtle)' }}>{selectedLang.badge}</span>
-                  <span className="text-sm" style={{ color: 'var(--color-text)' }}>{selectedLang.label}</span>
+                  <span className="text-[10px] font-bold w-5" style={{ color: 'var(--color-text-subtle)' }}>{currentLanguage.badge}</span>
+                  <span className="text-sm" style={{ color: 'var(--color-text)' }}>{currentLanguage.label}</span>
                 </div>
                 <ChevronUp
                   size={14}
@@ -123,7 +126,7 @@ export default function ProfileDropdown() {
                           <span className="text-[10px] font-bold w-5" style={{ color: 'var(--color-text-subtle)' }}>{lang.badge}</span>
                           <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{lang.label}</span>
                         </div>
-                        {language === lang.code && (
+                        {locale === lang.code && (
                           <Check size={14} style={{ color: 'var(--color-text-muted)' }} />
                         )}
                       </button>

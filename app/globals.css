@@ -108,6 +108,9 @@ nav {
 /* Only override text that sits on the page background, not on dark images */
 .light .poster-overlay-text { color: #ffffff !important; }
 
+/* ── Footer links ────────────────────────────────────────────────────── */
+.footer-link:hover { color: var(--color-text) !important; }
+
 /* ── Light search focus ──────────────────────────────────────────────── */
 .light .search-focused {
   border-color: rgba(0, 0, 0, 0.40) !important;

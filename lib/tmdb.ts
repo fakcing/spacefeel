@@ -1,23 +1,23 @@
 import { cache } from 'react'
+import { cookies } from 'next/headers'
 import { Movie, TVShow, Credits, Video, TMDBResponse } from '@/types/tmdb'
+import { getTmdbLanguage } from './tmdbLanguage'
 
 const BASE_URL = 'https://api.themoviedb.org/3'
 const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
 
-export const IMG_BASE = 'https://image.tmdb.org/t/p'
-
-export const getPoster = (path: string | null, size = 'w500'): string | null =>
-  path ? `${IMG_BASE}/${size}${path}` : null
-
-export const getBackdrop = (path: string | null, size = 'w1280'): string | null =>
-  path ? `${IMG_BASE}/${size}${path}` : null
+export { IMG_BASE, getPoster, getBackdrop } from './tmdbImages'
 
 async function tmdbFetch<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
+  const cookieStore = cookies()
+  const locale = cookieStore.get('locale')?.value ?? 'en'
+  const language = getTmdbLanguage(locale)
+
   const url = new URL(`${BASE_URL}${endpoint}`)
   url.searchParams.set('api_key', API_KEY || '')
-  url.searchParams.set('language', 'en-US')
+  url.searchParams.set('language', language)
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))
-  const res = await fetch(url.toString(), { next: { revalidate: 3600 } })
+  const res = await fetch(url.toString(), { next: { revalidate: 3600, tags: [`tmdb-${locale}`] } })
   if (!res.ok) throw new Error(`TMDB error: ${res.status}`)
   return res.json()
 }
@@ -51,11 +51,43 @@ export const fetchOnTheAir = cache(async (page = 1): Promise<TMDBResponse<TVShow
 })
 
 export const fetchMovieDetail = cache(async (id: number): Promise<Movie> => {
-  return tmdbFetch<Movie>(`/movie/${id}`)
+  const cookieStore = cookies()
+  const locale = cookieStore.get('locale')?.value ?? 'en'
+
+  const data = await tmdbFetch<Movie>(`/movie/${id}`)
+
+  if ((!data.overview || data.overview.trim() === '') && locale !== 'en') {
+    const fallback = await fetch(
+      `${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=en-US`
+    ).then(r => r.json())
+    return {
+      ...data,
+      overview: fallback.overview || data.overview,
+      title: data.title || fallback.title,
+    }
+  }
+
+  return data
 })
 
 export const fetchTVDetail = cache(async (id: number): Promise<TVShow> => {
-  return tmdbFetch<TVShow>(`/tv/${id}`)
+  const cookieStore = cookies()
+  const locale = cookieStore.get('locale')?.value ?? 'en'
+
+  const data = await tmdbFetch<TVShow>(`/tv/${id}`)
+
+  if ((!data.overview || data.overview.trim() === '') && locale !== 'en') {
+    const fallback = await fetch(
+      `${BASE_URL}/tv/${id}?api_key=${API_KEY}&language=en-US`
+    ).then(r => r.json())
+    return {
+      ...data,
+      overview: fallback.overview || data.overview,
+      name: data.name || fallback.name,
+    }
+  }
+
+  return data
 })
 
 export const fetchCredits = cache(async (type: 'movie' | 'tv', id: number): Promise<Credits> => {
@@ -81,7 +113,7 @@ export const fetchSearch = cache(async (query: string, page = 1): Promise<TMDBRe
   })
 })
 
-// Anime: always enforces animation genre + anime keyword — never mixes in other content
+// Anime: always enforces animation genre + anime keyword
 export const fetchAnime = cache(async (category = 'trending', page = 1): Promise<TMDBResponse<TVShow>> => {
   const base: Record<string, string> = {
     with_genres: '16',
@@ -105,7 +137,7 @@ export const fetchAnime = cache(async (category = 'trending', page = 1): Promise
   }
 })
 
-// Cartoons: always enforces animation + family genre + English origin — excludes anime
+// Cartoons: always enforces animation + family genre + English origin
 export const fetchCartoons = cache(async (category = 'trending', page = 1): Promise<TMDBResponse<TVShow>> => {
   const base: Record<string, string> = {
     with_genres: '16,10751',

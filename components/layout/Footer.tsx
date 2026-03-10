@@ -24,10 +24,8 @@ export default async function Footer() {
             <Link
               key={l.href}
               href={l.href}
-              className="text-sm transition-colors"
+              className="text-sm transition-colors footer-link"
               style={{ color: 'var(--color-text-muted)' }}
-              onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = 'var(--color-text)')}
-              onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => (e.currentTarget.style.color = 'var(--color-text-muted)')}
             >
               {l.label}
             </Link>
