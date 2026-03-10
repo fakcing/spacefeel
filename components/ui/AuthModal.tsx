@@ -48,7 +48,7 @@ export default function AuthModal() {
             </button>
 
             {/* Logo */}
-            <div className="flex flex-col items-center mb-6">
+            <div className="flex flex-col items-center">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="52" height="52">
                 <rect width="32" height="32" rx="6" fill="#0d0d0d"/>
                 <text
@@ -58,8 +58,11 @@ export default function AuthModal() {
                   fill="white" textAnchor="middle"
                 >s</text>
               </svg>
-              <p className="text-sm text-[var(--color-text-muted)] mt-3">Sign in to continue</p>
             </div>
+
+            {/* Title */}
+            <h2 className="text-2xl font-bold text-center mt-4">Welcome Back</h2>
+            <p className="text-white/50 text-sm text-center mb-6">Sign in to continue to your account</p>
 
             {/* Google button */}
             <button className="w-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/10 rounded-xl py-3 flex items-center justify-center gap-3 transition-colors mb-4">
