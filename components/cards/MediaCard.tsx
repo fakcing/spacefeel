@@ -13,9 +13,10 @@ const BookmarkButton = dynamic(() => import('@/components/ui/BookmarkButton'), {
 interface MediaCardProps {
   item: Movie | TVShow
   mediaType: 'movie' | 'tv'
+  priority?: boolean
 }
 
-export default function MediaCard({ item, mediaType }: MediaCardProps) {
+export default function MediaCard({ item, mediaType, priority = false }: MediaCardProps) {
   const title = 'title' in item ? item.title : item.name
   const year = ('release_date' in item ? item.release_date : item.first_air_date)?.slice(0, 4) || ''
   const poster = getPoster(item.poster_path, 'w342')
@@ -43,7 +44,8 @@ export default function MediaCard({ item, mediaType }: MediaCardProps) {
               alt={title || 'Media'}
               sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 16vw"
               onError={() => setImgError(true)}
-              loading="lazy"
+              priority={priority}
+              loading={priority ? undefined : 'lazy'}
             />
           ) : (
             <div className="w-full h-full bg-white/[0.08] flex items-center justify-center">

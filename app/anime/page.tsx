@@ -46,8 +46,8 @@ export default async function AnimePage({
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {(results as TVShow[]).map((item) => (
-          <MediaCard key={item.id} item={item} mediaType="tv" />
+        {(results as TVShow[]).map((item, index) => (
+          <MediaCard key={item.id} item={item} mediaType="tv" priority={index < 6} />
         ))}
       </div>
 

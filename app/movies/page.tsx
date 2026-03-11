@@ -73,8 +73,8 @@ export default async function MoviesPage({
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {results.map((movie) => (
-          <MediaCard key={movie.id} item={movie} mediaType="movie" />
+        {results.map((movie, index) => (
+          <MediaCard key={movie.id} item={movie} mediaType="movie" priority={index < 6} />
         ))}
       </div>
 

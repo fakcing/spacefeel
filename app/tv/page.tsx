@@ -77,8 +77,8 @@ export default async function TVPage({
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {results.map((show) => (
-          <MediaCard key={show.id} item={show} mediaType="tv" />
+        {results.map((show, index) => (
+          <MediaCard key={show.id} item={show} mediaType="tv" priority={index < 6} />
         ))}
       </div>
 
