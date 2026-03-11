@@ -8,6 +8,7 @@ import Footer from '@/components/layout/Footer'
 import AuthModal from '@/components/ui/AuthModal'
 import PageTransition from '@/components/layout/PageTransition'
 import ScrollToTop from '@/components/ui/ScrollToTop'
+import AniPlayerModal from '@/components/anime/AniPlayerModal'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 import './globals.css'
 
@@ -46,6 +47,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Footer />
               <AuthModal />
               <ScrollToTop />
+              <AniPlayerModal />
             </NextIntlClientProvider>
           </SessionProvider>
         </ThemeProvider>

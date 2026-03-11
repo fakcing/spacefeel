@@ -29,6 +29,11 @@ const nextConfig = {
 				protocol: 'https',
 				hostname: 'avatars.githubusercontent.com',
 			},
+			// AniLibria posters
+			{
+				protocol: 'https',
+				hostname: 'anilibria.tv',
+			},
 		],
 		formats: ['image/avif', 'image/webp'],
 		minimumCacheTTL: 86400,
