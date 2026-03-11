@@ -38,8 +38,9 @@ export default function UserRating({ tmdbId, mediaType }: UserRatingProps) {
 
   useEffect(() => {
     fetch(`/api/ratings?tmdbId=${tmdbId}&mediaType=${mediaType}`)
-      .then((r) => r.json())
-      .then(setData)
+      .then((r) => r.ok ? r.json() : Promise.resolve(null))
+      .then((d) => { if (d) setData(d) })
+      .catch(() => {})
   }, [tmdbId, mediaType, submitted])
 
   const handleSubmit = async () => {

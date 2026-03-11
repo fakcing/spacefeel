@@ -17,7 +17,7 @@ async function tmdbFetch<T>(endpoint: string, params: Record<string, string> = {
   url.searchParams.set('api_key', API_KEY || '')
   url.searchParams.set('language', language)
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))
-  const res = await fetch(url.toString(), { next: { revalidate: 3600, tags: [`tmdb-${locale}`] } })
+  const res = await fetch(url.toString(), { next: { revalidate: 3600, tags: [`tmdb`, `tmdb-${locale}`, `tmdb-${endpoint}`] } })
   if (!res.ok) throw new Error(`TMDB error: ${res.status}`)
   return res.json()
 }

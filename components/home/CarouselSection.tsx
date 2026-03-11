@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { MediaItem } from '@/types/tmdb'
@@ -99,13 +100,16 @@ export default function CarouselSection({
           className="flex gap-3 transition-transform duration-300 ease-out"
           style={{ transform: `translateX(calc(-${currentIndex} * (100% / 6 + 2px)))` }}
         >
-          {items.map((item) => (
-            <div
+          {items.map((item, index) => (
+            <motion.div
               key={item.id}
               className="w-[calc((100%-60px)/6)] min-w-[calc((100%-60px)/6)] flex-shrink-0 flex-grow-0"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: index * 0.03, duration: 0.3 }}
             >
               <MediaCard item={item} mediaType={mediaType} />
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

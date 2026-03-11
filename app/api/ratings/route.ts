@@ -41,20 +41,24 @@ export async function GET(req: NextRequest) {
   const tmdbId = req.nextUrl.searchParams.get('tmdbId')
   const mediaType = req.nextUrl.searchParams.get('mediaType')
 
-  const ratings = await prisma.rating.findMany({
-    where: {
-      tmdbId: parseInt(tmdbId ?? '0'),
-      mediaType: mediaType ?? 'movie',
-    },
-    include: {
-      user: { select: { name: true, image: true } },
-    },
-    orderBy: { createdAt: 'desc' },
-  })
+  try {
+    const ratings = await prisma.rating.findMany({
+      where: {
+        tmdbId: parseInt(tmdbId ?? '0'),
+        mediaType: mediaType ?? 'movie',
+      },
+      include: {
+        user: { select: { name: true, image: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+    })
 
-  const avg = ratings.length
-    ? ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length
-    : 0
+    const avg = ratings.length
+      ? ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length
+      : 0
 
-  return NextResponse.json({ ratings, average: avg, count: ratings.length })
+    return NextResponse.json({ ratings, average: avg, count: ratings.length })
+  } catch {
+    return NextResponse.json({ ratings: [], average: 0, count: 0 })
+  }
 }
