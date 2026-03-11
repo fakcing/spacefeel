@@ -44,6 +44,7 @@ export const fetchYaniCatalog = cache(async (page = 1, limit = 20) => {
   return { items: all.slice(0, limit), hasMore: all.length > limit }
 })
 
+
 // Single anime by URL slug
 export const fetchYaniTitle = cache(async (animeUrl: string): Promise<YaniAnime> => {
   return yaniFetch<YaniAnime>(`/anime/${animeUrl}`)
