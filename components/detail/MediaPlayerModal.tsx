@@ -85,8 +85,8 @@ export default function MediaPlayerModal() {
             <div className="w-full max-w-5xl aspect-video rounded-lg sm:rounded-xl overflow-hidden bg-black">
               <UniversalPlayer
                 type={mediaType}
-                tmdbId={tmdbId || undefined}
-                shikimoriId={shikimoriId || undefined}
+                tmdbId={mediaType === 'anime' ? undefined : tmdbId || undefined}
+                shikimoriId={mediaType === 'anime' ? shikimoriId || undefined : undefined}
                 season={season}
                 episode={episode}
               />

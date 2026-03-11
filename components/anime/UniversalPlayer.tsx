@@ -40,10 +40,19 @@ export default function UniversalPlayer({
   yaniVideos,
   yaniDubbing,
 }: UniversalPlayerProps) {
+  // Determine available servers based on content type
+  // Yani/Alloha only for anime, VideoCDN only for movie/tv/cartoon
+  const isAnime = type === 'anime'
+  const defaultServer: ServerType = isAnime ? 'yani' : 'videocdn'
+
   // Server state
   const [currentServer, setCurrentServer] = useState<ServerType>(() => {
-    if (typeof window === 'undefined') return 'yani'
-    return (localStorage.getItem(STORAGE_SERVER_KEY) as ServerType) || 'yani'
+    if (typeof window === 'undefined') return defaultServer
+    const saved = localStorage.getItem(STORAGE_SERVER_KEY) as ServerType | null
+    // Validate saved server is available for this content type
+    if (saved && isAnime && saved === 'yani') return saved
+    if (saved && !isAnime && saved === 'videocdn') return saved
+    return defaultServer
   })
 
   // Loading states
@@ -133,25 +142,24 @@ export default function UniversalPlayer({
     localStorage.setItem(STORAGE_DUBBING_KEY, String(selectedTranslation))
   }, [selectedTranslation])
 
-  // Fetch VideoCDN data
+  // Fetch VideoCDN data (only for non-anime content)
   useEffect(() => {
+    if (isAnime) return // Don't fetch VideoCDN for anime
+
     const fetchVideoCDNData = async () => {
-      if (type === 'anime' && !shikimoriId) return
-      if (type !== 'anime' && !tmdbId) return
+      if (!tmdbId) return
 
       try {
         const [qualities, translations] = await Promise.all([
           fetchVideoCDN({
             type: type === 'cartoon' ? 'movie' : type,
-            tmdbId: type === 'anime' ? undefined : tmdbId,
-            shikimoriId: type === 'anime' ? shikimoriId : undefined,
+            tmdbId,
             season: selectedSeason,
             episode: selectedEpisode,
           }),
           fetchVideoCDNTranslations({
             type: type === 'cartoon' ? 'movie' : type,
-            tmdbId: type === 'anime' ? undefined : tmdbId,
-            shikimoriId: type === 'anime' ? shikimoriId : undefined,
+            tmdbId,
           }),
         ])
 
@@ -163,7 +171,7 @@ export default function UniversalPlayer({
     }
 
     fetchVideoCDNData()
-  }, [type, tmdbId, shikimoriId, selectedSeason, selectedEpisode])
+  }, [isAnime, type, tmdbId, shikimoriId, selectedSeason, selectedEpisode])
 
   // Reset loading state
   useEffect(() => {
@@ -204,15 +212,16 @@ export default function UniversalPlayer({
     return () => clearTimeout(timeout)
   }, [isLoading])
 
-  // Available servers
+  // Available servers (only one server per content type)
   const availableServers = useMemo(() => {
-    const servers: ServerType[] = []
-    if (yaniIframeSrc) servers.push('yani')
-    if (videocdnQualities.length > 0) servers.push('videocdn')
-    return servers
-  }, [yaniIframeSrc, videocdnQualities.length])
+    if (isAnime) {
+      return yaniIframeSrc ? ['yani' as ServerType] : []
+    } else {
+      return videocdnQualities.length > 0 ? ['videocdn' as ServerType] : []
+    }
+  }, [isAnime, yaniIframeSrc, videocdnQualities.length])
 
-  // Switch server
+  // Switch server (for future use if we add more servers)
   const switchServer = useCallback((server: ServerType) => {
     setCurrentServer(server)
     setIsLoading(true)
@@ -220,59 +229,48 @@ export default function UniversalPlayer({
     setLoadTimeout(false)
   }, [])
 
-  // Suggest alternative server
-  const suggestAlternative = useCallback(() => {
-    if (currentServer === 'yani' && availableServers.includes('videocdn')) {
-      return 'videocdn'
-    }
-    if (currentServer === 'videocdn' && availableServers.includes('yani')) {
-      return 'yani'
-    }
-    return null
-  }, [currentServer, availableServers])
-
-  const alternativeServer = (hasError || loadTimeout) ? suggestAlternative() : null
-
   // Check if content has multiple seasons
-  const hasMultipleSeasons = yaniSeasons.length > 1
+  const hasMultipleSeasons = yaniSeasons.length > 1 || (type === 'tv' && !isAnime)
 
   return (
     <div className="w-full h-full flex flex-col">
-      {/* Server Switcher */}
-      <div className="flex items-center justify-between px-4 py-2 sm:py-3 border-b border-white/10 bg-black/40">
-        <div className="flex items-center gap-2">
-          <Server size={16} className="text-white/60" />
-          <span className="text-white/80 text-xs sm:text-sm font-medium">Сервер</span>
+      {/* Server Switcher - Only show if both servers available (future proofing) */}
+      {availableServers.length > 1 && (
+        <div className="flex items-center justify-between px-4 py-2 sm:py-3 border-b border-white/10 bg-black/40">
+          <div className="flex items-center gap-2">
+            <Server size={16} className="text-white/60" />
+            <span className="text-white/80 text-xs sm:text-sm font-medium">Сервер</span>
+          </div>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {availableServers.includes('yani') && (
+              <button
+                onClick={() => switchServer('yani')}
+                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all min-h-[36px] sm:min-h-[40px] ${
+                  currentServer === 'yani'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/30'
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                Сервер 1
+                {currentServer === 'yani' && <Check size={12} />}
+              </button>
+            )}
+            {availableServers.includes('videocdn') && (
+              <button
+                onClick={() => switchServer('videocdn')}
+                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all min-h-[36px] sm:min-h-[40px] ${
+                  currentServer === 'videocdn'
+                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/30'
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                Сервер 2
+                {currentServer === 'videocdn' && <Check size={12} />}
+              </button>
+            )}
+          </div>
         </div>
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {availableServers.includes('yani') && (
-            <button
-              onClick={() => switchServer('yani')}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all min-h-[36px] sm:min-h-[40px] ${
-                currentServer === 'yani'
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/30'
-                  : 'bg-white/10 text-white/70 hover:bg-white/20'
-              }`}
-            >
-              Сервер 1
-              {currentServer === 'yani' && <Check size={12} />}
-            </button>
-          )}
-          {availableServers.includes('videocdn') && (
-            <button
-              onClick={() => switchServer('videocdn')}
-              className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all min-h-[36px] sm:min-h-[40px] ${
-                currentServer === 'videocdn'
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/30'
-                  : 'bg-white/10 text-white/70 hover:bg-white/20'
-              }`}
-            >
-              Сервер 2
-              {currentServer === 'videocdn' && <Check size={12} />}
-            </button>
-          )}
-        </div>
-      </div>
+      )}
 
       {/* Season/Episode Selectors (for TV/Anime/Cartoon series) */}
       {(type === 'tv' || type === 'anime' || type === 'cartoon') && hasMultipleSeasons && (
@@ -288,11 +286,15 @@ export default function UniversalPlayer({
                 }}
                 className="appearance-none bg-white/10 text-white text-sm sm:text-base px-4 py-2 sm:py-2.5 pr-10 rounded-xl border border-white/20 hover:bg-white/20 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50 min-h-[44px] sm:min-h-[48px]"
               >
-                {yaniSeasons.map((s) => (
+                {yaniSeasons.length > 0 ? yaniSeasons.map((s) => (
                   <option key={s.number} value={s.number} className="bg-[#1a1a1b] text-white">
                     Сезон {s.number}
                   </option>
-                ))}
+                )) : (
+                  <option value={selectedSeason} className="bg-[#1a1a1b] text-white">
+                    Сезон {selectedSeason}
+                  </option>
+                )}
               </select>
               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
             </div>
@@ -302,7 +304,7 @@ export default function UniversalPlayer({
               <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-1 sm:pb-0">
                 <span className="text-white/60 text-xs sm:text-sm font-medium flex-shrink-0">Серия:</span>
                 <div className="flex items-center gap-1.5 flex-shrink-0">
-                  {yaniEpisodes.slice(0, 20).map((ep) => (
+                  {yaniEpisodes.length > 0 ? yaniEpisodes.slice(0, 20).map((ep) => (
                     <button
                       key={ep}
                       onClick={() => setSelectedEpisode(ep)}
@@ -314,9 +316,13 @@ export default function UniversalPlayer({
                     >
                       {ep}
                     </button>
-                  ))}
-                  {yaniEpisodes.length > 20 && (
-                    <span className="text-white/40 text-xs px-2">+{yaniEpisodes.length - 20}</span>
+                  )) : (
+                    <button
+                      onClick={() => setSelectedEpisode(selectedEpisode)}
+                      className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all flex-shrink-0 touch-manipulation bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/30`}
+                    >
+                      {selectedEpisode}
+                    </button>
                   )}
                 </div>
               </div>
@@ -351,16 +357,6 @@ export default function UniversalPlayer({
                 Попробуйте сменить сервер или включить VPN.
               </p>
             </div>
-
-            {alternativeServer && (
-              <button
-                onClick={() => switchServer(alternativeServer as ServerType)}
-                className="flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold text-xs sm:text-sm hover:from-blue-600 hover:to-purple-600 transition-all shadow-lg shadow-blue-500/30 active:scale-95 min-h-[44px] sm:min-h-[48px]"
-              >
-                <RefreshCw size={14} className="sm:w-4 sm:h-4" />
-                Попробовать {alternativeServer === 'yani' ? 'Сервер 1' : 'Сервер 2'}
-              </button>
-            )}
 
             <button
               onClick={() => {
@@ -399,8 +395,8 @@ export default function UniversalPlayer({
         )}
       </div>
 
-      {/* VideoCDN Translation Selector */}
-      {currentServer === 'videocdn' && videocdnTranslations.length > 1 && (
+      {/* VideoCDN Translation Selector (only for non-anime) */}
+      {!isAnime && currentServer === 'videocdn' && videocdnTranslations.length > 1 && (
         <div className="px-4 py-2 sm:py-3 border-t border-white/10 bg-black/40">
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
             <span className="text-white/60 text-xs sm:text-sm font-medium flex-shrink-0">Озвучка:</span>
