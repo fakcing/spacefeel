@@ -5,6 +5,7 @@ import DetailTabs from '@/components/detail/DetailTabs'
 import TrailerModal from '@/components/detail/TrailerModal'
 import SimilarSection from '@/components/detail/SimilarSection'
 import { TVShow } from '@/types/tmdb'
+import UserRating from '@/components/ui/UserRating'
 
 
 export default async function TVDetailPage({ params }: { params: { id: string } }) {
@@ -35,6 +36,9 @@ export default async function TVDetailPage({ params }: { params: { id: string } 
                 <TrailerModal video={trailer} />
               </div>
             )}
+          </div>
+          <div className="px-4 md:px-12 pb-8">
+            <UserRating tmdbId={id} mediaType="tv" />
           </div>
           <SimilarSection items={similar.results as TVShow[]} mediaType="tv" />
         </div>

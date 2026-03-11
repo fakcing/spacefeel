@@ -8,6 +8,7 @@ import Footer from '@/components/layout/Footer'
 import AuthModal from '@/components/ui/AuthModal'
 import PageTransition from '@/components/layout/PageTransition'
 import ScrollToTop from '@/components/ui/ScrollToTop'
+import { SessionProvider } from '@/components/providers/SessionProvider'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '500', '600', '700', '900'], variable: '--font-inter' })
@@ -38,13 +39,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${bebasNeue.variable}`}>
       <body className={inter.variable} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <NextIntlClientProvider messages={messages}>
-            <Navbar />
-            <PageTransition>{children}</PageTransition>
-            <Footer />
-            <AuthModal />
-            <ScrollToTop />
-          </NextIntlClientProvider>
+          <SessionProvider>
+            <NextIntlClientProvider messages={messages}>
+              <Navbar />
+              <PageTransition>{children}</PageTransition>
+              <Footer />
+              <AuthModal />
+              <ScrollToTop />
+            </NextIntlClientProvider>
+          </SessionProvider>
         </ThemeProvider>
       </body>
     </html>

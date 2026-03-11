@@ -2,9 +2,9 @@
 
 import { Bookmark, BookmarkCheck } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useSession } from 'next-auth/react'
 import { useWatchlistStore } from '@/store/watchlistStore'
 import { useAuthModalStore } from '@/store/authModalStore'
-import { useSettingsStore } from '@/store/settingsStore'
 import { WatchlistItem } from '@/types/tmdb'
 
 interface BookmarkButtonProps {
@@ -14,17 +14,17 @@ interface BookmarkButtonProps {
 export default function BookmarkButton({ item }: BookmarkButtonProps) {
   const { toggleItem, isInWatchlist } = useWatchlistStore()
   const { open } = useAuthModalStore()
-  const { isLoggedIn } = useSettingsStore()
+  const { data: session } = useSession()
   const isBookmarked = isInWatchlist(item.id)
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    if (!isLoggedIn) {
+    if (!session) {
       open()
       return
     }
-    toggleItem(item)
+    toggleItem(item, true)
   }
 
   return (

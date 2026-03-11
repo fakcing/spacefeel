@@ -78,6 +78,7 @@ export default function Navbar() {
   const td = useTranslations('dropdown')
   const ts = useTranslations('search')
 
+
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [isOpen, setIsOpen] = useState(false)

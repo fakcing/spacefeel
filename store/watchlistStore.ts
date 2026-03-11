@@ -4,20 +4,70 @@ import { WatchlistItem } from '@/types/tmdb'
 
 interface WatchlistStore {
   items: WatchlistItem[]
-  addItem: (item: WatchlistItem) => void
-  removeItem: (id: number) => void
-  toggleItem: (item: WatchlistItem) => void
+  addItem: (item: WatchlistItem, isLoggedIn?: boolean) => Promise<void>
+  removeItem: (id: number, mediaType: string, isLoggedIn?: boolean) => Promise<void>
+  toggleItem: (item: WatchlistItem, isLoggedIn?: boolean) => Promise<void>
   isInWatchlist: (id: number) => boolean
+  syncFromDB: () => Promise<void>
 }
 
 export const useWatchlistStore = create<WatchlistStore>()(
   persist(
     (set, get) => ({
       items: [],
-      addItem: (item) => set((s) => ({ items: [...s.items, item] })),
-      removeItem: (id) => set((s) => ({ items: s.items.filter((i) => i.id !== id) })),
-      toggleItem: (item) =>
-        get().isInWatchlist(item.id) ? get().removeItem(item.id) : get().addItem(item),
+
+      syncFromDB: async () => {
+        const res = await fetch('/api/watchlist')
+        if (!res.ok) return
+        const data = await res.json()
+        const mapped: WatchlistItem[] = data.map((d: {
+          tmdbId: number
+          mediaType: string
+          posterPath: string | null
+          voteAverage: number | null
+          releaseDate: string | null
+        }) => ({
+          id: d.tmdbId,
+          media_type: d.mediaType as 'movie' | 'tv',
+          poster_path: d.posterPath ?? null,
+          vote_average: d.voteAverage ?? 0,
+          release_date: d.releaseDate ?? '',
+        }))
+        set({ items: mapped })
+      },
+
+      addItem: async (item, isLoggedIn = false) => {
+        set((s) => ({ items: [...s.items, item] }))
+        if (isLoggedIn) {
+          await fetch('/api/watchlist', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              tmdbId: item.id,
+              mediaType: item.media_type,
+              posterPath: item.poster_path,
+              voteAverage: item.vote_average,
+              releaseDate: item.release_date,
+            }),
+          })
+        }
+      },
+
+      removeItem: async (id, mediaType, isLoggedIn = false) => {
+        set((s) => ({ items: s.items.filter((i) => !(i.id === id && i.media_type === mediaType)) }))
+        if (isLoggedIn) {
+          await fetch(`/api/watchlist/${id}:${mediaType}`, { method: 'DELETE' })
+        }
+      },
+
+      toggleItem: async (item, isLoggedIn = false) => {
+        if (get().isInWatchlist(item.id)) {
+          await get().removeItem(item.id, item.media_type, isLoggedIn)
+        } else {
+          await get().addItem(item, isLoggedIn)
+        }
+      },
+
       isInWatchlist: (id) => get().items.some((i) => i.id === id),
     }),
     { name: 'spacefeel-watchlist' }

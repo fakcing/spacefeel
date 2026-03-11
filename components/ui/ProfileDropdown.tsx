@@ -1,11 +1,14 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from 'next-themes'
-import { User, ChevronUp, Check, Sun, Moon, Monitor } from 'lucide-react'
+import { useSession, signOut } from 'next-auth/react'
+import { User, ChevronUp, Check, Sun, Moon, Monitor, LogOut } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
 import { useSettingsStore } from '@/store/settingsStore'
+import { useAuthModalStore } from '@/store/authModalStore'
 
 const LANGUAGES = [
   { code: 'en', label: 'English',    badge: 'US' },
@@ -26,6 +29,8 @@ export default function ProfileDropdown() {
   const { theme, setTheme } = useTheme()
   const locale = useLocale()
   const { setLanguage } = useSettingsStore()
+  const { open: openAuthModal } = useAuthModalStore()
+  const { data: session } = useSession()
   const t = useTranslations('profile')
 
   const currentLanguage = LANGUAGES.find((l) => l.code === locale) ?? LANGUAGES[0]
@@ -60,11 +65,21 @@ export default function ProfileDropdown() {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors"
+        className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors overflow-hidden"
         style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
         aria-label="Profile"
       >
-        <User size={16} style={{ color: 'var(--color-text-muted)' }} />
+        {session?.user?.image ? (
+          <Image
+            src={session.user.image}
+            width={36}
+            height={36}
+            className="rounded-xl object-cover"
+            alt={session.user.name ?? ''}
+          />
+        ) : (
+          <User size={16} style={{ color: 'var(--color-text-muted)' }} />
+        )}
       </button>
 
       <AnimatePresence>
@@ -79,9 +94,46 @@ export default function ProfileDropdown() {
           >
             {/* Account section */}
             <p className="text-xs uppercase tracking-wider mb-3" style={{ color: 'var(--color-text-subtle)' }}>{t('account')}</p>
-            <button className="w-full rounded-xl py-2.5 px-4 text-sm font-semibold transition-colors mb-2" style={{ backgroundColor: 'var(--color-text)', color: 'var(--color-bg)' }}>
-              {t('login')}
-            </button>
+
+            {session?.user ? (
+              <>
+                <div className="flex items-center gap-3 mb-3">
+                  {session.user.image ? (
+                    <Image
+                      src={session.user.image}
+                      width={36}
+                      height={36}
+                      className="rounded-full flex-shrink-0"
+                      alt=""
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: 'var(--color-overlay)' }}>
+                      <User size={16} style={{ color: 'var(--color-text-muted)' }} />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>{session.user.name}</p>
+                    <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>{session.user.email}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  className="w-full rounded-xl py-2.5 px-4 text-sm font-semibold transition-colors mb-2 flex items-center justify-center gap-2"
+                  style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
+                >
+                  <LogOut size={14} />
+                  {t('logout')}
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => { setOpen(false); openAuthModal() }}
+                className="w-full rounded-xl py-2.5 px-4 text-sm font-semibold transition-colors mb-2"
+                style={{ backgroundColor: 'var(--color-text)', color: 'var(--color-bg)' }}
+              >
+                {t('login')}
+              </button>
+            )}
 
             <div className="border-t my-4" style={{ borderColor: 'var(--color-border)' }} />
 

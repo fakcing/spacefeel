@@ -7,9 +7,9 @@ import { Movie, TVShow, WatchlistItem } from '@/types/tmdb'
 import { getBackdrop, getPoster } from '@/lib/tmdbImages'
 import Badge from '@/components/ui/Badge'
 import Rating from '@/components/ui/Rating'
+import { useSession } from 'next-auth/react'
 import { useWatchlistStore } from '@/store/watchlistStore'
 import { useAuthModalStore } from '@/store/authModalStore'
-import { useSettingsStore } from '@/store/settingsStore'
 
 interface DetailHeroProps {
   item: Movie | TVShow
@@ -39,12 +39,12 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
 
   const { toggleItem, isInWatchlist } = useWatchlistStore()
   const { open: openAuthModal } = useAuthModalStore()
-  const { isLoggedIn } = useSettingsStore()
+  const { data: session } = useSession()
   const isBookmarked = isInWatchlist(item.id)
 
   const handleWatchlist = () => {
-    if (!isLoggedIn) { openAuthModal(); return }
-    toggleItem(watchlistItem)
+    if (!session) { openAuthModal(); return }
+    toggleItem(watchlistItem, true)
   }
 
   const backdrop = getBackdrop(item.backdrop_path)
