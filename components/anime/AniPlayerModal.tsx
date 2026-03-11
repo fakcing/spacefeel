@@ -18,7 +18,7 @@ export default function AniPlayerModal() {
   const [iframeError, setIframeError] = useState(false)
   const [iframeLoading, setIframeLoading] = useState(true)
   const [iframeLoadTimeout, setIframeLoadTimeout] = useState(false)
-  const [playerUrl, setPlayerUrl] = useState<string | null>(null)
+  const [iframeKey, setIframeKey] = useState(0)
 
   // Get unique seasons sorted
   const seasons = useMemo(
@@ -62,55 +62,23 @@ export default function AniPlayerModal() {
     return result.sort((a, b) => Number(a) - Number(b))
   }, [seasonVideos, currentDubbing])
 
-  // Fetch player URL from our API endpoint (client-side)
+  // Get current video iframe URL
+  const iframeSrc = useMemo(() => {
+    const video = seasonVideos.find(
+      (v) => v.data.dubbing === currentDubbing && v.number === currentEpisode
+    )
+    if (!video?.iframe_url) return null
+    const url = video.iframe_url
+    return url.startsWith('//') ? `https:${url}` : url
+  }, [seasonVideos, currentDubbing, currentEpisode])
+
+  // Reset iframe state when video changes
   useEffect(() => {
-    if (!isOpen || !currentEpisode || !videos.length) return
-
-    let cancelled = false
-    setIframeLoading(true)
     setIframeError(false)
+    setIframeLoading(true)
     setIframeLoadTimeout(false)
-    setPlayerUrl(null)
-
-    const fetchPlayer = async () => {
-      const animeId = videos[0]?.data?.player_id
-      if (!animeId) return
-
-      try {
-        const params = new URLSearchParams({
-          animeId: String(animeId),
-          episode: currentEpisode,
-          dubbing: currentDubbing,
-          season: String(currentSeason),
-        })
-
-        const res = await fetch(`/api/anime/player?${params}`, {
-          // Client-side request - no cache
-          cache: 'no-store',
-        })
-
-        if (!res.ok) {
-          throw new Error(`Failed to fetch player: ${res.status}`)
-        }
-
-        const data = await res.json()
-        if (!cancelled && data.playerUrl) {
-          setPlayerUrl(data.playerUrl)
-        }
-      } catch (error) {
-        console.error('Player fetch error:', error)
-        if (!cancelled) {
-          setIframeError(true)
-        }
-      }
-    }
-
-    fetchPlayer()
-
-    return () => {
-      cancelled = true
-    }
-  }, [isOpen, currentEpisode, currentDubbing, currentSeason, videos])
+    setIframeKey((prev) => prev + 1)
+  }, [iframeSrc])
 
   // Handle iframe load
   const handleIframeLoad = useCallback(() => {
@@ -126,31 +94,30 @@ export default function AniPlayerModal() {
 
   // Timeout for iframe loading (alloha.yani.tv timeout handling)
   useEffect(() => {
-    if (!iframeLoading || !playerUrl) return
+    if (!iframeLoading) return
 
     const timeout = setTimeout(() => {
       setIframeLoadTimeout(true)
     }, 15000) // 15 seconds timeout
 
     return () => clearTimeout(timeout)
-  }, [iframeLoading, playerUrl])
+  }, [iframeLoading])
+
+  // Navigation helpers
+  const currentEpisodeIndex = episodeNumbers.indexOf(currentEpisode)
+  const prevEp = currentEpisodeIndex > 0 ? episodeNumbers[currentEpisodeIndex - 1] : null
+  const nextEp = currentEpisodeIndex < episodeNumbers.length - 1 ? episodeNumbers[currentEpisodeIndex + 1] : null
 
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closePlayer()
-      if (e.key === 'ArrowLeft') {
-        const idx = episodeNumbers.indexOf(currentEpisode)
-        if (idx > 0) setEpisode(episodeNumbers[idx - 1])
-      }
-      if (e.key === 'ArrowRight') {
-        const idx = episodeNumbers.indexOf(currentEpisode)
-        if (idx < episodeNumbers.length - 1) setEpisode(episodeNumbers[idx + 1])
-      }
+      if (e.key === 'ArrowLeft' && prevEp) setEpisode(prevEp)
+      if (e.key === 'ArrowRight' && nextEp) setEpisode(nextEp)
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [closePlayer, currentEpisode, episodeNumbers, setEpisode])
+  }, [closePlayer, prevEp, nextEp, setEpisode])
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -164,11 +131,6 @@ export default function AniPlayerModal() {
     window.addEventListener('click', handler)
     return () => window.removeEventListener('click', handler)
   }, [])
-
-  // Navigation helpers
-  const currentEpisodeIndex = episodeNumbers.indexOf(currentEpisode)
-  const prevEp = currentEpisodeIndex > 0 ? episodeNumbers[currentEpisodeIndex - 1] : null
-  const nextEp = currentEpisodeIndex < episodeNumbers.length - 1 ? episodeNumbers[currentEpisodeIndex + 1] : null
 
   if (!isOpen) return null
 
@@ -331,6 +293,7 @@ export default function AniPlayerModal() {
                     onClick={() => {
                       setIframeLoadTimeout(false)
                       setIframeLoading(true)
+                      setIframeKey((prev) => prev + 1)
                     }}
                     className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm hover:bg-white/20 transition-colors"
                   >
@@ -348,6 +311,7 @@ export default function AniPlayerModal() {
                     onClick={() => {
                       setIframeError(false)
                       setIframeLoading(true)
+                      setIframeKey((prev) => prev + 1)
                     }}
                     className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm hover:bg-white/20 transition-colors"
                   >
@@ -357,10 +321,10 @@ export default function AniPlayerModal() {
               )}
 
               {/* Iframe */}
-              {playerUrl && !iframeError && !iframeLoadTimeout && (
+              {iframeSrc && !iframeError && !iframeLoadTimeout && (
                 <iframe
-                  key={playerUrl}
-                  src={playerUrl}
+                  key={iframeKey}
+                  src={iframeSrc}
                   className="w-full h-full"
                   onLoad={handleIframeLoad}
                   onError={handleIframeError}
@@ -372,7 +336,7 @@ export default function AniPlayerModal() {
               )}
 
               {/* No video available */}
-              {!playerUrl && !iframeLoading && !iframeError && !iframeLoadTimeout && (
+              {!iframeSrc && !iframeLoading && !iframeError && !iframeLoadTimeout && (
                 <div className="flex items-center justify-center h-full text-white/30 text-sm">
                   Нет доступного видео
                 </div>
