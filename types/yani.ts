@@ -57,6 +57,7 @@ export interface YaniVideo {
     dubbing: string
     player_id: number
     season?: number
+    alternative_player?: string
   }
   number: string
   date: number
@@ -69,4 +70,5 @@ export interface YaniVideo {
   views: number
   duration: number
   season?: number
+  alternative_iframe_url?: string
 }

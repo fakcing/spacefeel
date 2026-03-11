@@ -1,9 +1,10 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronLeft, ChevronRight, ChevronDown, AlertTriangle } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react'
 import { useAniPlayerStore } from '@/store/aniPlayerStore'
-import { useEffect, useMemo, useState, useCallback } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import MirrorPlayer from './MirrorPlayer'
 
 export default function AniPlayerModal() {
   const {
@@ -15,10 +16,6 @@ export default function AniPlayerModal() {
   const [showSeasonDropdown, setShowSeasonDropdown] = useState(false)
   const [showEpisodeDropdown, setShowEpisodeDropdown] = useState(false)
   const [showDubbingDropdown, setShowDubbingDropdown] = useState(false)
-  const [iframeError, setIframeError] = useState(false)
-  const [iframeLoading, setIframeLoading] = useState(true)
-  const [iframeLoadTimeout, setIframeLoadTimeout] = useState(false)
-  const [iframeKey, setIframeKey] = useState(0)
 
   // Get unique seasons sorted
   const seasons = useMemo(
@@ -62,46 +59,12 @@ export default function AniPlayerModal() {
     return result.sort((a, b) => Number(a) - Number(b))
   }, [seasonVideos, currentDubbing])
 
-  // Get current video iframe URL
-  const iframeSrc = useMemo(() => {
-    const video = seasonVideos.find(
+  // Get current video
+  const currentVideo = useMemo(() => {
+    return seasonVideos.find(
       (v) => v.data.dubbing === currentDubbing && v.number === currentEpisode
     )
-    if (!video?.iframe_url) return null
-    const url = video.iframe_url
-    return url.startsWith('//') ? `https:${url}` : url
   }, [seasonVideos, currentDubbing, currentEpisode])
-
-  // Reset iframe state when video changes
-  useEffect(() => {
-    setIframeError(false)
-    setIframeLoading(true)
-    setIframeLoadTimeout(false)
-    setIframeKey((prev) => prev + 1)
-  }, [iframeSrc])
-
-  // Handle iframe load
-  const handleIframeLoad = useCallback(() => {
-    setIframeLoading(false)
-    setIframeLoadTimeout(false)
-  }, [])
-
-  // Handle iframe error
-  const handleIframeError = useCallback(() => {
-    setIframeLoading(false)
-    setIframeError(true)
-  }, [])
-
-  // Timeout for iframe loading (alloha.yani.tv timeout handling)
-  useEffect(() => {
-    if (!iframeLoading) return
-
-    const timeout = setTimeout(() => {
-      setIframeLoadTimeout(true)
-    }, 15000) // 15 seconds timeout
-
-    return () => clearTimeout(timeout)
-  }, [iframeLoading])
 
   // Navigation helpers
   const currentEpisodeIndex = episodeNumbers.indexOf(currentEpisode)
@@ -268,75 +231,16 @@ export default function AniPlayerModal() {
             </button>
           </div>
 
-          {/* Video container */}
+          {/* Video container with MirrorPlayer */}
           <div className="flex-1 flex items-center justify-center px-2 sm:px-4 py-3 min-h-0">
-            <div className="w-full max-w-5xl aspect-video rounded-lg sm:rounded-xl overflow-hidden bg-black relative">
-              {/* Loading state */}
-              {iframeLoading && !iframeLoadTimeout && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#1a1a1b]">
-                  <div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin" />
-                  <p className="text-white/40 text-sm">Загрузка плеера...</p>
-                </div>
-              )}
-
-              {/* Timeout error */}
-              {iframeLoadTimeout && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#1a1a1b] p-6 text-center">
-                  <AlertTriangle className="w-12 h-12 text-yellow-400" />
-                  <div className="max-w-md">
-                    <p className="text-white/80 font-medium mb-1">Превышено время ожидания ответа</p>
-                    <p className="text-white/40 text-sm">
-                      alloha.yani.tv не отвечает. Попробуйте использовать VPN или смените озвучку.
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setIframeLoadTimeout(false)
-                      setIframeLoading(true)
-                      setIframeKey((prev) => prev + 1)
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm hover:bg-white/20 transition-colors"
-                  >
-                    Попробовать снова
-                  </button>
-                </div>
-              )}
-
-              {/* Load error */}
-              {iframeError && !iframeLoadTimeout && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#1a1a1b] p-6 text-center">
-                  <AlertTriangle className="w-12 h-12 text-red-400" />
-                  <p className="text-white/80 font-medium">Ошибка загрузки видео</p>
-                  <button
-                    onClick={() => {
-                      setIframeError(false)
-                      setIframeLoading(true)
-                      setIframeKey((prev) => prev + 1)
-                    }}
-                    className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm hover:bg-white/20 transition-colors"
-                  >
-                    Попробовать снова
-                  </button>
-                </div>
-              )}
-
-              {/* Iframe */}
-              {iframeSrc && !iframeError && !iframeLoadTimeout && (
-                <iframe
-                  key={iframeKey}
-                  src={iframeSrc}
-                  className="w-full h-full"
-                  onLoad={handleIframeLoad}
-                  onError={handleIframeError}
-                  allowFullScreen
-                  allow="autoplay; fullscreen; picture-in-picture"
-                  frameBorder="0"
-                  title={`${titleName} - Серия ${currentEpisode}`}
+            <div className="w-full max-w-5xl aspect-video rounded-lg sm:rounded-xl overflow-hidden bg-black">
+              {currentVideo ? (
+                <MirrorPlayer
+                  videoId={currentVideo.data.player_id}
+                  episode={currentEpisode}
+                  dubbing={currentDubbing}
                 />
-              )}
-
-              {/* No video available */}
-              {!iframeSrc && !iframeLoading && !iframeError && !iframeLoadTimeout && (
+              ) : (
                 <div className="flex items-center justify-center h-full text-white/30 text-sm">
                   Нет доступного видео
                 </div>
