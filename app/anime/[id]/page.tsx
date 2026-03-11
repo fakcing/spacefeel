@@ -10,26 +10,23 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   try {
-    const title = await fetchAniTitle(parseInt(params.id))
-    return { title: `${title.names.ru} — SpaceFeel` }
+    const title = await fetchAniTitle(params.id)
+    return { title: `${title.name.main} — SpaceFeel` }
   } catch {
     return { title: 'SpaceFeel' }
   }
 }
 
 export default async function AniDetailPage({ params }: Props) {
-  const id = parseInt(params.id)
-  if (isNaN(id)) notFound()
-
   let title
   try {
-    title = await fetchAniTitle(id)
+    title = await fetchAniTitle(params.id)
   } catch {
     notFound()
   }
 
-  const poster = getPosterUrl(title.posters.original.url)
-  const episodes = Object.values(title.player.list).sort((a, b) => a.serie - b.serie)
+  const poster = getPosterUrl(title.poster.optimized || title.poster.src)
+  const episodes = (title.episodes ?? []).sort((a, b) => a.ordinal - b.ordinal)
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
@@ -42,7 +39,7 @@ export default async function AniDetailPage({ params }: Props) {
               src={poster}
               fill
               className="object-cover"
-              alt={title.names.ru}
+              alt={title.name.main}
               priority
             />
           </div>
@@ -53,11 +50,11 @@ export default async function AniDetailPage({ params }: Props) {
               className="text-4xl font-black tracking-tight"
               style={{ color: 'var(--color-text)' }}
             >
-              {title.names.ru}
+              {title.name.main}
             </h1>
-            {title.names.en && (
+            {title.name.english && (
               <p className="text-lg mt-1" style={{ color: 'var(--color-text-muted)' }}>
-                {title.names.en}
+                {title.name.english}
               </p>
             )}
 
@@ -65,14 +62,14 @@ export default async function AniDetailPage({ params }: Props) {
             <div className="flex flex-wrap gap-2 mt-4">
               {title.genres.slice(0, 5).map((g) => (
                 <span
-                  key={g}
+                  key={g.id}
                   className="px-3 py-1 rounded-full text-xs border"
                   style={{
                     borderColor: 'var(--color-border)',
                     color: 'var(--color-text-muted)',
                   }}
                 >
-                  {g}
+                  {g.name}
                 </span>
               ))}
             </div>
@@ -82,10 +79,10 @@ export default async function AniDetailPage({ params }: Props) {
               className="flex gap-6 mt-4 text-sm flex-wrap"
               style={{ color: 'var(--color-text-muted)' }}
             >
-              <span>{title.season?.year}</span>
-              <span>{title.type?.full_string}</span>
-              <span>{title.player.series?.string}</span>
-              <span>{title.status?.string}</span>
+              <span>{title.year}</span>
+              <span>{title.type?.value}</span>
+              {title.episodes_total && <span>{title.episodes_total} эп.</span>}
+              {title.is_ongoing && <span>Онгоинг</span>}
             </div>
 
             {/* Description */}
@@ -101,8 +98,7 @@ export default async function AniDetailPage({ params }: Props) {
               <div className="flex gap-3 mt-6">
                 <AniPlayerButton
                   episodes={episodes}
-                  host={title.player.host}
-                  titleName={title.names.ru}
+                  titleName={title.name.main}
                 />
               </div>
             )}
@@ -114,8 +110,7 @@ export default async function AniDetailPage({ params }: Props) {
       {episodes.length > 0 && (
         <AniEpisodesGrid
           episodes={episodes}
-          host={title.player.host}
-          titleName={title.names.ru}
+          titleName={title.name.main}
         />
       )}
     </main>

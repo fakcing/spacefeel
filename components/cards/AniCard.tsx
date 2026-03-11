@@ -13,13 +13,14 @@ interface Props {
 
 export default function AniCard({ item }: Props) {
   const router = useRouter()
-  const poster = getPosterUrl(item.posters.medium.url)
-  const title = item.names.ru || item.names.en
+  const poster = getPosterUrl(item.poster.optimized || item.poster.src)
+  const title = item.name.main || item.name.english
+  const href = `/anime/${item.alias}`
 
   return (
     <Link
-      href={`/anime/${item.id}`}
-      onMouseEnter={() => router.prefetch(`/anime/${item.id}`)}
+      href={href}
+      onMouseEnter={() => router.prefetch(href)}
       className="group relative block w-full"
     >
       <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-white/5">
@@ -39,14 +40,14 @@ export default function AniCard({ item }: Props) {
 
         {/* Favorites count */}
         <div className="absolute bottom-10 left-2 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-xs font-semibold text-white">
-          ♥ {(item.in_favorites / 1000).toFixed(1)}K
+          ♥ {(item.added_in_users_favorites / 1000).toFixed(1)}K
         </div>
 
         {/* Title */}
         <div className="absolute bottom-0 left-0 right-0 p-2.5">
           <p className="text-white text-xs font-medium leading-tight line-clamp-2">{title}</p>
           <p className="text-white/50 text-[10px] mt-0.5">
-            {item.season?.year} • {item.type?.string}
+            {item.year} • {item.type?.value}
           </p>
         </div>
       </div>

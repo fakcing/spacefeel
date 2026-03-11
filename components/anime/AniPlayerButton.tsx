@@ -6,19 +6,17 @@ import { AniEpisode } from '@/types/anilibria'
 
 interface Props {
   episodes: AniEpisode[]
-  host: string
   titleName: string
 }
 
-export default function AniPlayerButton({ episodes, host, titleName }: Props) {
+export default function AniPlayerButton({ episodes, titleName }: Props) {
   const { openPlayer } = useAniPlayerStore()
 
   const handlePlay = () => {
     openPlayer({
       episodes,
-      host,
       titleName,
-      startEpisode: episodes[0]?.serie ?? 1,
+      startEpisode: episodes[0]?.ordinal ?? 1,
     })
   }
 

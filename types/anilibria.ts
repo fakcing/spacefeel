@@ -1,76 +1,56 @@
 export interface AniLibriaTitle {
   id: number
-  code: string
-  names: {
-    ru: string
-    en: string
-    alternative: string | null
+  alias: string
+  name: {
+    main: string
+    english: string
+    alternative: string[]
   }
-  announce: string | null
-  status: {
-    string: string
-    code: number
-  }
-  posters: {
-    small: { url: string }
-    medium: { url: string }
-    original: { url: string }
-  }
-  updated: number
-  last_change: number
-  type: {
-    full_string: string
-    code: number
-    string: string
-    series: number | null
-    length: string | null
-  }
-  genres: string[]
-  team: {
-    voice: string[]
-    translator: string[]
-    editing: string[]
-    decor: string[]
-    timing: string[]
-  }
+  year: number
   season: {
-    string: string
-    code: number
-    year: number
-    week_day: number | null
+    value: string
+    description: string
   }
+  type: {
+    value: string
+    description: string
+  }
+  poster: {
+    src: string
+    preview: string | null
+    thumbnail: string | null
+    optimized: string
+  }
+  genres: {
+    id: number
+    name: string
+    description: string
+  }[]
+  episodes_total: number | null
+  average_duration_of_episode: number | null
+  age_rating: {
+    value: string
+    label: string
+    is_adult: boolean
+  }
+  is_ongoing: boolean
   description: string
-  in_favorites: number
-  blocked: {
-    blocked: boolean
-    bakanim: boolean
-  }
-  player: {
-    alternative_player: string | null
-    host: string
-    series: {
-      first: number
-      last: number
-      string: string
-    }
-    list: {
-      [episode: string]: AniEpisode
-    }
-  }
-  torrents: {
-    episodes: { first: number; last: number; string: string }
-    list: unknown[]
-  }
+  added_in_users_favorites: number
+  fresh_at: string
+  created_at: string
+  updated_at: string
+  episodes?: AniEpisode[]
 }
 
 export interface AniEpisode {
-  serie: number
-  created_timestamp: number
-  preview: string | null
-  skips: { opening: number[]; ending: number[] }
-  hls: {
-    fhd: string | null
-    hd: string | null
-    sd: string | null
-  }
+  id: number
+  ordinal: number
+  name: string | null
+  duration: number
+  opening: { start: number; end: number } | null
+  ending: { start: number; end: number } | null
+  preview: { src: string; thumbnail: string } | null
+  hls_480: string | null
+  hls_720: string | null
+  hls_1080: string | null
 }

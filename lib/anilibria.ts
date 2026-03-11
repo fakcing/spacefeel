@@ -1,8 +1,8 @@
 import { cache } from 'react'
 import { AniLibriaTitle } from '@/types/anilibria'
 
-const BASE = 'https://api.anilibria.tv/v3'
-const IMG_BASE = 'https://anilibria.tv'
+const BASE = 'https://anilibria.top/api/v1'
+const IMG_BASE = 'https://anilibria.top'
 
 async function aniFetch<T>(endpoint: string): Promise<T> {
   const res = await fetch(`${BASE}${endpoint}`, {
@@ -13,36 +13,42 @@ async function aniFetch<T>(endpoint: string): Promise<T> {
 }
 
 export const getPosterUrl = (path: string) => `${IMG_BASE}${path}`
-export const getStreamUrl = (host: string, path: string) => `https://${host}${path}`
 
-export const fetchAniUpdates = cache(async (limit = 20, page = 0) => {
-  const data = await aniFetch<{ list: AniLibriaTitle[] }>(
-    `/title/updates?limit=${limit}&page=${page}&filter=id,names,posters,season,type,genres,description,status,in_favorites`
+interface CatalogResponse {
+  data: AniLibriaTitle[]
+  meta: {
+    total: number
+    count: number
+    per_page: number
+    current_page: number
+  }
+}
+
+// Recent updates — sorted by updated_at
+export const fetchAniUpdates = cache(async (limit = 20, page = 1) => {
+  const data = await aniFetch<CatalogResponse>(
+    `/anime/catalog/releases?limit=${limit}&page=${page}&order=updated_at&sort=desc`
   )
-  return data.list
+  return data.data
 })
 
-export const fetchAniPopular = cache(async (limit = 20, page = 0) => {
-  const data = await aniFetch<{ list: AniLibriaTitle[] }>(
-    `/title/list?limit=${limit}&page=${page}&order_by=in_favorites&sort_direction=1&filter=id,names,posters,season,type,genres,description,status,in_favorites`
+// Popular — sorted by favorites count
+export const fetchAniPopular = cache(async (limit = 20, page = 1) => {
+  const data = await aniFetch<CatalogResponse>(
+    `/anime/catalog/releases?limit=${limit}&page=${page}&order=added_in_users_favorites&sort=desc`
   )
-  return data.list
+  return data.data
 })
 
+// Search by name
 export const searchAnilibria = cache(async (query: string, limit = 10) => {
-  const data = await aniFetch<{ list: AniLibriaTitle[] }>(
-    `/title/search?search=${encodeURIComponent(query)}&limit=${limit}&filter=id,names,posters,season,type,genres,description,status`
+  const data = await aniFetch<CatalogResponse>(
+    `/anime/catalog/releases?search=${encodeURIComponent(query)}&limit=${limit}`
   )
-  return data.list
+  return data.data
 })
 
-export const fetchAniTitle = cache(async (id: number) => {
-  return aniFetch<AniLibriaTitle>(`/title?id=${id}`)
-})
-
-export const fetchAniSchedule = cache(async () => {
-  const data = await aniFetch<{ day: number; list: AniLibriaTitle[] }[]>(
-    `/title/schedule?filter=id,names,posters,player`
-  )
-  return data
+// Single title by alias (slug), includes episodes with HLS
+export const fetchAniTitle = cache(async (alias: string) => {
+  return aniFetch<AniLibriaTitle>(`/anime/releases/${alias}`)
 })

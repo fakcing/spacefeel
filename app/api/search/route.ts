@@ -13,24 +13,26 @@ export async function GET(req: NextRequest) {
       `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${encodeURIComponent(q)}&language=${language}`
     ).then((r) => r.json()),
     fetch(
-      `https://api.anilibria.tv/v3/title/search?search=${encodeURIComponent(q)}&limit=4&filter=id,names,posters,type`
+      `https://anilibria.top/api/v1/anime/catalog/releases?search=${encodeURIComponent(q)}&limit=4`
     )
       .then((r) => r.json())
-      .catch(() => ({ list: [] })),
+      .catch(() => ({ data: [] })),
   ])
 
-  const aniResults = ((aniData.list ?? []) as Array<{
+  const aniResults = ((aniData.data ?? []) as Array<{
     id: number
-    names: { ru: string; en: string }
-    posters: { medium: { url: string } }
-    type: { string: string }
+    alias: string
+    name: { main: string; english: string }
+    poster: { optimized: string; src: string }
+    type: { value: string }
   }>).map((t) => ({
     id: t.id,
-    title: t.names.ru,
+    title: t.name.main,
     poster_path: null,
-    anilibria_poster: `https://anilibria.tv${t.posters.medium.url}`,
+    anilibria_poster: `https://anilibria.top${t.poster.optimized || t.poster.src}`,
     media_type: 'anime',
-    type: t.type.string,
+    alias: t.alias,
+    type: t.type.value,
   }))
 
   return NextResponse.json({

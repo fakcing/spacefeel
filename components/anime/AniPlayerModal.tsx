@@ -4,34 +4,32 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useAniPlayerStore } from '@/store/aniPlayerStore'
 import { useEffect, useMemo } from 'react'
-import { getStreamUrl } from '@/lib/anilibria'
 
 export default function AniPlayerModal() {
   const {
-    isOpen, episodes, host, titleName,
+    isOpen, episodes, titleName,
     currentEpisode, quality,
     closePlayer, setEpisode, setQuality,
   } = useAniPlayerStore()
 
   const episodeData = useMemo(
-    () => episodes.find((e) => e.serie === currentEpisode),
+    () => episodes.find((e) => e.ordinal === currentEpisode),
     [episodes, currentEpisode]
   )
 
   const streamUrl = useMemo(() => {
     if (!episodeData) return null
-    const path = episodeData.hls[quality] || episodeData.hls.hd || episodeData.hls.sd
-    return path ? getStreamUrl(host, path) : null
-  }, [episodeData, quality, host])
+    return episodeData[quality] || episodeData.hls_720 || episodeData.hls_480
+  }, [episodeData, quality])
 
-  const prevEp = episodes.find((e) => e.serie === currentEpisode - 1)
-  const nextEp = episodes.find((e) => e.serie === currentEpisode + 1)
+  const prevEp = episodes.find((e) => e.ordinal === currentEpisode - 1)
+  const nextEp = episodes.find((e) => e.ordinal === currentEpisode + 1)
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key === 'Escape') closePlayer()
-      if (e.key === 'ArrowLeft' && prevEp) setEpisode(prevEp.serie)
-      if (e.key === 'ArrowRight' && nextEp) setEpisode(nextEp.serie)
+      if (e.key === 'ArrowLeft' && prevEp) setEpisode(prevEp.ordinal)
+      if (e.key === 'ArrowRight' && nextEp) setEpisode(nextEp.ordinal)
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
@@ -56,18 +54,18 @@ export default function AniPlayerModal() {
 
             {/* Quality selector + close */}
             <div className="flex items-center gap-3">
-              {(['fhd', 'hd', 'sd'] as const).map((q) => (
+              {(['hls_1080', 'hls_720', 'hls_480'] as const).map((q) => (
                 <button
                   key={q}
                   onClick={() => setQuality(q)}
-                  disabled={!episodeData?.hls[q]}
+                  disabled={!episodeData?.[q]}
                   className={`text-xs px-2.5 py-1 rounded-md font-medium transition-colors ${
                     quality === q
                       ? 'bg-white text-black'
                       : 'text-white/50 hover:text-white disabled:opacity-20 disabled:cursor-not-allowed'
                   }`}
                 >
-                  {q === 'fhd' ? '1080p' : q === 'hd' ? '720p' : '480p'}
+                  {q === 'hls_1080' ? '1080p' : q === 'hls_720' ? '720p' : '480p'}
                 </button>
               ))}
 
@@ -104,14 +102,14 @@ export default function AniPlayerModal() {
           <div className="flex-shrink-0 px-6 pb-6">
             <div className="flex items-center gap-2 mb-3">
               <button
-                onClick={() => prevEp && setEpisode(prevEp.serie)}
+                onClick={() => prevEp && setEpisode(prevEp.ordinal)}
                 disabled={!prevEp}
                 className="p-1.5 rounded-lg bg-white/10 disabled:opacity-30 hover:bg-white/20 transition-colors"
               >
                 <ChevronLeft size={16} className="text-white" />
               </button>
               <button
-                onClick={() => nextEp && setEpisode(nextEp.serie)}
+                onClick={() => nextEp && setEpisode(nextEp.ordinal)}
                 disabled={!nextEp}
                 className="p-1.5 rounded-lg bg-white/10 disabled:opacity-30 hover:bg-white/20 transition-colors"
               >
@@ -124,15 +122,15 @@ export default function AniPlayerModal() {
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
               {episodes.map((ep) => (
                 <button
-                  key={ep.serie}
-                  onClick={() => setEpisode(ep.serie)}
+                  key={ep.ordinal}
+                  onClick={() => setEpisode(ep.ordinal)}
                   className={`flex-shrink-0 w-10 h-10 rounded-xl text-sm font-medium transition-colors ${
-                    currentEpisode === ep.serie
+                    currentEpisode === ep.ordinal
                       ? 'bg-white text-black'
                       : 'bg-white/10 text-white/70 hover:bg-white/20'
                   }`}
                 >
-                  {ep.serie}
+                  {ep.ordinal}
                 </button>
               ))}
             </div>
