@@ -17,14 +17,31 @@ export const getPosterUrl = (path: string) => `${IMG_BASE}${path}`
 interface CatalogResponse {
   data: AniLibriaTitle[]
   meta: {
-    total: number
-    count: number
-    per_page: number
-    current_page: number
+    pagination: {
+      total: number
+      count: number
+      per_page: number
+      current_page: number
+      total_pages: number
+    }
   }
 }
 
-// Recent updates — sorted by updated_at
+const orderMap: Record<string, string> = {
+  updated: 'updated_at',
+  popular: 'added_in_users_favorites',
+}
+
+// Full catalog with pagination (for /anime page)
+export const fetchAniCatalog = cache(async (category = 'updated', page = 1, limit = 20) => {
+  const order = orderMap[category] || 'updated_at'
+  const data = await aniFetch<CatalogResponse>(
+    `/anime/catalog/releases?limit=${limit}&page=${page}&order=${order}&sort=desc`
+  )
+  return { items: data.data, totalPages: data.meta.pagination.total_pages }
+})
+
+// Recent updates (for home page carousel)
 export const fetchAniUpdates = cache(async (limit = 20, page = 1) => {
   const data = await aniFetch<CatalogResponse>(
     `/anime/catalog/releases?limit=${limit}&page=${page}&order=updated_at&sort=desc`
@@ -32,7 +49,7 @@ export const fetchAniUpdates = cache(async (limit = 20, page = 1) => {
   return data.data
 })
 
-// Popular — sorted by favorites count
+// Popular (for home page carousel)
 export const fetchAniPopular = cache(async (limit = 20, page = 1) => {
   const data = await aniFetch<CatalogResponse>(
     `/anime/catalog/releases?limit=${limit}&page=${page}&order=added_in_users_favorites&sort=desc`
