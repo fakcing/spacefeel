@@ -158,7 +158,7 @@ export default function Navbar() {
   }, [])
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-40 h-16 border-b backdrop-blur-xl bg-[var(--color-bg)]/80" style={{ borderColor: 'var(--color-border)' }}>
+    <nav className="fixed top-0 left-0 right-0 z-40 h-14 border-b md:block hidden" style={{ backgroundColor: 'var(--color-bg)', borderColor: 'var(--color-border)' }}>
       <div className="max-w-7xl mx-auto px-4 md:px-8 h-full flex items-center justify-between">
 
         {/* Logo */}

@@ -49,12 +49,12 @@ export default function MediaCard({ item, mediaType, priority = false }: MediaCa
         className="group cursor-pointer overflow-visible"
         onMouseEnter={() => router.prefetch(href)}
       >
-        <div className="relative w-full aspect-[2/3] rounded-xl overflow-hidden transition-all duration-500 ease-out group-hover:scale-[1.03] group-hover:shadow-2xl shadow-lg">
+        <div className="relative w-full aspect-[2/3] rounded-lg md:rounded-xl overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-[1.03] group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
           {poster && !imgError ? (
             <Image
               src={poster}
               fill
-              className="object-cover transition-all duration-500 group-hover:scale-110"
+              className="object-cover transition-opacity duration-500"
               alt={title || 'Media'}
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
               onError={() => setImgError(true)}
@@ -72,40 +72,27 @@ export default function MediaCard({ item, mediaType, priority = false }: MediaCa
             </div>
           )}
 
-          {/* Animated gradient overlay */}
+          {/* Always-visible bottom gradient */}
           <div
-            className="absolute inset-0 pointer-events-none z-10 opacity-60 group-hover:opacity-80 transition-opacity duration-500"
+            className="absolute inset-0 pointer-events-none z-10"
             style={{
               background: 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.2) 55%, transparent 75%)',
             }}
           />
 
           {/* Rating + title + year — inside image at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 p-2 md:p-2.5 z-20 transform translate-y-1 group-hover:translate-y-0 transition-transform duration-300">
-            <div className="inline-flex items-center gap-1 bg-gradient-to-r from-blue-500/90 to-purple-500/90 backdrop-blur-sm rounded-full px-2 md:px-2.5 py-1 text-[10px] md:text-xs font-bold text-white mb-1.5 shadow-lg">
-              <span>★</span>
+          <div className="absolute bottom-0 left-0 right-0 p-1.5 md:p-2 z-20">
+            <div className="inline-flex items-center bg-black/80 backdrop-blur-sm rounded-full px-1.5 md:px-2 py-0.5 text-[10px] md:text-xs font-semibold text-white mb-1">
               {item.vote_average > 0 ? item.vote_average.toFixed(1) : 'N/A'}
             </div>
             <p
-              className="text-xs md:text-sm font-bold text-white truncate leading-tight drop-shadow-lg"
-              style={{ textShadow: '0 2px 8px rgba(0,0,0,0.9)' }}
+              className="text-xs md:text-sm font-semibold text-white truncate leading-tight"
+              style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6)' }}
             >{title}</p>
             <p
-              className="text-[10px] md:text-xs text-white/80 mt-0.5 font-medium"
-              style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9)' }}
+              className="text-[10px] md:text-xs text-white/60"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
             >{year}</p>
-          </div>
-
-          {/* Hover shine effect */}
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden">
-            <div
-              className="absolute inset-0"
-              style={{
-                background: 'linear-gradient(45deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%)',
-                backgroundSize: '200% 200%',
-                animation: 'shimmer 2s infinite',
-              }}
-            />
           </div>
 
           {/* Bookmark button — top right */}
