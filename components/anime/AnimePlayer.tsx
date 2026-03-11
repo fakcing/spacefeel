@@ -39,8 +39,12 @@ export default function AnimePlayer({
       setError(null)
 
       try {
+        console.log('Fetching servers for shikimoriId:', shikimoriId)
         const serverData = await getAnimeServers(shikimoriId)
+        console.log('Received servers:', serverData)
+        
         const availableServers = serverData.filter(s => s.available)
+        console.log('Available servers:', availableServers)
         
         if (availableServers.length === 0) {
           setError('No servers available')
@@ -49,13 +53,15 @@ export default function AnimePlayer({
 
         setServers(serverData)
         
-        // Set default translation
+        // Set default server (prefer Yummy if available)
         const defaultServer = availableServers.find(s => s.server === 'yummy') || availableServers[0]
+        console.log('Setting default server:', defaultServer)
         setActiveServer(defaultServer.server)
         if (defaultServer.translations.length > 0) {
           setActiveTranslation(defaultServer.translations[0].id)
         }
       } catch (err) {
+        console.error('Failed to load servers:', err)
         setError(err instanceof Error ? err.message : 'Failed to load servers')
       } finally {
         setIsLoading(false)
@@ -123,12 +129,19 @@ export default function AnimePlayer({
 
   // Handle server change
   const handleServerChange = (server: AnimeServer) => {
+    console.log('Switching to server:', server)
+    const serverData = servers.find(s => s.server === server)
+    
+    if (!serverData?.available) {
+      console.warn('Server not available:', server)
+      return
+    }
+    
     setActiveServer(server)
     setIsPlayerLoading(true)
     setError(null)
     
     // Reset translation to first available
-    const serverData = servers.find(s => s.server === server)
     if (serverData?.translations.length) {
       setActiveTranslation(serverData.translations[0].id)
     }
