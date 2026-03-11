@@ -32,7 +32,7 @@ const nextConfig = {
 			// AniLibria posters
 			{
 				protocol: 'https',
-				hostname: 'anilibria.tv',
+				hostname: 'anilibria.top',
 			},
 		],
 		formats: ['image/avif', 'image/webp'],
