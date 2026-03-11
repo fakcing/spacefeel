@@ -37,10 +37,19 @@ export async function GET(req: NextRequest) {
     source: 'anilibria',
   }))
 
+  // Exclude TMDB animation TV shows (they are anime — covered by AniLibria)
+  // Also exclude person results
+  const tmdbFiltered = ((tmdbData.results ?? []) as Array<{
+    media_type: string
+    genre_ids?: number[]
+  }>)
+    .filter(item =>
+      item.media_type !== 'person' &&
+      !(item.media_type === 'tv' && (item.genre_ids ?? []).includes(16))
+    )
+    .slice(0, 6)
+
   return NextResponse.json({
-    results: [
-      ...((tmdbData.results ?? []) as unknown[]).slice(0, 6),
-      ...aniResults,
-    ],
+    results: [...tmdbFiltered, ...aniResults],
   })
 }
