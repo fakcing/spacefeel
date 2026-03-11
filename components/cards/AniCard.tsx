@@ -36,17 +36,28 @@ export default function AniCard({ item }: Props) {
         />
 
         {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+        <div
+          className="absolute inset-0 pointer-events-none z-10"
+          style={{
+            background: 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.2) 55%, transparent 75%)',
+          }}
+        />
 
         {/* Favorites count */}
-        <div className="absolute bottom-10 left-2 bg-black/60 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-xs font-semibold text-white">
+        <div className="absolute bottom-10 left-2 z-20 bg-black/80 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-xs font-semibold text-white">
           ♥ {(item.added_in_users_favorites / 1000).toFixed(1)}K
         </div>
 
         {/* Title */}
-        <div className="absolute bottom-0 left-0 right-0 p-2.5">
-          <p className="text-white text-xs font-medium leading-tight line-clamp-2">{title}</p>
-          <p className="text-white/50 text-[10px] mt-0.5">
+        <div className="absolute bottom-0 left-0 right-0 p-2.5 z-20">
+          <p
+            className="text-white text-xs font-semibold leading-tight line-clamp-2"
+            style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6)' }}
+          >{title}</p>
+          <p
+            className="text-white/60 text-[10px] mt-0.5"
+            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
+          >
             {item.year} • {item.type?.value}
           </p>
         </div>

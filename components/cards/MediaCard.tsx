@@ -63,15 +63,26 @@ export default function MediaCard({ item, mediaType, priority = false }: MediaCa
           )}
 
           {/* Always-visible bottom gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+          <div
+            className="absolute inset-0 pointer-events-none z-10"
+            style={{
+              background: 'linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.2) 55%, transparent 75%)',
+            }}
+          />
 
           {/* Rating + title + year — inside image at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 p-2">
-            <div className="inline-flex items-center bg-black/70 backdrop-blur-sm rounded-full px-2 py-0.5 text-xs font-semibold text-white mb-1">
+          <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
+            <div className="inline-flex items-center bg-black/80 backdrop-blur-sm rounded-full px-2 py-0.5 text-xs font-semibold text-white mb-1">
               {item.vote_average > 0 ? item.vote_average.toFixed(1) : 'N/A'}
             </div>
-            <p className="text-sm font-semibold text-white truncate leading-tight">{title}</p>
-            <p className="text-xs text-white/60">{year}</p>
+            <p
+              className="text-sm font-semibold text-white truncate leading-tight"
+              style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6)' }}
+            >{title}</p>
+            <p
+              className="text-xs text-white/60"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
+            >{year}</p>
           </div>
 
           {/* Bookmark button — top right */}
