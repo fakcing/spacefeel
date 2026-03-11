@@ -60,7 +60,7 @@ export const fetchAniPopular = cache(async (limit = 20, page = 1) => {
 // Search by name
 export const searchAnilibria = cache(async (query: string, limit = 10) => {
   const data = await aniFetch<CatalogResponse>(
-    `/anime/catalog/releases?search=${encodeURIComponent(query)}&limit=${limit}`
+    `/anime/catalog/releases?f[search]=${encodeURIComponent(query)}&limit=${limit}`
   )
   return data.data
 })

@@ -3,19 +3,18 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { AniLibriaTitle } from '@/types/anilibria'
-import { getPosterUrl } from '@/lib/anilibria'
+import { YaniAnime } from '@/types/yani'
+import { getPosterUrl } from '@/lib/yani'
 import { BLUR_DATA_URL } from '@/lib/blurhash'
 
 interface Props {
-  item: AniLibriaTitle
+  item: YaniAnime
 }
 
 export default function AniCard({ item }: Props) {
   const router = useRouter()
-  const poster = getPosterUrl(item.poster.optimized?.src || item.poster.src)
-  const title = item.name.main || item.name.english
-  const href = `/anime/${item.alias}`
+  const poster = getPosterUrl(item.poster.medium || item.poster.big)
+  const href = `/anime/${item.anime_url}`
 
   return (
     <Link
@@ -28,7 +27,7 @@ export default function AniCard({ item }: Props) {
           src={poster}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-105"
-          alt={title}
+          alt={item.title}
           placeholder="blur"
           blurDataURL={BLUR_DATA_URL}
           sizes="(max-width: 640px) 33vw, 16vw"
@@ -46,17 +45,17 @@ export default function AniCard({ item }: Props) {
         {/* Title */}
         <div className="absolute bottom-0 left-0 right-0 p-2.5 z-20">
           <div className="inline-flex items-center bg-black/70 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-white mb-1">
-            ♥ {(item.added_in_users_favorites / 1000).toFixed(1)}K
+            ★ {item.rating.average.toFixed(1)}
           </div>
           <p
             className="text-white text-xs font-semibold leading-tight line-clamp-2"
             style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6)' }}
-          >{title}</p>
+          >{item.title}</p>
           <p
             className="text-white/60 text-[10px] mt-0.5"
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
           >
-            {item.year} • {item.type?.value}
+            {item.year} • {item.type?.name}
           </p>
         </div>
       </div>

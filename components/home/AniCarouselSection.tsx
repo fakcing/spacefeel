@@ -4,13 +4,13 @@ import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { AniLibriaTitle } from '@/types/anilibria'
+import { YaniAnime } from '@/types/yani'
 import AniCard from '@/components/cards/AniCard'
 
 interface AniCarouselSectionProps {
   title: string
   subtitle?: string
-  items: AniLibriaTitle[]
+  items: YaniAnime[]
   viewAllHref?: string
 }
 
@@ -98,7 +98,7 @@ export default function AniCarouselSection({
         >
           {items.map((item, index) => (
             <motion.div
-              key={item.id}
+              key={item.anime_id}
               className="w-[calc((100%-60px)/6)] min-w-[calc((100%-60px)/6)] flex-shrink-0 flex-grow-0"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

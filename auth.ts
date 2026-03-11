@@ -7,6 +7,14 @@ import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
 
+// Validate required configuration
+if (!process.env.AUTH_SECRET) {
+  console.warn('⚠️ AUTH_SECRET is not set. Authentication may not work properly.')
+}
+
+const hasGoogleCredentials = process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+const hasGitHubCredentials = process.env.GITHUB_CLIENT_ID && process.env.GITHUB_CLIENT_SECRET
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(prisma),
   session: { strategy: 'jwt' },
@@ -15,14 +23,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     error: '/',
   },
   providers: [
-    Google({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-    GitHub({
-      clientId: process.env.GITHUB_CLIENT_ID!,
-      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-    }),
+    // Google Provider (only if credentials exist)
+    ...(hasGoogleCredentials ? [Google({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    })] : []),
+    
+    // GitHub Provider (only if credentials exist)
+    ...(hasGitHubCredentials ? [GitHub({
+      clientId: process.env.GITHUB_CLIENT_ID,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    })] : []),
+    
     Credentials({
       name: 'credentials',
       credentials: {
@@ -62,4 +74,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session
     },
   },
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === 'development',
 })

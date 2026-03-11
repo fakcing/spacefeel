@@ -23,6 +23,7 @@ const bebasNeue = Bebas_Neue({
 export const metadata: Metadata = {
   title: 'spacefeel',
   description: 'Cinema information platform',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
   icons: {
     icon: '/favicon.svg',
     apple: '/favicon.svg',
@@ -38,6 +39,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await getMessages()
   return (
     <html lang="en" suppressHydrationWarning className={`${inter.variable} ${bebasNeue.variable}`}>
+      <head>
+        <link rel="preconnect" href="https://image.tmdb.org" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://api.yani.tv" crossOrigin="anonymous" />
+      </head>
       <body className={inter.variable} suppressHydrationWarning>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <SessionProvider>

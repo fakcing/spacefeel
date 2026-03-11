@@ -19,26 +19,27 @@ const nextConfig = {
 				protocol: 'https',
 				hostname: 'img.youtube.com',
 			},
-			// Добавляем домен для аватарок Google
 			{
 				protocol: 'https',
 				hostname: 'lh3.googleusercontent.com',
 			},
-			// Добавляем домен для аватарок GitHub (на будущее)
 			{
 				protocol: 'https',
 				hostname: 'avatars.githubusercontent.com',
 			},
-			// AniLibria posters
 			{
 				protocol: 'https',
 				hostname: 'anilibria.top',
 			},
+			{
+				protocol: 'https',
+				hostname: 'static.yani.tv',
+			},
 		],
 		formats: ['image/avif', 'image/webp'],
-		minimumCacheTTL: 86400,
+		minimumCacheTTL: 604800,
 		deviceSizes: [640, 828, 1080, 1200, 1920],
-		imageSizes: [64, 128, 180, 256, 342, 384],
+		imageSizes: [64, 128, 180, 256, 342],
 	},
 	experimental: {
 		optimisticClientCache: true,

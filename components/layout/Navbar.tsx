@@ -24,7 +24,7 @@ type SearchResult = {
   first_air_date?: string
   alias?: string
   year?: string
-  source?: 'tmdb' | 'anilibria'
+  source?: 'tmdb' | 'anilibria' | 'yani'
 }
 
 interface DropdownItem {

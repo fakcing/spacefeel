@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { cache } from 'react'
 import { fetchCartoons } from '@/lib/tmdb'
 import { TVShow } from '@/types/tmdb'
 import MediaCard from '@/components/cards/MediaCard'
@@ -14,6 +15,10 @@ const categories = [
   { value: 'classics',  label: 'Classics' },
 ]
 
+const getCartoons = cache(async (category: string, page: number) => {
+  return await fetchCartoons(category, page)
+})
+
 export default async function CartoonsPage({
   searchParams,
 }: {
@@ -21,7 +26,7 @@ export default async function CartoonsPage({
 }) {
   const category = searchParams.category || 'popular'
   const page = Math.max(1, parseInt(searchParams.page || '1') || 1)
-  const { results, total_pages } = await fetchCartoons(category, page)
+  const { results, total_pages } = await getCartoons(category, page)
   const label = categories.find((c) => c.value === category)?.label || 'Popular'
   const baseHref = `/cartoons?category=${category}`
 

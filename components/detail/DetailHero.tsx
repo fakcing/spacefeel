@@ -10,7 +10,6 @@ import Rating from '@/components/ui/Rating'
 import { useSession } from 'next-auth/react'
 import { useWatchlistStore } from '@/store/watchlistStore'
 import { useAuthModalStore } from '@/store/authModalStore'
-import { BLUR_DATA_URL } from '@/lib/blurhash'
 
 interface DetailHeroProps {
   item: Movie | TVShow
@@ -81,8 +80,6 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
                 fill
                 className="object-cover"
                 priority
-                placeholder="blur"
-                blurDataURL={BLUR_DATA_URL}
                 sizes="(max-width: 768px) 40vw, 160px"
               />
             )}

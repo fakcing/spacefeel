@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { cache } from 'react'
 import { fetchTrending, fetchPopular, fetchTopRated, fetchUpcoming, fetchNowPlaying, fetchDiscover } from '@/lib/tmdb'
 import { Movie, TMDBResponse } from '@/types/tmdb'
 import MediaCard from '@/components/cards/MediaCard'
@@ -14,7 +15,7 @@ const categories = [
   { value: 'discover',   label: 'Discover' },
 ]
 
-async function getMovies(category: string, page: number): Promise<{ results: Movie[]; total_pages: number }> {
+const getMovies = cache(async (category: string, page: number): Promise<{ results: Movie[]; total_pages: number }> => {
   let r: TMDBResponse<Movie>
   switch (category) {
     case 'trending':
@@ -39,7 +40,7 @@ async function getMovies(category: string, page: number): Promise<{ results: Mov
       r = await fetchTrending('movie', page) as TMDBResponse<Movie>
   }
   return { results: r.results, total_pages: r.total_pages }
-}
+})
 
 export default async function MoviesPage({
   searchParams,

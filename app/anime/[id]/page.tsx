@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import { fetchAniTitle, getPosterUrl } from '@/lib/anilibria'
+import { fetchYaniTitle, fetchYaniVideos, getPosterUrl } from '@/lib/yani'
 import AniPlayerButton from '@/components/anime/AniPlayerButton'
 import AniEpisodesGrid from '@/components/anime/AniEpisodesGrid'
 
@@ -10,8 +10,8 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   try {
-    const title = await fetchAniTitle(params.id)
-    return { title: `${title.name.main} — SpaceFeel` }
+    const title = await fetchYaniTitle(params.id)
+    return { title: `${title.title} — SpaceFeel` }
   } catch {
     return { title: 'SpaceFeel' }
   }
@@ -20,13 +20,13 @@ export async function generateMetadata({ params }: Props) {
 export default async function AniDetailPage({ params }: Props) {
   let title
   try {
-    title = await fetchAniTitle(params.id)
+    title = await fetchYaniTitle(params.id)
   } catch {
     notFound()
   }
 
-  const poster = getPosterUrl(title.poster.optimized?.src || title.poster.src)
-  const episodes = (title.episodes ?? []).sort((a, b) => a.ordinal - b.ordinal)
+  const videos = await fetchYaniVideos(title.anime_id).catch(() => [])
+  const poster = getPosterUrl(title.poster.big || title.poster.medium)
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
@@ -39,7 +39,7 @@ export default async function AniDetailPage({ params }: Props) {
               src={poster}
               fill
               className="object-cover"
-              alt={title.name.main}
+              alt={title.title}
               priority
             />
           </div>
@@ -50,13 +50,8 @@ export default async function AniDetailPage({ params }: Props) {
               className="text-4xl font-black tracking-tight"
               style={{ color: 'var(--color-text)' }}
             >
-              {title.name.main}
+              {title.title}
             </h1>
-            {title.name.english && (
-              <p className="text-lg mt-1" style={{ color: 'var(--color-text-muted)' }}>
-                {title.name.english}
-              </p>
-            )}
 
             {/* Genres */}
             <div className="flex flex-wrap gap-2 mt-4">
@@ -69,7 +64,7 @@ export default async function AniDetailPage({ params }: Props) {
                     color: 'var(--color-text-muted)',
                   }}
                 >
-                  {g.name}
+                  {g.title}
                 </span>
               ))}
             </div>
@@ -80,9 +75,10 @@ export default async function AniDetailPage({ params }: Props) {
               style={{ color: 'var(--color-text-muted)' }}
             >
               <span>{title.year}</span>
-              <span>{title.type?.value}</span>
-              {title.episodes_total && <span>{title.episodes_total} эп.</span>}
-              {title.is_ongoing && <span>Онгоинг</span>}
+              <span>{title.type?.name}</span>
+              {title.episodes?.count > 0 && <span>{title.episodes.count} эп.</span>}
+              {title.anime_status && <span>{title.anime_status.title}</span>}
+              {title.rating.average > 0 && <span>★ {title.rating.average.toFixed(1)}</span>}
             </div>
 
             {/* Description */}
@@ -94,12 +90,9 @@ export default async function AniDetailPage({ params }: Props) {
             </p>
 
             {/* Play button */}
-            {episodes.length > 0 && (
+            {videos.length > 0 && (
               <div className="flex gap-3 mt-6">
-                <AniPlayerButton
-                  episodes={episodes}
-                  titleName={title.name.main}
-                />
+                <AniPlayerButton videos={videos} titleName={title.title} />
               </div>
             )}
           </div>
@@ -107,11 +100,8 @@ export default async function AniDetailPage({ params }: Props) {
       </div>
 
       {/* Episodes grid */}
-      {episodes.length > 0 && (
-        <AniEpisodesGrid
-          episodes={episodes}
-          titleName={title.name.main}
-        />
+      {videos.length > 0 && (
+        <AniEpisodesGrid videos={videos} titleName={title.title} />
       )}
     </main>
   )

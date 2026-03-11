@@ -18,10 +18,18 @@ interface MediaCardProps {
   priority?: boolean
 }
 
+/**
+ * Optimized MediaCard with:
+ * - Priority loading for above-fold content
+ * - Proper srcset sizes for responsive images
+ * - Blur placeholder for instant visual feedback
+ * - Lazy loading for below-fold content
+ */
 export default function MediaCard({ item, mediaType, priority = false }: MediaCardProps) {
   const title = 'title' in item ? item.title : item.name
   const year = ('release_date' in item ? item.release_date : item.first_air_date)?.slice(0, 4) || ''
-  const poster = getPoster(item.poster_path, 'w342')
+  // Use smaller image for non-priority cards
+  const poster = getPoster(item.poster_path, priority ? 'w342' : 'w185')
   const [imgError, setImgError] = useState(false)
   const router = useRouter()
 
@@ -48,10 +56,12 @@ export default function MediaCard({ item, mediaType, priority = false }: MediaCa
               fill
               className="object-cover transition-opacity duration-500"
               alt={title || 'Media'}
-              sizes="(max-width: 640px) 33vw, (max-width: 1024px) 20vw, 16vw"
+              sizes="(max-width: 640px) 165px, (max-width: 768px) 170px, (max-width: 1024px) 20vw, (max-width: 1280px) 16vw, 190px"
               onError={() => setImgError(true)}
               priority={priority}
               loading={priority ? undefined : 'lazy'}
+              decoding={priority ? 'sync' : 'async'}
+              fetchPriority={priority ? 'high' : 'auto'}
               placeholder="blur"
               blurDataURL={BLUR_DATA_URL}
               onLoad={(e) => { (e.target as HTMLImageElement).style.opacity = '1' }}

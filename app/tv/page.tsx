@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { cache } from 'react'
 import { fetchDiscover, fetchOnTheAir, fetchAiringToday } from '@/lib/tmdb'
 import { TVShow, TMDBResponse } from '@/types/tmdb'
 import MediaCard from '@/components/cards/MediaCard'
@@ -17,7 +18,7 @@ const categories = [
 // Exclude animation (genre 16) from all TV discover fetches
 const noAnim = { without_genres: '16' }
 
-async function getShows(category: string, page: number): Promise<{ results: TVShow[]; total_pages: number }> {
+const getShows = cache(async (category: string, page: number): Promise<{ results: TVShow[]; total_pages: number }> => {
   let r: TMDBResponse<TVShow>
   const p = String(page)
   switch (category) {
@@ -43,7 +44,7 @@ async function getShows(category: string, page: number): Promise<{ results: TVSh
       r = await fetchDiscover('tv', { ...noAnim, sort_by: 'popularity.desc', page: p }) as TMDBResponse<TVShow>
   }
   return { results: r.results, total_pages: r.total_pages }
-}
+})
 
 export default async function TVPage({
   searchParams,

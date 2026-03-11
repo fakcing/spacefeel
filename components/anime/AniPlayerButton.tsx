@@ -2,22 +2,18 @@
 
 import { Play } from 'lucide-react'
 import { useAniPlayerStore } from '@/store/aniPlayerStore'
-import { AniEpisode } from '@/types/anilibria'
+import { YaniVideo } from '@/types/yani'
 
 interface Props {
-  episodes: AniEpisode[]
+  videos: YaniVideo[]
   titleName: string
 }
 
-export default function AniPlayerButton({ episodes, titleName }: Props) {
+export default function AniPlayerButton({ videos, titleName }: Props) {
   const { openPlayer } = useAniPlayerStore()
 
   const handlePlay = () => {
-    openPlayer({
-      episodes,
-      titleName,
-      startEpisode: episodes[0]?.ordinal ?? 1,
-    })
+    openPlayer({ videos, titleName })
   }
 
   return (

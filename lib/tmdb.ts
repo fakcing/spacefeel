@@ -8,6 +8,12 @@ const API_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
 
 export { IMG_BASE, getPoster, getBackdrop } from './tmdbImages'
 
+/**
+ * Advanced TMDB fetch with caching strategy
+ * - Uses React cache() for request deduplication
+ * - Next.js data cache with revalidation
+ * - Cache tags for on-demand revalidation
+ */
 async function tmdbFetch<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
   const cookieStore = cookies()
   const locale = cookieStore.get('locale')?.value ?? 'en'
@@ -17,11 +23,19 @@ async function tmdbFetch<T>(endpoint: string, params: Record<string, string> = {
   url.searchParams.set('api_key', API_KEY || '')
   url.searchParams.set('language', language)
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v))
-  const res = await fetch(url.toString(), { next: { revalidate: 3600, tags: [`tmdb`, `tmdb-${locale}`, `tmdb-${endpoint}`] } })
+  
+  const res = await fetch(url.toString(), { 
+    next: { 
+      revalidate: 600, // Revalidate every 10 minutes
+      tags: ['tmdb', `tmdb-${locale}`, `tmdb-${endpoint.split('?')[0]}`]
+    } 
+  })
+  
   if (!res.ok) throw new Error(`TMDB error: ${res.status}`)
   return res.json()
 }
 
+// Cached fetch functions with specific tags for on-demand revalidation
 export const fetchTrending = cache(async (type: 'movie' | 'tv' | 'all' = 'all', page = 1): Promise<TMDBResponse<Movie | TVShow>> => {
   return tmdbFetch<TMDBResponse<Movie | TVShow>>(`/trending/${type}/week`, { page: String(page) })
 })
@@ -51,43 +65,11 @@ export const fetchOnTheAir = cache(async (page = 1): Promise<TMDBResponse<TVShow
 })
 
 export const fetchMovieDetail = cache(async (id: number): Promise<Movie> => {
-  const cookieStore = cookies()
-  const locale = cookieStore.get('locale')?.value ?? 'en'
-
-  const data = await tmdbFetch<Movie>(`/movie/${id}`)
-
-  if ((!data.overview || data.overview.trim() === '') && locale !== 'en') {
-    const fallback = await fetch(
-      `${BASE_URL}/movie/${id}?api_key=${API_KEY}&language=en-US`
-    ).then(r => r.json())
-    return {
-      ...data,
-      overview: fallback.overview || data.overview,
-      title: data.title || fallback.title,
-    }
-  }
-
-  return data
+  return tmdbFetch<Movie>(`/movie/${id}`)
 })
 
 export const fetchTVDetail = cache(async (id: number): Promise<TVShow> => {
-  const cookieStore = cookies()
-  const locale = cookieStore.get('locale')?.value ?? 'en'
-
-  const data = await tmdbFetch<TVShow>(`/tv/${id}`)
-
-  if ((!data.overview || data.overview.trim() === '') && locale !== 'en') {
-    const fallback = await fetch(
-      `${BASE_URL}/tv/${id}?api_key=${API_KEY}&language=en-US`
-    ).then(r => r.json())
-    return {
-      ...data,
-      overview: fallback.overview || data.overview,
-      name: data.name || fallback.name,
-    }
-  }
-
-  return data
+  return tmdbFetch<TVShow>(`/tv/${id}`)
 })
 
 export const fetchCredits = cache(async (type: 'movie' | 'tv', id: number): Promise<Credits> => {
@@ -113,7 +95,6 @@ export const fetchSearch = cache(async (query: string, page = 1): Promise<TMDBRe
   })
 })
 
-// Cartoons: always enforces animation + family genre + English origin
 export const fetchCartoons = cache(async (category = 'trending', page = 1): Promise<TMDBResponse<TVShow>> => {
   const base: Record<string, string> = {
     with_genres: '16,10751',
@@ -133,8 +114,19 @@ export const fetchCartoons = cache(async (category = 'trending', page = 1): Prom
       return tmdbFetch('/discover/tv', { ...base, sort_by: 'first_air_date.desc' })
     case 'classics':
       return tmdbFetch('/discover/tv', { ...base, 'first_air_date.lte': '2000-01-01', sort_by: 'vote_average.desc' })
-    case 'discover':
     default:
       return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
   }
 })
+
+/**
+ * Revalidate specific cache tags
+ * Call this from API route or on-demand revalidation
+ */
+export async function revalidateTMDBData(endpoint?: string) {
+  const { revalidateTag } = await import('next/cache')
+  revalidateTag('tmdb')
+  if (endpoint) {
+    revalidateTag(`tmdb-${endpoint}`)
+  }
+}
