@@ -28,6 +28,9 @@ export default function Pagination({ currentPage, totalPages, baseHref }: Pagina
   const pages = getPageList(currentPage, capped)
   const btn = 'flex items-center justify-center w-9 h-9 rounded-full text-sm font-medium transition-colors'
 
+  // Determine if we need to use ? or & for the first page parameter
+  const separator = baseHref.includes('?') ? '&' : '?'
+
   return (
     <div className="flex items-center justify-center gap-1.5 py-10 flex-wrap">
       {pages.map((page, i) =>
@@ -38,7 +41,7 @@ export default function Pagination({ currentPage, totalPages, baseHref }: Pagina
         ) : (
           <Link
             key={page}
-            href={`${baseHref}&page=${page}`}
+            href={`${baseHref}${separator}page=${page}`}
             className={`${btn} ${
               page === currentPage
                 ? 'bg-white text-black'
@@ -52,7 +55,7 @@ export default function Pagination({ currentPage, totalPages, baseHref }: Pagina
 
       {currentPage < capped && (
         <Link
-          href={`${baseHref}&page=${currentPage + 1}`}
+          href={`${baseHref}${separator}page=${currentPage + 1}`}
           className="flex items-center justify-center h-9 px-4 rounded-full text-sm font-medium bg-white/[0.08] hover:bg-white/[0.15] text-white/70 transition-colors"
         >
           Next ›
