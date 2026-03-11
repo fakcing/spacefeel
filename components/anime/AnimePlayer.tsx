@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { AlertTriangle, RefreshCw } from 'lucide-react'
+import { AlertTriangle, RefreshCw, ChevronDown } from 'lucide-react'
 import Hls from 'hls.js'
 import { getAnimeServers, getVostHlsUrl } from '@/lib/animePlayerService'
 import { AnimeServer, AnimeServerData } from '@/types/animePlayer'
@@ -246,72 +246,62 @@ export default function AnimePlayer({
         {renderVideoPlayer()}
       </div>
 
-      {/* Server Selector (Top row) */}
-      <div className="mt-4 flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
-        {servers.map((server) => (
-          <button
-            key={server.server}
-            onClick={() => handleServerChange(server.server)}
-            className={`flex-shrink-0 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-              activeServer === server.server
-                ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/30 scale-105'
-                : 'bg-white/10 text-white/70 hover:bg-white/20 hover:scale-102'
-            } ${!server.available ? 'opacity-50 cursor-not-allowed' : ''}`}
-            disabled={!server.available}
+      {/* Controls Row - Server, Dub, Episodes */}
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        {/* Server Selector (Dropdown) */}
+        <div className="relative">
+          <select
+            value={activeServer}
+            onChange={(e) => handleServerChange(e.target.value as AnimeServer)}
+            className="appearance-none bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-white text-sm font-semibold px-4 py-2.5 pr-10 rounded-xl border border-indigo-500/30 hover:border-indigo-500/50 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/50 min-h-[44px]"
           >
-            {server.name}
-            {!server.available && ' (Offline)'}
-          </button>
-        ))}
-      </div>
+            {servers.map((server) => (
+              <option
+                key={server.server}
+                value={server.server}
+                className="bg-[#1a1a1b] text-white"
+                disabled={!server.available}
+              >
+                {server.name}{!server.available ? ' (Offline)' : ''}
+              </option>
+            ))}
+          </select>
+          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400 pointer-events-none" />
+        </div>
 
-      {/* Translation/Episode Selector (Bottom row) */}
-      <div className="mt-2 flex items-center gap-2 overflow-x-auto scrollbar-hide pb-2">
         {/* Translation selector */}
         {availableTranslations.length > 1 && (
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            <span className="text-white/60 text-xs font-medium px-2">Dub:</span>
-            {availableTranslations.map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setActiveTranslation(t.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                  activeTranslation === t.id
-                    ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30'
-                    : 'bg-white/10 text-white/70 hover:bg-white/20'
-                }`}
-              >
-                {t.name}
-                {t.type === 'sub' && <span className="opacity-60 ml-0.5">[SUB]</span>}
-              </button>
-            ))}
+          <div className="relative">
+            <select
+              value={activeTranslation || ''}
+              onChange={(e) => setActiveTranslation(Number(e.target.value))}
+              className="appearance-none bg-white/10 text-white text-sm px-4 py-2.5 pr-10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/50 min-h-[44px]"
+            >
+              {availableTranslations.map((t) => (
+                <option key={t.id} value={t.id} className="bg-[#1a1a1b] text-white">
+                  {t.name}{t.type === 'sub' ? ' [SUB]' : ''}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
           </div>
         )}
 
         {/* Episode selector */}
         {availableEpisodes.length > 1 && (
-          <div className="flex items-center gap-1.5 flex-shrink-0">
-            <span className="text-white/60 text-xs font-medium px-2">Ep:</span>
-            <div className="flex items-center gap-1.5">
-              {availableEpisodes.slice(0, 20).map((ep) => (
-                <button
-                  key={ep.episode}
-                  onClick={() => handleEpisodeChange(ep.episode)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-medium transition-all ${
-                    activeEpisode === ep.episode
-                      ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30'
-                      : 'bg-white/10 text-white/70 hover:bg-white/20'
-                  }`}
-                >
-                  {ep.episode}
-                </button>
+          <div className="relative">
+            <select
+              value={activeEpisode}
+              onChange={(e) => handleEpisodeChange(Number(e.target.value))}
+              className="appearance-none bg-white/10 text-white text-sm px-4 py-2.5 pr-10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/50 min-h-[44px]"
+            >
+              {availableEpisodes.slice(0, 50).map((ep) => (
+                <option key={ep.episode} value={ep.episode} className="bg-[#1a1a1b] text-white">
+                  Episode {ep.episode}
+                </option>
               ))}
-              {availableEpisodes.length > 20 && (
-                <span className="text-white/40 text-xs px-2">
-                  +{availableEpisodes.length - 20}
-                </span>
-              )}
-            </div>
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
           </div>
         )}
       </div>
@@ -321,7 +311,7 @@ export default function AnimePlayer({
         <div className="mt-3 px-2">
           <h3 className="text-white/80 font-semibold text-sm truncate">{title}</h3>
           <p className="text-white/40 text-xs">
-            Season {activeServerData?.episodes[0]?.episode ? '1' : '1'} • Episode {activeEpisode}
+            Episode {activeEpisode}
           </p>
         </div>
       )}
