@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getImdbId } from '@/lib/tmdb'
 import { getPlayers } from '@/lib/playerService'
 
 export async function GET(
@@ -25,24 +24,14 @@ export async function GET(
       )
     }
 
-    // Get IMDB ID from TMDB
-    const imdbId = await getImdbId(tmdbId, type === 'cartoon' ? 'tv' : type)
-    
-    if (!imdbId) {
-      return NextResponse.json(
-        { error: 'Could not find IMDB ID for this title' },
-        { status: 404 }
-      )
-    }
-
-    // Get players from aggregator
-    const result = await getPlayers(tmdbId, type, imdbId)
+    // Get players from aggregator (no IMDB ID needed)
+    const result = await getPlayers(tmdbId, type)
 
     if (result.servers.length === 0) {
       return NextResponse.json(
         { 
           servers: [],
-          message: 'No video sources found. Try again later or check back when more sources are added.',
+          message: 'No video sources available for this title.',
           cached: false,
         },
         { status: 404 }

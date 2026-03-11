@@ -5,15 +5,15 @@ import { AlertTriangle, RefreshCw, Server } from 'lucide-react'
 import { PlayerServer } from '@/types/player'
 
 interface ParsedPlayerProps {
-  tmdbId: number
-  type: 'movie' | 'tv' | 'cartoon'
+  tmdbId?: number
+  type?: 'movie' | 'tv' | 'cartoon'
   season?: number
   episode?: number
 }
 
 export default function ParsedPlayer({
-  tmdbId,
-  type,
+  tmdbId: propTmdbId,
+  type: propType,
   season = 1,
   episode = 1,
 }: ParsedPlayerProps) {
@@ -23,7 +23,38 @@ export default function ParsedPlayer({
   const [error, setError] = useState<string | null>(null)
   const [cached, setCached] = useState(false)
 
+  // Auto-detect tmdbId and type from URL if not provided
+  const [tmdbId, setTmdbId] = useState(propTmdbId)
+  const [type, setType] = useState(propType)
+
   useEffect(() => {
+    // If tmdbId not provided, try to extract from URL
+    if (!propTmdbId && typeof window !== 'undefined') {
+      const path = window.location.pathname
+      const segments = path.split('/').filter(Boolean)
+      
+      // Pattern: /movies/[id], /tv/[id], /cartoons/[id]
+      const detectedId = segments[segments.length - 1]
+      const detectedType = segments[0]
+      
+      const id = parseInt(detectedId)
+      if (!isNaN(id)) {
+        setTmdbId(id)
+      }
+      
+      // Map URL type to our type
+      if (detectedType === 'movies') setType('movie')
+      else if (detectedType === 'tv') setType('tv')
+      else if (detectedType === 'cartoons') setType('cartoon')
+    } else {
+      setTmdbId(propTmdbId)
+      setType(propType)
+    }
+  }, [propTmdbId, propType])
+
+  useEffect(() => {
+    if (!tmdbId || !type) return
+
     const fetchPlayers = async () => {
       setIsLoading(true)
       setError(null)
@@ -72,7 +103,7 @@ export default function ParsedPlayer({
             {error || 'No video sources available'}
           </p>
           <p className="text-white/40 text-sm">
-            This title may not have parsed sources yet. Try again later.
+            This title may not have available sources yet.
           </p>
         </div>
       </div>
@@ -104,9 +135,6 @@ export default function ParsedPlayer({
               }`}
             >
               {server.name}
-              {server.quality && (
-                <span className="text-[10px] opacity-60">{server.quality}</span>
-              )}
             </button>
           ))}
         </div>

@@ -1,16 +1,36 @@
 import { prisma } from '@/lib/prisma'
-import { PlayerServer, PlayerResponse, ParserResult } from '@/types/player'
-import { parseSource1 } from '@/services/parsers/source1'
-import { parseSource2 } from '@/services/parsers/source2'
-import { parseSource3 } from '@/services/parsers/source3'
+import { PlayerServer, PlayerResponse } from '@/types/player'
 
 const CACHE_TTL_HOURS = 24
 
 /**
- * Player Aggregator Service
+ * Simplified Player Aggregator
  * 
- * Orchestrates all parsers and manages caching
+ * Uses direct embed URLs from known sources
+ * No HTML parsing required
  */
+
+/**
+ * Generate embed URLs for all sources
+ */
+function generateEmbedUrls(tmdbId: number, type: 'movie' | 'tv' | 'cartoon'): { source: string; iframe: string }[] {
+  const isTV = type === 'tv' || type === 'cartoon'
+  
+  return [
+    {
+      source: 'VoidBoost',
+      iframe: `https://voidboost.net/embed/${tmdbId}`,
+    },
+    {
+      source: 'Collaps',
+      iframe: `https://api.collaps.org/embed/${isTV ? 'tv' : 'movie'}/${tmdbId}`,
+    },
+    {
+      source: 'VDBaz',
+      iframe: `https://vdbaz.to/embed/${isTV ? 'tv' : 'movie'}/${tmdbId}`,
+    },
+  ]
+}
 
 /**
  * Get cached player data if available and not expired
@@ -24,6 +44,9 @@ async function getCachedPlayers(tmdbId: number, type: string): Promise<PlayerSer
         createdAt: {
           gt: new Date(Date.now() - CACHE_TTL_HOURS * 60 * 60 * 1000), // 24 hours
         },
+      },
+      orderBy: {
+        id: 'asc',
       },
     })
 
@@ -45,101 +68,96 @@ async function getCachedPlayers(tmdbId: number, type: string): Promise<PlayerSer
 async function saveToCache(
   tmdbId: number,
   type: string,
-  source: string,
-  iframe: string,
-  quality?: string
+  servers: { source: string; iframe: string }[]
 ): Promise<void> {
   try {
-    await prisma.playerCache.upsert({
-      where: {
-        tmdbId_source_type: {
-          tmdbId,
-          source,
-          type,
+    for (const server of servers) {
+      await prisma.playerCache.upsert({
+        where: {
+          tmdbId_source_type: {
+            tmdbId,
+            source: server.source,
+            type,
+          },
         },
-      },
-      update: {
-        iframe,
-        quality,
-      },
-      create: {
-        tmdbId,
-        type,
-        source,
-        iframe,
-        quality,
-      },
-    })
+        update: {
+          iframe: server.iframe,
+        },
+        create: {
+          tmdbId,
+          type,
+          source: server.source,
+          iframe: server.iframe,
+        },
+      })
+    }
   } catch (error) {
     console.error('Error saving player cache:', error)
   }
 }
 
 /**
- * Run all parsers and collect results
+ * Check if iframe URL is working (not 404)
  */
-async function runAllParsers(imdbId: string): Promise<ParserResult[]> {
-  const parsers = [
-    { name: 'Source1', fn: () => parseSource1(imdbId) },
-    { name: 'Source2', fn: () => parseSource2(imdbId) },
-    { name: 'Source3', fn: () => parseSource3(imdbId) },
-  ]
-
-  const results = await Promise.allSettled(parsers.map((p) => p.fn()))
-  
-  return results.map((result, index) => {
-    if (result.status === 'fulfilled') {
-      return result.value
-    } else {
-      return {
-        source: parsers[index].name,
-        iframe: null,
-        error: result.reason instanceof Error ? result.reason.message : 'Unknown error',
-      }
-    }
-  })
+async function checkIframeHealth(iframe: string): Promise<boolean> {
+  try {
+    // Simple HEAD request to check if URL exists
+    const response = await fetch(iframe, {
+      method: 'HEAD',
+      signal: AbortSignal.timeout(5000), // 5 second timeout
+    })
+    return response.ok && response.status !== 404
+  } catch {
+    return false
+  }
 }
 
 /**
  * Main function to get players for a movie/TV show
  */
-export async function getPlayers(tmdbId: number, type: 'movie' | 'tv' | 'cartoon', imdbId: string): Promise<PlayerResponse> {
-  const typeStr = type === 'cartoon' ? 'cartoon' : type
+export async function getPlayers(tmdbId: number, type: 'movie' | 'tv' | 'cartoon'): Promise<PlayerResponse> {
+  const typeStr = type
   
   // Try cache first
   const cached = await getCachedPlayers(tmdbId, typeStr)
   
   if (cached.length > 0) {
-    return {
-      servers: cached,
-      cached: true,
-      cachedAt: new Date(),
+    // Check if at least one server is healthy
+    const healthyServers = await Promise.all(
+      cached.map(async (server) => {
+        const isHealthy = await checkIframeHealth(server.iframe)
+        return { server, isHealthy }
+      })
+    )
+    
+    const workingServers = healthyServers
+      .filter(s => s.isHealthy)
+      .map(s => s.server)
+    
+    if (workingServers.length > 0) {
+      return {
+        servers: workingServers,
+        cached: true,
+        cachedAt: new Date(),
+      }
     }
   }
 
-  // Run all parsers
-  const results = await runAllParsers(imdbId)
-  
-  // Filter successful results
-  const successfulResults = results.filter(
-    (r): r is ParserResult & { iframe: string } => r.iframe !== null
-  )
+  // Generate fresh embed URLs
+  const servers = generateEmbedUrls(tmdbId, type)
   
   // Save to cache
-  for (const result of successfulResults) {
-    await saveToCache(tmdbId, typeStr, result.source, result.iframe, result.quality)
-  }
+  await saveToCache(tmdbId, typeStr, servers)
   
   // Build server list
-  const servers: PlayerServer[] = successfulResults.map((r) => ({
-    name: r.source,
-    iframe: r.iframe,
-    quality: r.quality,
-    source: r.source,
+  const playerServers: PlayerServer[] = servers.map((s) => ({
+    name: s.source,
+    iframe: s.iframe,
+    source: s.source,
   }))
   
   return {
-    servers,
+    servers: playerServers,
     cached: false,
   }
 }
@@ -154,22 +172,5 @@ export async function clearPlayerCache(tmdbId: number): Promise<void> {
     })
   } catch (error) {
     console.error('Error clearing player cache:', error)
-  }
-}
-
-/**
- * Clear all expired cache entries
- */
-export async function clearExpiredCache(): Promise<void> {
-  try {
-    await prisma.playerCache.deleteMany({
-      where: {
-        createdAt: {
-          lt: new Date(Date.now() - CACHE_TTL_HOURS * 60 * 60 * 1000),
-        },
-      },
-    })
-  } catch (error) {
-    console.error('Error clearing expired cache:', error)
   }
 }
