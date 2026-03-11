@@ -26,8 +26,8 @@ export interface AnimeEpisode {
   quality?: 'SD' | 'HD'
 }
 
-const ANILIBRIA_BASE = 'https://api.anilibria.top/api/v1'
-const ANIMEVOST_BASE = 'https://animevost.org'
+const ANILIBRIA_BASE = 'https://anilibria.top/api/v1'
+const ANIMEVOST_BASE = 'https://api.animevost.org'
 
 /**
  * Get Yani TV videos (already loaded from page)
@@ -53,38 +53,53 @@ export function getYaniSources(videos: YaniVideo[]): AnimeSource {
 
 /**
  * Search AniLibria by Shikimori ID
+ * API: https://anilibria.top/api/docs/v1
  */
 export async function getAniLibriaSources(shikimoriId: number): Promise<AnimeSource | null> {
   try {
+    console.log('Fetching AniLibria for shikimoriId:', shikimoriId)
+    
     // Search by Shikimori ID
     const searchRes = await fetch(`${ANILIBRIA_BASE}/anime?shikimori_id=${shikimoriId}`)
     
     if (!searchRes.ok) {
+      console.log('AniLibria search failed:', searchRes.status)
       return null
     }
 
     const searchData = await searchRes.json()
-    const animeId = searchData.id || searchData[0]?.id
+    console.log('AniLibria search result:', searchData)
+    
+    const anime = Array.isArray(searchData) ? searchData[0] : searchData
+    const animeId = anime?.id
     
     if (!animeId) {
       return null
     }
 
-    // Get episodes/player data
-    const playerRes = await fetch(`${ANILIBRIA_BASE}/player/${animeId}`)
-    
-    if (!playerRes.ok) {
+    // Get episodes from player
+    const episodes: AnimeEpisode[] = []
+    if (anime.player && anime.player.list) {
+      try {
+        const playerList = JSON.parse(anime.player.list)
+        if (Array.isArray(playerList)) {
+          episodes.push(...playerList.map((ep: unknown, idx: number) => ({
+            number: String(idx + 1),
+            title: (ep as { title?: string }).title || `Episode ${idx + 1}`,
+            hlsUrl: (ep as { url?: string; hls?: string }).url || (ep as { url?: string; hls?: string }).hls,
+            quality: 'HD' as const,
+          })))
+        }
+      } catch (e) {
+        console.error('Failed to parse AniLibria player list:', e)
+      }
+    }
+
+    if (episodes.length === 0) {
       return null
     }
 
-    const playerData = await playerRes.json()
-    
-    const episodes: AnimeEpisode[] = (playerData.episodes || []).map((ep: unknown, idx: number) => ({
-      number: String(idx + 1),
-      title: (ep as { title?: string }).title || `Episode ${idx + 1}`,
-      hlsUrl: (ep as { hls?: string; url?: string }).hls || (ep as { url?: string }).url,
-      quality: (ep as { quality?: string }).quality === 'fhd' || (ep as { quality?: string }).quality === '1080' ? 'HD' as const : 'SD' as const,
-    }))
+    console.log('AniLibria episodes:', episodes.length)
 
     return {
       id: 'libria',
@@ -92,7 +107,7 @@ export async function getAniLibriaSources(shikimoriId: number): Promise<AnimeSou
       type: 'libria',
       available: episodes.length > 0,
       episodes,
-      translations: ['AniLibria', 'AniLibria [SUB]'],
+      translations: ['AniLibria'],
     }
   } catch (error) {
     console.error('AniLibria fetch error:', error)
@@ -102,25 +117,40 @@ export async function getAniLibriaSources(shikimoriId: number): Promise<AnimeSou
 
 /**
  * Search AnimeVost by Shikimori ID
+ * API: https://github.com/Semolik/AnimeVostPlayer
  */
 export async function getAnimeVostSources(shikimoriId: number): Promise<AnimeSource | null> {
   try {
-    // Search AnimeVost
-    const searchRes = await fetch(`${ANIMEVOST_BASE}/api/search?query=${shikimoriId}&type=shikimori`)
+    console.log('Fetching AnimeVost for shikimoriId:', shikimoriId)
+    
+    // AnimeVost uses internal IDs, not Shikimori
+    // We need to search by title or use a mapping
+    // For now, we'll try to fetch using the shikimori ID as a reference
+    
+    // First, try to get anime list and find by shikimori
+    const searchRes = await fetch(`${ANIMEVOST_BASE}/anime/list`)
     
     if (!searchRes.ok) {
+      console.log('AnimeVost list fetch failed:', searchRes.status)
       return null
     }
 
-    const searchData = await searchRes.json()
-    const animeId = searchData.id || searchData[0]?.id
+    const animeList = await searchRes.json()
+    
+    // Find anime by shikimori_id in metadata
+    const foundAnime = Array.isArray(animeList) 
+      ? animeList.find((a: unknown) => (a as { shikimori?: number }).shikimori === shikimoriId)
+      : null
+    
+    const animeId = (foundAnime as { id?: number })?.id
     
     if (!animeId) {
+      console.log('AnimeVost: No match for shikimoriId', shikimoriId)
       return null
     }
 
     // Get episodes
-    const episodesRes = await fetch(`${ANIMEVOST_BASE}/api/episodes/${animeId}`)
+    const episodesRes = await fetch(`${ANIMEVOST_BASE}/anime/${animeId}/episodes`)
     
     if (!episodesRes.ok) {
       return null
@@ -128,12 +158,20 @@ export async function getAnimeVostSources(shikimoriId: number): Promise<AnimeSou
 
     const episodesData = await episodesRes.json()
     
-    const episodes: AnimeEpisode[] = (episodesData.episodes || []).map((ep: unknown) => ({
-      number: String((ep as { episode?: number }).episode),
-      title: (ep as { title?: string }).title || `Episode ${(ep as { episode?: number }).episode}`,
-      hlsUrl: (ep as { hdUrl?: string; sdUrl?: string }).hdUrl || (ep as { sdUrl?: string }).sdUrl,
-      quality: (ep as { hdUrl?: string }).hdUrl ? 'HD' as const : 'SD' as const,
-    }))
+    const episodes: AnimeEpisode[] = Array.isArray(episodesData) 
+      ? episodesData.map((ep: unknown) => ({
+          number: String((ep as { episode?: number }).episode || 1),
+          title: (ep as { title?: string }).title || `Episode ${(ep as { episode?: number }).episode || 1}`,
+          hlsUrl: (ep as { url?: string; hls?: string }).url || (ep as { url?: string; hls?: string }).hls,
+          quality: 'HD' as const,
+        }))
+      : []
+
+    if (episodes.length === 0) {
+      return null
+    }
+
+    console.log('AnimeVost episodes:', episodes.length)
 
     return {
       id: 'vost',
