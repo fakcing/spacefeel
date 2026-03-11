@@ -92,7 +92,7 @@ export default async function AniDetailPage({ params }: Props) {
             {/* Play button */}
             {videos.length > 0 && (
               <div className="flex gap-3 mt-6">
-                <AniPlayerButton videos={videos} titleName={title.title} />
+                <AniPlayerButton videos={videos} titleName={title.title} shikimoriId={title.anime_id} />
               </div>
             )}
           </div>
@@ -101,7 +101,7 @@ export default async function AniDetailPage({ params }: Props) {
 
       {/* Episodes grid */}
       {videos.length > 0 && (
-        <AniEpisodesGrid videos={videos} titleName={title.title} />
+        <AniEpisodesGrid videos={videos} titleName={title.title} shikimoriId={title.anime_id} />
       )}
     </main>
   )

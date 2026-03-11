@@ -7,13 +7,14 @@ import { YaniVideo } from '@/types/yani'
 interface Props {
   videos: YaniVideo[]
   titleName: string
+  shikimoriId: number
 }
 
-export default function AniPlayerButton({ videos, titleName }: Props) {
+export default function AniPlayerButton({ videos, titleName, shikimoriId }: Props) {
   const { openPlayer } = useAniPlayerStore()
 
   const handlePlay = () => {
-    openPlayer({ videos, titleName })
+    openPlayer({ videos, titleName, shikimoriId })
   }
 
   return (

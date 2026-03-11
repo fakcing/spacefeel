@@ -8,9 +8,10 @@ import { useMemo } from 'react'
 interface Props {
   videos: YaniVideo[]
   titleName: string
+  shikimoriId: number
 }
 
-export default function AniEpisodesGrid({ videos, titleName }: Props) {
+export default function AniEpisodesGrid({ videos, titleName, shikimoriId }: Props) {
   const { openPlayer } = useAniPlayerStore()
 
   // Unique dubbings
@@ -39,7 +40,7 @@ export default function AniEpisodesGrid({ videos, titleName }: Props) {
         {episodes.map((ep) => (
           <button
             key={ep.video_id}
-            onClick={() => openPlayer({ videos, titleName, startEpisode: ep.number })}
+            onClick={() => openPlayer({ videos, titleName, shikimoriId, startEpisode: ep.number })}
             className="group relative aspect-square rounded-xl flex items-center justify-center text-sm font-medium transition-all duration-200 hover:scale-105 active:scale-95"
             style={{
               backgroundColor: 'var(--color-overlay)',

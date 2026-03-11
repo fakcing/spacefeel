@@ -7,108 +7,70 @@ import { useEffect, useMemo, useState, useCallback } from 'react'
 
 export default function AniPlayerModal() {
   const {
-    isOpen, videos, titleName,
+    isOpen, videos, titleName, sources, activeSource,
     currentSeason, currentDubbing, currentEpisode,
-    closePlayer, setSeason, setDubbing, setEpisode,
+    closePlayer, setSeason, setDubbing, setEpisode, setActiveSource,
   } = useAniPlayerStore()
 
   const [iframeError, setIframeError] = useState(false)
   const [iframeLoading, setIframeLoading] = useState(true)
   const [iframeLoadTimeout, setIframeLoadTimeout] = useState(false)
   const [iframeKey, setIframeKey] = useState(0)
-  const [activeServer, setActiveServer] = useState<'yummy' | 'libria' | 'vost'>('yummy')
 
-  // Get unique seasons sorted
-  const seasons = useMemo(
-    () => Array.from(new Set(videos.map((v) => v.season ?? 1))).sort((a, b) => a - b),
-    [videos]
-  )
+  // Get active source
+  const activeSourceData = useMemo(() => {
+    return sources.find(s => s.id === activeSource)
+  }, [sources, activeSource])
 
-  // Videos for selected season
-  const seasonVideos = useMemo(
-    () => videos.filter((v) => (v.season ?? 1) === currentSeason),
-    [videos, currentSeason]
-  )
-
-  // Get unique dubbings for selected server
-  const serverDubbingMap: Record<string, string[]> = useMemo(() => {
-    const map: Record<string, Set<string>> = {
-      yummy: new Set(),
-      libria: new Set(),
-      vost: new Set(),
+  // Get episodes from active source
+  const sourceEpisodes = useMemo(() => {
+    if (activeSourceData) {
+      return activeSourceData.episodes
     }
+    // Fallback to Yani videos
+    return videos
+      .filter((v) => (v.season ?? 1) === currentSeason && v.data.dubbing === currentDubbing)
+      .sort((a, b) => Number(a.number) - Number(b.number))
+  }, [activeSourceData, videos, currentSeason, currentDubbing])
 
-    seasonVideos.forEach((video) => {
-      const dubbing = video.data.dubbing
-      const player = video.data.player?.toLowerCase() || ''
-
-      if (player.includes('yummy')) {
-        map.yummy.add(dubbing)
-      } else if (player.includes('libria') || player.includes('anilibria')) {
-        map.libria.add(dubbing)
-      } else if (player.includes('vost') || player.includes('animevost')) {
-        map.vost.add(dubbing)
-      } else {
-        // Default to yummy if can't determine
-        map.yummy.add(dubbing)
-      }
-    })
-
-    return {
-      yummy: Array.from(map.yummy),
-      libria: Array.from(map.libria),
-      vost: Array.from(map.vost),
-    }
-  }, [seasonVideos])
-
-  // Get available dubbings for active server
-  const availableDubbing = serverDubbingMap[activeServer] || []
-
-  // Filter videos by active server and dubbing
-  const dubVideos = useMemo(() => {
-    return seasonVideos.filter((v) => {
-      const player = v.data.player?.toLowerCase() || ''
-      const matchesServer = 
-        (activeServer === 'yummy' && (player.includes('yummy') || !player)) ||
-        (activeServer === 'libria' && (player.includes('libria') || player.includes('anilibria'))) ||
-        (activeServer === 'vost' && (player.includes('vost') || player.includes('animevost')))
-      
-      const matchesDubbing = v.data.dubbing === currentDubbing
-      
-      return matchesServer && matchesDubbing
-    }).sort((a, b) => Number(a.number) - Number(b.number))
-  }, [seasonVideos, activeServer, currentDubbing])
-
-  // Unique episodes for selected season and dubbing (no duplicates)
+  // Get unique episode numbers
   const episodeNumbers = useMemo(() => {
+    if (activeSourceData) {
+      return activeSourceData.episodes.map(e => e.number)
+    }
     const seen = new Set<string>()
     const result: string[] = []
-    for (const v of dubVideos) {
+    for (const v of sourceEpisodes) {
       if (!seen.has(v.number)) {
         seen.add(v.number)
         result.push(v.number)
       }
     }
-    return result.sort((a, b) => Number(a) - Number(b))
-  }, [dubVideos])
+    return result
+  }, [activeSourceData, sourceEpisodes])
 
-  // Get current video iframe URL
+  // Get iframe/HLS URL
   const iframeSrc = useMemo(() => {
-    const video = dubVideos.find(
-      (v) => v.number === currentEpisode
+    if (activeSourceData) {
+      const ep = activeSourceData.episodes.find(e => e.number === currentEpisode)
+      return ep?.iframeUrl || ep?.hlsUrl || null
+    }
+    // Fallback to Yani
+    const video = videos.find(
+      (v) => v.data.dubbing === currentDubbing && v.number === currentEpisode
     )
     if (!video?.iframe_url) return null
     const url = video.iframe_url
     return url.startsWith('//') ? `https:${url}` : url
-  }, [dubVideos, currentEpisode])
+  }, [activeSourceData, videos, currentEpisode, currentDubbing])
 
-  // Reset iframe state when video changes
+  // Reset iframe state when source/episode changes
   useEffect(() => {
     setIframeError(false)
     setIframeLoading(true)
     setIframeLoadTimeout(false)
     setIframeKey((prev) => prev + 1)
-  }, [iframeSrc])
+  }, [activeSource, currentEpisode])
 
   // Handle iframe load
   const handleIframeLoad = useCallback(() => {
@@ -183,34 +145,29 @@ export default function AniPlayerModal() {
               <span className="text-white/40 text-sm">·</span>
 
               {/* Server selector */}
-              <select
-                value={activeServer}
-                onChange={(e) => {
-                  setActiveServer(e.target.value as 'yummy' | 'libria' | 'vost')
-                  // Reset dubbing to first available for new server
-                  const newServer = e.target.value as 'yummy' | 'libria' | 'vost'
-                  const firstDub = serverDubbingMap[newServer]?.[0]
-                  if (firstDub) setDubbing(firstDub)
-                }}
-                className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-300 font-semibold text-sm px-3 py-1.5 rounded-lg border border-indigo-500/30 hover:border-indigo-500/50 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
-              >
-                <option value="yummy" className="bg-[#1a1a1b]">Yummy</option>
-                <option value="libria" className="bg-[#1a1a1b]">AniLibria</option>
-                <option value="vost" className="bg-[#1a1a1b]">AnimeVost</option>
-              </select>
+              {sources.length > 0 && (
+                <select
+                  value={activeSource}
+                  onChange={(e) => setActiveSource(e.target.value)}
+                  className="bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-indigo-300 font-semibold text-sm px-3 py-1.5 rounded-lg border border-indigo-500/30 hover:border-indigo-500/50 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+                >
+                  {sources.map((source) => (
+                    <option key={source.id} value={source.id} className="bg-[#1a1a1b]">
+                      {source.name}
+                    </option>
+                  ))}
+                </select>
+              )}
 
               {/* Season selector */}
-              {seasons.length > 1 && (
+              {currentSeason > 1 && (
                 <select
                   value={currentSeason}
                   onChange={(e) => setSeason(Number(e.target.value))}
                   className="bg-white/10 text-white text-sm px-3 py-1.5 rounded-lg border border-white/20 hover:bg-white/20 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30"
                 >
-                  {seasons.map((s) => (
-                    <option key={s} value={s} className="bg-[#1a1a1b]">
-                      Сезон {s}
-                    </option>
-                  ))}
+                  <option value={1} className="bg-[#1a1a1b]">Сезон 1</option>
+                  <option value={2} className="bg-[#1a1a1b]">Сезон 2</option>
                 </select>
               )}
 
@@ -219,25 +176,22 @@ export default function AniPlayerModal() {
                 value={currentEpisode}
                 onChange={(e) => setEpisode(e.target.value)}
                 className="bg-white/10 text-white text-sm px-3 py-1.5 rounded-lg border border-white/20 hover:bg-white/20 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30"
-                disabled={episodeNumbers.length === 0}
               >
-                {episodeNumbers.length > 0 ? episodeNumbers.map((ep) => (
+                {episodeNumbers.map((ep) => (
                   <option key={ep} value={ep} className="bg-[#1a1a1b]">
                     Серия {ep}
                   </option>
-                )) : (
-                  <option value="" className="bg-[#1a1a1b]">Нет серий</option>
-                )}
+                ))}
               </select>
 
               {/* Dubbing selector */}
-              {availableDubbing.length > 1 && (
+              {activeSourceData && activeSourceData.translations.length > 1 && (
                 <select
                   value={currentDubbing}
                   onChange={(e) => setDubbing(e.target.value)}
                   className="bg-white/10 text-white text-sm px-3 py-1.5 rounded-lg border border-white/20 hover:bg-white/20 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30"
                 >
-                  {availableDubbing.map((dub) => (
+                  {activeSourceData.translations.map((dub) => (
                     <option key={dub} value={dub} className="bg-[#1a1a1b]">
                       {dub}
                     </option>
@@ -262,6 +216,7 @@ export default function AniPlayerModal() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#1a1a1b]">
                   <div className="w-10 h-10 border-4 border-white/20 border-t-white rounded-full animate-spin" />
                   <p className="text-white/40 text-sm">Загрузка плеера...</p>
+                  <p className="text-white/30 text-xs">{activeSourceData?.name || 'Yummy'}</p>
                 </div>
               )}
 
@@ -270,9 +225,7 @@ export default function AniPlayerModal() {
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#1a1a1b] p-6 text-center">
                   <AlertTriangle className="w-12 h-12 text-yellow-400" />
                   <p className="text-white/80 font-medium mb-1">Превышено время ожидания</p>
-                  <p className="text-white/40 text-sm mb-4">
-                    Попробуйте сменить озвучку или загрузить снова
-                  </p>
+                  <p className="text-white/40 text-sm mb-4">Попробуйте другой сервер</p>
                   <button
                     onClick={() => {
                       setIframeLoadTimeout(false)
@@ -290,7 +243,7 @@ export default function AniPlayerModal() {
               {iframeError && !iframeLoadTimeout && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-[#1a1a1b] p-6 text-center">
                   <AlertTriangle className="w-12 h-12 text-red-400" />
-                  <p className="text-white/80 font-medium mb-1">Ошибка загрузки видео</p>
+                  <p className="text-white/80 font-medium mb-1">Ошибка загрузки</p>
                   <button
                     onClick={() => {
                       setIframeError(false)
