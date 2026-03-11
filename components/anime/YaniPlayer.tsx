@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useCallback } from 'react'
 import { Play, AlertCircle, Loader2 } from 'lucide-react'
 import { YaniVideo } from '@/types/yani'
 
@@ -8,13 +8,6 @@ interface Props {
   tmdbId?: string | number
   shikimoriId?: string | number
   title?: string
-}
-
-interface YaniSearchResult {
-  id: number
-  title: string
-  shikimori_id: number
-  tmdb_id?: number
 }
 
 export default function YaniPlayer({ tmdbId, shikimoriId, title }: Props) {
@@ -28,7 +21,7 @@ export default function YaniPlayer({ tmdbId, shikimoriId, title }: Props) {
   const yaniToken = process.env.NEXT_PUBLIC_YANI_TV_TOKEN
 
   // Fetch anime from Yani TV by Shikimori ID
-  const fetchByShikimoriId = async (id: string | number) => {
+  const fetchByShikimoriId = useCallback(async (id: string | number) => {
     const res = await fetch(`https://api.yani.tv/anileak/shikimori/${id}`, {
       headers: {
         'X-Application': yaniToken || '',
@@ -37,10 +30,10 @@ export default function YaniPlayer({ tmdbId, shikimoriId, title }: Props) {
     if (!res.ok) throw new Error(`Failed to fetch by Shikimori ID: ${res.status}`)
     const data = await res.json()
     return data.response?.anime_id
-  }
+  }, [yaniToken])
 
   // Fetch anime from Yani TV by TMDB ID
-  const fetchByTmdbId = async (id: string | number) => {
+  const fetchByTmdbId = useCallback(async (id: string | number) => {
     const res = await fetch(`https://api.yani.tv/anileak/tmdb/${id}`, {
       headers: {
         'X-Application': yaniToken || '',
@@ -49,10 +42,10 @@ export default function YaniPlayer({ tmdbId, shikimoriId, title }: Props) {
     if (!res.ok) throw new Error(`Failed to fetch by TMDB ID: ${res.status}`)
     const data = await res.json()
     return data.response?.anime_id
-  }
+  }, [yaniToken])
 
   // Fetch videos for an anime
-  const fetchVideos = async (animeId: number) => {
+  const fetchVideos = useCallback(async (animeId: number) => {
     const res = await fetch(`https://api.yani.tv/anime/${animeId}/videos`, {
       headers: {
         'X-Application': yaniToken || '',
@@ -61,7 +54,7 @@ export default function YaniPlayer({ tmdbId, shikimoriId, title }: Props) {
     if (!res.ok) throw new Error(`Failed to fetch videos: ${res.status}`)
     const data = await res.json()
     return data.response as YaniVideo[]
-  }
+  }, [yaniToken])
 
   // Main fetch effect - runs on client side only
   useEffect(() => {
@@ -126,7 +119,7 @@ export default function YaniPlayer({ tmdbId, shikimoriId, title }: Props) {
     }
 
     fetchPlayer()
-  }, [tmdbId, shikimoriId, yaniToken])
+  }, [tmdbId, shikimoriId, yaniToken, fetchByShikimoriId, fetchByTmdbId, fetchVideos])
 
   // Get unique dubbings in order of appearance
   const dubbings = useMemo(
