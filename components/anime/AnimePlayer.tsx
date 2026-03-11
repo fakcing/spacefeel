@@ -1,88 +1,122 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { AlertTriangle, RefreshCw, ChevronDown } from 'lucide-react'
+import { Play, Pause, Volume2, Maximize, Settings } from 'lucide-react'
 import Hls from 'hls.js'
-import { getAnimeServers, getVostHlsUrl } from '@/lib/animePlayerService'
-import { AnimeServer, AnimeServerData } from '@/types/animePlayer'
+import { AnimeSource } from '@/lib/animeSources'
+import { buildAnilibriaSource, searchByShikimori as searchAnilibria } from '@/services/anilibria'
+import { buildAnimeVostSource } from '@/services/animevost'
+import { YaniVideo } from '@/types/yani'
+
+type ServerType = 'yummy' | 'libria' | 'vost'
 
 interface AnimePlayerProps {
   shikimoriId: number
-  title?: string
+  title: string
+  yaniVideos: YaniVideo[]
   initialEpisode?: number
 }
 
 export default function AnimePlayer({
   shikimoriId,
-  title,
+  yaniVideos,
   initialEpisode = 1,
 }: AnimePlayerProps) {
   // Server state
-  const [servers, setServers] = useState<AnimeServerData[]>([])
-  const [activeServer, setActiveServer] = useState<AnimeServer>('yummy')
-  const [activeTranslation, setActiveTranslation] = useState<number | null>(null)
-  const [activeEpisode, setActiveEpisode] = useState(initialEpisode)
-  
-  // Loading state
-  const [isLoading, setIsLoading] = useState(true)
-  const [isPlayerLoading, setIsPlayerLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [activeServer, setActiveServer] = useState<ServerType>('yummy')
+  const [sources, setSources] = useState<Record<ServerType, AnimeSource | null>>({
+    yummy: null,
+    libria: null,
+    vost: null,
+  })
+  const [isLoadingSources, setIsLoadingSources] = useState(true)
 
-  // Video refs
+  // Episode/Translation state
+  const [currentEpisode, setCurrentEpisode] = useState(String(initialEpisode))
+  const [currentTranslation, setCurrentTranslation] = useState<string>('')
+
+  // Player state
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [volume, setVolume] = useState(1)
+
+  // Video ref
   const videoRef = useRef<HTMLVideoElement>(null)
   const hlsRef = useRef<Hls | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
-  // Fetch servers on mount
+  // Initialize sources
   useEffect(() => {
-    const fetchServers = async () => {
-      setIsLoading(true)
-      setError(null)
+    const initSources = async () => {
+      setIsLoadingSources(true)
 
-      try {
-        console.log('Fetching servers for shikimoriId:', shikimoriId)
-        const serverData = await getAnimeServers(shikimoriId)
-        console.log('Received servers:', serverData)
-        
-        const availableServers = serverData.filter(s => s.available)
-        console.log('Available servers:', availableServers)
-        
-        if (availableServers.length === 0) {
-          setError('No servers available')
-          return
-        }
-
-        setServers(serverData)
-        
-        // Set default server (prefer Yummy if available)
-        const defaultServer = availableServers.find(s => s.server === 'yummy') || availableServers[0]
-        console.log('Setting default server:', defaultServer)
-        setActiveServer(defaultServer.server)
-        if (defaultServer.translations.length > 0) {
-          setActiveTranslation(defaultServer.translations[0].id)
-        }
-      } catch (err) {
-        console.error('Failed to load servers:', err)
-        setError(err instanceof Error ? err.message : 'Failed to load servers')
-      } finally {
-        setIsLoading(false)
+      // Yummy (Yani) - already available
+      const yummySource: AnimeSource = {
+        id: 'yummy',
+        name: 'Yummy (Alloha)',
+        type: 'yummy',
+        available: yaniVideos.length > 0,
+        episodes: yaniVideos.map(v => ({
+          number: v.number,
+          iframeUrl: v.iframe_url.startsWith('//') ? `https:${v.iframe_url}` : v.iframe_url,
+          quality: 'HD',
+        })),
+        translations: Array.from(new Set(yaniVideos.map(v => v.data.dubbing))),
       }
+
+      // Fetch AniLibria
+      const libriaPromise = (async () => {
+        try {
+          const release = await searchAnilibria(shikimoriId)
+          if (release) {
+            return buildAnilibriaSource(release)
+          }
+          return null
+        } catch {
+          return null
+        }
+      })()
+
+      // Fetch AnimeVost
+      const vostPromise = buildAnimeVostSource(shikimoriId)
+
+      const [libria, vost] = await Promise.all([libriaPromise, vostPromise])
+
+      setSources({
+        yummy: yummySource,
+        libria,
+        vost,
+      })
+
+      setIsLoadingSources(false)
     }
 
-    fetchServers()
-  }, [shikimoriId])
+    initSources()
+  }, [shikimoriId, yaniVideos])
 
-  // Get active server data
-  const activeServerData = servers.find(s => s.server === activeServer)
+  // Get active source
+  const activeSource = sources[activeServer]
 
-  // Get available translations for active server
-  const availableTranslations = activeServerData?.translations || []
+  // Get episodes for active source
+  const episodes = activeSource?.episodes || []
 
-  // Get available episodes for active server
-  const availableEpisodes = activeServerData?.episodes || []
+  // Get translations for active source
+  const translations = activeSource?.translations || []
 
-  // Initialize HLS player for AnimeVost
-  const initializeHls = useCallback((url: string) => {
+  // Get current episode URL
+  const currentEpisodeData = episodes.find(ep => ep.number === currentEpisode)
+  const currentUrl = currentEpisodeData?.hlsUrl || currentEpisodeData?.iframeUrl
+
+  // Initialize HLS player
+  const initHls = useCallback((url: string) => {
     if (!videoRef.current) return
+
+    // Clean up previous instance
+    if (hlsRef.current) {
+      hlsRef.current.destroy()
+      hlsRef.current = null
+    }
 
     if (Hls.isSupported()) {
       const hls = new Hls({
@@ -95,29 +129,34 @@ export default function AnimePlayer({
       hls.attachMedia(videoRef.current)
 
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        setIsPlayerLoading(false)
         videoRef.current?.play()
+        setIsPlaying(true)
       })
 
       hls.on(Hls.Events.ERROR, (_, data) => {
         if (data.fatal) {
-          setError('Failed to load video stream')
-          setIsPlayerLoading(false)
+          console.error('HLS fatal error:', data)
         }
       })
 
       hlsRef.current = hls
     } else if (videoRef.current.canPlayType('application/vnd.apple.mpegurl')) {
-      // Native HLS support (Safari)
       videoRef.current.src = url
       videoRef.current.addEventListener('loadedmetadata', () => {
-        setIsPlayerLoading(false)
         videoRef.current?.play()
+        setIsPlaying(true)
       })
     }
   }, [])
 
-  // Cleanup HLS on unmount
+  // Handle URL change
+  useEffect(() => {
+    if (currentUrl && activeServer !== 'yummy') {
+      initHls(currentUrl)
+    }
+  }, [currentUrl, activeServer, initHls])
+
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (hlsRef.current) {
@@ -127,194 +166,223 @@ export default function AnimePlayer({
     }
   }, [])
 
+  // Toggle play/pause
+  const togglePlay = () => {
+    if (!videoRef.current) return
+    
+    if (isPlaying) {
+      videoRef.current.pause()
+    } else {
+      videoRef.current.play()
+    }
+    setIsPlaying(!isPlaying)
+  }
+
+  // Handle time update
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime)
+    }
+  }
+
+  // Handle duration change
+  const handleDurationChange = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration)
+    }
+  }
+
+  // Handle volume change
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value)
+    setVolume(newVolume)
+    if (videoRef.current) {
+      videoRef.current.volume = newVolume
+    }
+  }
+
+  // Toggle fullscreen
+  const toggleFullscreen = async () => {
+    if (!containerRef.current) return
+
+    if (!document.fullscreenElement) {
+      await containerRef.current.requestFullscreen()
+    } else {
+      await document.exitFullscreen()
+    }
+  }
+
+  // Format time
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60)
+    const seconds = Math.floor(time % 60)
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`
+  }
+
   // Handle server change
-  const handleServerChange = (server: AnimeServer) => {
-    console.log('Switching to server:', server)
-    const serverData = servers.find(s => s.server === server)
-    
-    if (!serverData?.available) {
-      console.warn('Server not available:', server)
-      return
-    }
-    
+  const handleServerChange = (server: ServerType) => {
     setActiveServer(server)
-    setIsPlayerLoading(true)
-    setError(null)
-    
-    // Reset translation to first available
-    if (serverData?.translations.length) {
-      setActiveTranslation(serverData.translations[0].id)
+    const source = sources[server]
+    if (source?.episodes.length) {
+      setCurrentEpisode(source.episodes[0].number)
     }
-  }
-
-  // Handle episode change
-  const handleEpisodeChange = (episode: number) => {
-    setActiveEpisode(episode)
-    setIsPlayerLoading(true)
-    setError(null)
-  }
-
-  // Render video player
-  const renderVideoPlayer = () => {
-    if (!activeServerData) return null
-
-    // AnimeVost uses HLS directly
-    if (activeServer === 'vost') {
-      const episode = availableEpisodes.find(e => e.episode === activeEpisode)
-      const hlsUrl = episode?.hlsUrl || getVostHlsUrl(shikimoriId, activeEpisode, 'HD')
-
-      if (hlsUrl) {
-        setTimeout(() => initializeHls(hlsUrl), 100)
-      }
-
-      return (
-        <video
-          ref={videoRef}
-          className="w-full h-full"
-          controls
-          autoPlay
-          playsInline
-        />
-      )
+    if (source?.translations.length) {
+      setCurrentTranslation(source.translations[0])
     }
-
-    // Yummy and AniLibria use iframe
-    if (activeServerData.iframe) {
-      return (
-        <iframe
-          key={`${activeServer}-${activeEpisode}`}
-          src={activeServerData.iframe}
-          className="w-full h-full"
-          allowFullScreen
-          allow="autoplay; fullscreen; picture-in-picture"
-          frameBorder="0"
-          onLoad={() => setIsPlayerLoading(false)}
-          title={`${title || 'Anime'} - Episode ${activeEpisode}`}
-        />
-      )
-    }
-
-    return null
   }
 
   // Loading skeleton
-  if (isLoading) {
+  if (isLoadingSources) {
     return (
-      <div className="w-full aspect-video bg-[#1a1a1b] rounded-3xl overflow-hidden relative">
-        <div className="absolute inset-0 animate-pulse">
-          <div className="h-full w-full bg-gradient-to-br from-white/[0.05] to-white/[0.02]" />
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex flex-col items-center gap-3">
-              <RefreshCw className="w-10 h-10 text-white/40 animate-spin" />
-              <p className="text-white/60 text-sm">Loading servers...</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // Error state
-  if (error || servers.filter(s => s.available).length === 0) {
-    return (
-      <div className="w-full aspect-video bg-[#1a1a1b] rounded-3xl overflow-hidden flex flex-col items-center justify-center gap-4 p-6 text-center">
-        <AlertTriangle className="w-12 h-12 text-yellow-400" />
-        <div>
-          <p className="text-white/80 font-medium mb-1">
-            {error || 'No servers available'}
-          </p>
-          <p className="text-white/40 text-sm">
-            This anime may not have available sources yet.
-          </p>
-        </div>
+      <div className="w-full aspect-video bg-[#1a1a1b] rounded-2xl overflow-hidden animate-pulse">
+        <div className="h-full w-full bg-gradient-to-br from-white/[0.05] to-white/[0.02]" />
       </div>
     )
   }
 
   return (
-    <div className="w-full flex flex-col gap-0">
+    <div ref={containerRef} className="w-full bg-[#1a1a1b] rounded-2xl overflow-hidden">
+      {/* Server Selector */}
+      <div className="flex items-center gap-2 p-4 border-b border-white/10">
+        {(['yummy', 'libria', 'vost'] as ServerType[]).map((server) => {
+          const source = sources[server]
+          const isActive = activeServer === server
+          
+          return (
+            <button
+              key={server}
+              onClick={() => handleServerChange(server)}
+              disabled={!source?.available}
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                isActive
+                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
+              } ${!source?.available ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {source?.name || server}
+            </button>
+          )
+        })}
+      </div>
+
       {/* Video Container */}
-      <div className="relative aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl shadow-purple-500/10">
-        {/* Loading overlay */}
-        {isPlayerLoading && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/80 backdrop-blur-sm z-10">
-            <RefreshCw className="w-10 h-10 text-white/40 animate-spin" />
-            <p className="text-white/60 text-sm">Loading player...</p>
-          </div>
+      <div className="relative aspect-video bg-black">
+        {activeServer === 'yummy' ? (
+          // Yummy uses iframe
+          currentEpisodeData?.iframeUrl ? (
+            <iframe
+              src={currentEpisodeData.iframeUrl}
+              className="w-full h-full"
+              allowFullScreen
+              allow="autoplay; fullscreen; picture-in-picture"
+              frameBorder="0"
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-white/40">
+              No video available
+            </div>
+          )
+        ) : (
+          // Libria/Vost use HLS
+          <video
+            ref={videoRef}
+            className="w-full h-full"
+            onTimeUpdate={handleTimeUpdate}
+            onDurationChange={handleDurationChange}
+            onClick={togglePlay}
+            playsInline
+          />
         )}
 
-        {renderVideoPlayer()}
+        {/* Custom Controls (for HLS) */}
+        {activeServer !== 'yummy' && (
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4 opacity-0 hover:opacity-100 transition-opacity">
+            {/* Progress Bar */}
+            <div className="w-full h-1 bg-white/20 rounded-full mb-4 cursor-pointer">
+              <div
+                className="h-full bg-indigo-500 rounded-full"
+                style={{ width: `${(currentTime / duration) * 100}%` }}
+              />
+            </div>
+
+            {/* Controls */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button onClick={togglePlay} className="text-white hover:text-indigo-400">
+                  {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+                </button>
+                
+                <div className="flex items-center gap-2">
+                  <Volume2 size={20} className="text-white" />
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={volume}
+                    onChange={handleVolumeChange}
+                    className="w-20 accent-indigo-500"
+                  />
+                </div>
+
+                <span className="text-white/60 text-sm">
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <button className="text-white hover:text-indigo-400">
+                  <Settings size={20} />
+                </button>
+                <button onClick={toggleFullscreen} className="text-white hover:text-indigo-400">
+                  <Maximize size={20} />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Controls Row - Server, Dub, Episodes */}
-      <div className="mt-4 flex flex-wrap items-center gap-3">
-        {/* Server Selector (Dropdown) */}
-        <div className="relative">
-          <select
-            value={activeServer}
-            onChange={(e) => handleServerChange(e.target.value as AnimeServer)}
-            className="appearance-none bg-gradient-to-r from-indigo-500/20 to-purple-500/20 text-white text-sm font-semibold px-4 py-2.5 pr-10 rounded-xl border border-indigo-500/30 hover:border-indigo-500/50 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/50 min-h-[44px]"
-          >
-            {servers.map((server) => (
-              <option
-                key={server.server}
-                value={server.server}
-                className="bg-[#1a1a1b] text-white"
-                disabled={!server.available}
+      {/* Episode & Translation Selector */}
+      <div className="p-4 border-t border-white/10">
+        <div className="flex flex-wrap gap-4">
+          {/* Translation Selector */}
+          {translations.length > 1 && (
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-white/60 text-sm mb-2">Озвучка</label>
+              <select
+                value={currentTranslation}
+                onChange={(e) => setCurrentTranslation(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
-                {server.name}{!server.available ? ' (Offline)' : ''}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400 pointer-events-none" />
+                {translations.map((t) => (
+                  <option key={t} value={t} className="bg-[#1a1a1b]">
+                    {t}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Episode Selector */}
+          {episodes.length > 0 && (
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-white/60 text-sm mb-2">Серия</label>
+              <select
+                value={currentEpisode}
+                onChange={(e) => setCurrentEpisode(e.target.value)}
+                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                {episodes.map((ep) => (
+                  <option key={ep.number} value={ep.number} className="bg-[#1a1a1b]">
+                    {ep.title || `Серия ${ep.number}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
-
-        {/* Translation selector */}
-        {availableTranslations.length > 1 && (
-          <div className="relative">
-            <select
-              value={activeTranslation || ''}
-              onChange={(e) => setActiveTranslation(Number(e.target.value))}
-              className="appearance-none bg-white/10 text-white text-sm px-4 py-2.5 pr-10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/50 min-h-[44px]"
-            >
-              {availableTranslations.map((t) => (
-                <option key={t.id} value={t.id} className="bg-[#1a1a1b] text-white">
-                  {t.name}{t.type === 'sub' ? ' [SUB]' : ''}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
-          </div>
-        )}
-
-        {/* Episode selector */}
-        {availableEpisodes.length > 1 && (
-          <div className="relative">
-            <select
-              value={activeEpisode}
-              onChange={(e) => handleEpisodeChange(Number(e.target.value))}
-              className="appearance-none bg-white/10 text-white text-sm px-4 py-2.5 pr-10 rounded-xl border border-white/20 hover:bg-white/20 transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-purple-500/50 min-h-[44px]"
-            >
-              {availableEpisodes.slice(0, 50).map((ep) => (
-                <option key={ep.episode} value={ep.episode} className="bg-[#1a1a1b] text-white">
-                  Episode {ep.episode}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
-          </div>
-        )}
       </div>
-
-      {/* Title (optional) */}
-      {title && (
-        <div className="mt-3 px-2">
-          <h3 className="text-white/80 font-semibold text-sm truncate">{title}</h3>
-          <p className="text-white/40 text-xs">
-            Episode {activeEpisode}
-          </p>
-        </div>
-      )}
     </div>
   )
 }
