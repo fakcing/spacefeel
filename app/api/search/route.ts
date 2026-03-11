@@ -25,6 +25,7 @@ export async function GET(req: NextRequest) {
     name: { main: string; english: string }
     poster: { optimized: { src: string } | null; src: string }
     type: { value: string }
+    year: number
   }>).map((t) => ({
     id: t.id,
     title: t.name.main,
@@ -32,7 +33,8 @@ export async function GET(req: NextRequest) {
     anilibria_poster: `https://anilibria.top${t.poster.optimized?.src || t.poster.src}`,
     media_type: 'anime',
     alias: t.alias,
-    type: t.type.value,
+    year: String(t.year ?? ''),
+    source: 'anilibria',
   }))
 
   return NextResponse.json({

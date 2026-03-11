@@ -113,30 +113,6 @@ export const fetchSearch = cache(async (query: string, page = 1): Promise<TMDBRe
   })
 })
 
-// Anime: always enforces animation genre + anime keyword
-export const fetchAnime = cache(async (category = 'trending', page = 1): Promise<TMDBResponse<TVShow>> => {
-  const base: Record<string, string> = {
-    with_genres: '16',
-    with_keywords: '210024',
-    page: String(page),
-  }
-  switch (category) {
-    case 'trending':
-      return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
-    case 'popular':
-      return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
-    case 'top_rated':
-      return tmdbFetch('/discover/tv', { ...base, sort_by: 'vote_average.desc', 'vote_count.gte': '200' })
-    case 'upcoming':
-      return tmdbFetch('/discover/tv', { ...base, sort_by: 'first_air_date.desc' })
-    case 'airing':
-      return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc', status: '0' })
-    case 'discover':
-    default:
-      return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
-  }
-})
-
 // Cartoons: always enforces animation + family genre + English origin
 export const fetchCartoons = cache(async (category = 'trending', page = 1): Promise<TMDBResponse<TVShow>> => {
   const base: Record<string, string> = {

@@ -11,10 +11,21 @@ import {
   TrendingUp, Heart, Calendar, Play, Star, Compass, Radio,
   Sparkles, Clock, Users, X,
 } from 'lucide-react'
-import { Movie, TVShow } from '@/types/tmdb'
 import ProfileDropdown from '@/components/ui/ProfileDropdown'
 
-type SearchResult = (Movie | TVShow) & { media_type?: string }
+type SearchResult = {
+  id: number
+  title?: string
+  name?: string
+  poster_path?: string | null
+  anilibria_poster?: string | null
+  media_type?: string
+  release_date?: string
+  first_air_date?: string
+  alias?: string
+  year?: string
+  source?: 'tmdb' | 'anilibria'
+}
 
 interface DropdownItem {
   icon: React.ReactNode
@@ -231,33 +242,48 @@ export default function Navbar() {
                   style={{ backgroundColor: 'var(--color-surface)', borderColor: 'var(--color-border)' }}
                 >
                   {results.map((item) => {
-                    const title = 'title' in item ? item.title : item.name
-                    const year = (('release_date' in item ? item.release_date : item.first_air_date) || '').slice(0, 4)
-                    const href = item.media_type === 'tv' ? `/tv/${item.id}` : `/movies/${item.id}`
+                    const isAnime = item.media_type === 'anime'
+                    const itemTitle = item.title || item.name || ''
+                    const year = isAnime
+                      ? (item.year || '')
+                      : ((item.release_date || item.first_air_date) || '').slice(0, 4)
+                    const href = isAnime
+                      ? `/anime/${item.alias}`
+                      : item.media_type === 'tv'
+                        ? `/tv/${item.id}`
+                        : `/movies/${item.id}`
+                    const posterSrc = isAnime
+                      ? item.anilibria_poster
+                      : item.poster_path
+                        ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
+                        : null
+                    const typeLabel = isAnime
+                      ? 'Аниме'
+                      : item.media_type === 'tv' ? ts('tvShow') : ts('movie')
                     return (
                       <Link
-                        key={item.id}
+                        key={`${item.source ?? 'tmdb'}-${item.id}`}
                         href={href}
                         onClick={() => { setQuery(''); setIsOpen(false) }}
                         className="flex items-center gap-3 px-4 py-3 transition-colors"
                         onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
                         onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = '')}
                       >
-                        {item.poster_path ? (
+                        {posterSrc ? (
                           <Image
-                            src={`https://image.tmdb.org/t/p/w92${item.poster_path}`}
+                            src={posterSrc}
                             width={32}
                             height={48}
                             className="rounded object-cover flex-shrink-0"
-                            alt={title || ''}
+                            alt={itemTitle}
                           />
                         ) : (
                           <div className="w-8 h-12 rounded flex-shrink-0" style={{ backgroundColor: 'var(--color-overlay)' }} />
                         )}
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>{title}</p>
+                          <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>{itemTitle}</p>
                           <p className="text-xs mt-0.5" style={{ color: 'var(--color-text-muted)' }}>
-                            {item.media_type === 'tv' ? ts('tvShow') : ts('movie')}{year ? ` \u00b7 ${year}` : ''}
+                            {typeLabel}{year ? ` · ${year}` : ''}
                           </p>
                         </div>
                       </Link>
