@@ -10,6 +10,7 @@ import AuthModal from '@/components/ui/AuthModal'
 import PageTransition from '@/components/layout/PageTransition'
 import ScrollToTop from '@/components/ui/ScrollToTop'
 import AniPlayerModal from '@/components/anime/AniPlayerModal'
+import MediaPlayerModal from '@/components/detail/MediaPlayerModal'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 import './globals.css'
 
@@ -55,6 +56,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <AuthModal />
               <ScrollToTop />
               <AniPlayerModal />
+              <MediaPlayerModal />
             </NextIntlClientProvider>
           </SessionProvider>
         </ThemeProvider>

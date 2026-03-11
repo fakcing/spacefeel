@@ -10,6 +10,7 @@ import Rating from '@/components/ui/Rating'
 import { useSession } from 'next-auth/react'
 import { useWatchlistStore } from '@/store/watchlistStore'
 import { useAuthModalStore } from '@/store/authModalStore'
+import { useMediaPlayerStore } from '@/store/mediaPlayerStore'
 
 interface DetailHeroProps {
   item: Movie | TVShow
@@ -40,11 +41,22 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
   const { toggleItem, isInWatchlist } = useWatchlistStore()
   const { open: openAuthModal } = useAuthModalStore()
   const { data: session } = useSession()
+  const { openPlayer } = useMediaPlayerStore()
   const isBookmarked = isInWatchlist(item.id)
 
   const handleWatchlist = () => {
     if (!session) { openAuthModal(); return }
     toggleItem(watchlistItem, true)
+  }
+
+  const handlePlay = () => {
+    openPlayer({
+      mediaType,
+      item,
+      tmdbId: item.id,
+      season: 1,
+      episode: 1,
+    })
   }
 
   const backdrop = getBackdrop(item.backdrop_path)
@@ -123,7 +135,10 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
             {extra && <span className="text-[var(--text-muted)] text-sm">{extra}</span>}
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <button className="flex items-center justify-center gap-2 bg-white text-black font-semibold rounded-full px-6 py-3 sm:py-2.5 hover:bg-white/90 transition-colors text-sm w-full sm:w-auto">
+            <button
+              onClick={handlePlay}
+              className="flex items-center justify-center gap-2 bg-white text-black font-semibold rounded-full px-6 py-3 sm:py-2.5 hover:bg-white/90 transition-colors text-sm w-full sm:w-auto cursor-pointer"
+            >
               <Play size={16} fill="black" />
               {t('playNow')}
             </button>

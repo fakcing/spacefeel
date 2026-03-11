@@ -10,7 +10,7 @@ import {
 const VIDEOCDN_BASE = 'https://videocdn.tv/api'
 
 interface FetchVideoCDNOptions {
-  type: 'movie' | 'tv' | 'anime'
+  type: 'movie' | 'tv' | 'anime' | 'cartoon'
   tmdbId?: number
   shikimoriId?: number
   season?: number
@@ -127,6 +127,7 @@ export async function fetchVideoCDNTranslations(options: FetchVideoCDNOptions): 
       id: t.id,
       title: t.title,
       type: t.type,
+      language: t.language || 'unknown',
     }))
   } catch (error) {
     console.error('VideoCDN translations error:', error)
