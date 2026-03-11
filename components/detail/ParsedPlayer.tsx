@@ -1,0 +1,130 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { AlertTriangle, RefreshCw, Server } from 'lucide-react'
+import { PlayerServer } from '@/types/player'
+
+interface ParsedPlayerProps {
+  tmdbId: number
+  type: 'movie' | 'tv' | 'cartoon'
+  season?: number
+  episode?: number
+}
+
+export default function ParsedPlayer({
+  tmdbId,
+  type,
+  season = 1,
+  episode = 1,
+}: ParsedPlayerProps) {
+  const [servers, setServers] = useState<PlayerServer[]>([])
+  const [selectedServer, setSelectedServer] = useState<number>(0)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [cached, setCached] = useState(false)
+
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      setIsLoading(true)
+      setError(null)
+
+      try {
+        const params = new URLSearchParams({
+          type,
+          ...(type === 'tv' && { season: String(season), episode: String(episode) }),
+        })
+
+        const res = await fetch(`/api/player/${tmdbId}?${params}`)
+        const data = await res.json()
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Failed to load players')
+        }
+
+        setServers(data.servers || [])
+        setCached(data.cached)
+        setSelectedServer(0)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Unknown error')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchPlayers()
+  }, [tmdbId, type, season, episode])
+
+  if (isLoading) {
+    return (
+      <div className="w-full aspect-video bg-black flex flex-col items-center justify-center gap-3">
+        <RefreshCw className="w-10 h-10 text-white/40 animate-spin" />
+        <p className="text-white/60 text-sm">Loading video sources...</p>
+      </div>
+    )
+  }
+
+  if (error || servers.length === 0) {
+    return (
+      <div className="w-full aspect-video bg-black flex flex-col items-center justify-center gap-4 p-6 text-center">
+        <AlertTriangle className="w-12 h-12 text-yellow-400" />
+        <div>
+          <p className="text-white/80 font-medium mb-1">
+            {error || 'No video sources available'}
+          </p>
+          <p className="text-white/40 text-sm">
+            This title may not have parsed sources yet. Try again later.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  const currentServer = servers[selectedServer]
+
+  return (
+    <div className="w-full flex flex-col">
+      {/* Server Selector */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/40">
+        <div className="flex items-center gap-2">
+          <Server size={16} className="text-white/60" />
+          <span className="text-white/80 text-sm font-medium">Server</span>
+          {cached && (
+            <span className="text-xs text-green-400 ml-2">(cached)</span>
+          )}
+        </div>
+        <div className="flex items-center gap-2 overflow-x-auto">
+          {servers.map((server, index) => (
+            <button
+              key={server.source}
+              onClick={() => setSelectedServer(index)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+                selectedServer === index
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/30'
+                  : 'bg-white/10 text-white/70 hover:bg-white/20'
+              }`}
+            >
+              {server.name}
+              {server.quality && (
+                <span className="text-[10px] opacity-60">{server.quality}</span>
+              )}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Iframe */}
+      <div className="relative aspect-video bg-black">
+        <iframe
+          key={currentServer.iframe}
+          src={currentServer.iframe}
+          className="w-full h-full"
+          allowFullScreen
+          allow="autoplay; fullscreen; picture-in-picture"
+          frameBorder="0"
+          referrerPolicy="no-referrer-when-downgrade"
+          title={`Video Server ${selectedServer + 1}`}
+        />
+      </div>
+    </div>
+  )
+}

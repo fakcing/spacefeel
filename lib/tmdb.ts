@@ -130,3 +130,40 @@ export async function revalidateTMDBData(endpoint?: string) {
     revalidateTag(`tmdb-${endpoint}`)
   }
 }
+
+/**
+ * Get external IDs (IMDB, TVDB, etc.) for a movie or TV show
+ */
+export async function getExternalIds(tmdbId: number, type: 'movie' | 'tv'): Promise<{
+  imdb_id?: string | null
+  tvdb_id?: number | null
+  wikidata_id?: string | null
+  facebook_id?: string | null
+  instagram_id?: string | null
+  twitter_id?: string | null
+} | null> {
+  try {
+    const data = await tmdbFetch<{
+      id: number
+      imdb_id?: string | null
+      tvdb_id?: number | null
+      wikidata_id?: string | null
+      facebook_id?: string | null
+      instagram_id?: string | null
+      twitter_id?: string | null
+    }>(`/${type}/${tmdbId}/external_ids`)
+    
+    return data
+  } catch (error) {
+    console.error('Error fetching external IDs:', error)
+    return null
+  }
+}
+
+/**
+ * Get IMDB ID specifically
+ */
+export async function getImdbId(tmdbId: number, type: 'movie' | 'tv'): Promise<string | null> {
+  const externalIds = await getExternalIds(tmdbId, type)
+  return externalIds?.imdb_id || null
+}

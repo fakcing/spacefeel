@@ -112,3 +112,17 @@ model WatchHistory {
 
   @@map("watch_history")
 }
+
+model PlayerCache {
+  id        Int      @id @default(autoincrement())
+  tmdbId    Int
+  type      String   // movie, tv, cartoon
+  source    String   // parser source name
+  iframe    String   // iframe URL
+  quality   String?  // quality info (optional)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tmdbId, source, type])
+  @@map("player_cache")
+}
