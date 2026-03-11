@@ -18,6 +18,7 @@ export default function AniPlayerModal() {
   const [iframeError, setIframeError] = useState(false)
   const [iframeLoading, setIframeLoading] = useState(true)
   const [iframeLoadTimeout, setIframeLoadTimeout] = useState(false)
+  const [playerUrl, setPlayerUrl] = useState<string | null>(null)
 
   // Get unique seasons sorted
   const seasons = useMemo(
@@ -61,26 +62,55 @@ export default function AniPlayerModal() {
     return result.sort((a, b) => Number(a) - Number(b))
   }, [seasonVideos, currentDubbing])
 
-  // Get video for current episode and dubbing
-  const currentVideo = useMemo(() => {
-    return seasonVideos.find(
-      (v) => v.data.dubbing === currentDubbing && v.number === currentEpisode
-    )
-  }, [seasonVideos, currentDubbing, currentEpisode])
-
-  // Build iframe URL with timeout handling
-  const iframeSrc = useMemo(() => {
-    if (!currentVideo?.iframe_url) return null
-    const url = currentVideo.iframe_url
-    return url.startsWith('//') ? `https:${url}` : url
-  }, [currentVideo])
-
-  // Reset iframe state when video changes
+  // Fetch player URL from our API endpoint (client-side)
   useEffect(() => {
-    setIframeError(false)
+    if (!isOpen || !currentEpisode || !videos.length) return
+
+    let cancelled = false
     setIframeLoading(true)
+    setIframeError(false)
     setIframeLoadTimeout(false)
-  }, [currentVideo])
+    setPlayerUrl(null)
+
+    const fetchPlayer = async () => {
+      const animeId = videos[0]?.data?.player_id
+      if (!animeId) return
+
+      try {
+        const params = new URLSearchParams({
+          animeId: String(animeId),
+          episode: currentEpisode,
+          dubbing: currentDubbing,
+          season: String(currentSeason),
+        })
+
+        const res = await fetch(`/api/anime/player?${params}`, {
+          // Client-side request - no cache
+          cache: 'no-store',
+        })
+
+        if (!res.ok) {
+          throw new Error(`Failed to fetch player: ${res.status}`)
+        }
+
+        const data = await res.json()
+        if (!cancelled && data.playerUrl) {
+          setPlayerUrl(data.playerUrl)
+        }
+      } catch (error) {
+        console.error('Player fetch error:', error)
+        if (!cancelled) {
+          setIframeError(true)
+        }
+      }
+    }
+
+    fetchPlayer()
+
+    return () => {
+      cancelled = true
+    }
+  }, [isOpen, currentEpisode, currentDubbing, currentSeason, videos])
 
   // Handle iframe load
   const handleIframeLoad = useCallback(() => {
@@ -96,14 +126,14 @@ export default function AniPlayerModal() {
 
   // Timeout for iframe loading (alloha.yani.tv timeout handling)
   useEffect(() => {
-    if (!iframeLoading) return
+    if (!iframeLoading || !playerUrl) return
 
     const timeout = setTimeout(() => {
       setIframeLoadTimeout(true)
     }, 15000) // 15 seconds timeout
 
     return () => clearTimeout(timeout)
-  }, [iframeLoading, iframeSrc])
+  }, [iframeLoading, playerUrl])
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -327,10 +357,10 @@ export default function AniPlayerModal() {
               )}
 
               {/* Iframe */}
-              {iframeSrc && !iframeError && !iframeLoadTimeout && (
+              {playerUrl && !iframeError && !iframeLoadTimeout && (
                 <iframe
-                  key={iframeSrc}
-                  src={iframeSrc}
+                  key={playerUrl}
+                  src={playerUrl}
                   className="w-full h-full"
                   onLoad={handleIframeLoad}
                   onError={handleIframeError}
@@ -342,7 +372,7 @@ export default function AniPlayerModal() {
               )}
 
               {/* No video available */}
-              {!iframeSrc && !iframeLoading && !iframeError && !iframeLoadTimeout && (
+              {!playerUrl && !iframeLoading && !iframeError && !iframeLoadTimeout && (
                 <div className="flex items-center justify-center h-full text-white/30 text-sm">
                   Нет доступного видео
                 </div>
