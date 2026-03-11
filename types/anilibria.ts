@@ -19,7 +19,7 @@ export interface AniLibriaTitle {
     src: string
     preview: string | null
     thumbnail: string | null
-    optimized: string
+    optimized: { src: string; preview: string; thumbnail: string } | null
   }
   genres: {
     id: number

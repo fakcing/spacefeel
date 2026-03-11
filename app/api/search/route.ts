@@ -23,13 +23,13 @@ export async function GET(req: NextRequest) {
     id: number
     alias: string
     name: { main: string; english: string }
-    poster: { optimized: string; src: string }
+    poster: { optimized: { src: string } | null; src: string }
     type: { value: string }
   }>).map((t) => ({
     id: t.id,
     title: t.name.main,
     poster_path: null,
-    anilibria_poster: `https://anilibria.top${t.poster.optimized || t.poster.src}`,
+    anilibria_poster: `https://anilibria.top${t.poster.optimized?.src || t.poster.src}`,
     media_type: 'anime',
     alias: t.alias,
     type: t.type.value,

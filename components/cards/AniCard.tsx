@@ -13,7 +13,7 @@ interface Props {
 
 export default function AniCard({ item }: Props) {
   const router = useRouter()
-  const poster = getPosterUrl(item.poster.optimized || item.poster.src)
+  const poster = getPosterUrl(item.poster.optimized?.src || item.poster.src)
   const title = item.name.main || item.name.english
   const href = `/anime/${item.alias}`
 

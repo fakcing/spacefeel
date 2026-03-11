@@ -25,7 +25,7 @@ export default async function AniDetailPage({ params }: Props) {
     notFound()
   }
 
-  const poster = getPosterUrl(title.poster.optimized || title.poster.src)
+  const poster = getPosterUrl(title.poster.optimized?.src || title.poster.src)
   const episodes = (title.episodes ?? []).sort((a, b) => a.ordinal - b.ordinal)
 
   return (

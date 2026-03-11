@@ -3,8 +3,8 @@ import AniCarouselSection from '@/components/home/AniCarouselSection'
 
 export default async function AnimePage() {
   const [updates, popular] = await Promise.all([
-    fetchAniUpdates(20, 0),
-    fetchAniPopular(20, 0),
+    fetchAniUpdates(20, 1),
+    fetchAniPopular(20, 1),
   ])
 
   return (
