@@ -16,7 +16,7 @@ export default async function Footer() {
   ]
 
   return (
-    <footer className="border-t py-10 mt-12" style={{ backgroundColor: 'var(--color-bg)', borderColor: 'var(--color-border)' }}>
+    <footer className="border-t py-10 mt-12 md:block hidden" style={{ backgroundColor: 'var(--color-bg)', borderColor: 'var(--color-border)' }}>
       <div className="max-w-7xl mx-auto px-4 md:px-8">
         {/* Nav links */}
         <nav className="flex flex-wrap gap-6">

@@ -307,8 +307,8 @@ export default function AniPlayerModal() {
           </div>
 
           {/* Video container */}
-          <div className="flex-1 flex items-center justify-center px-4 py-3 min-h-0">
-            <div className="w-full max-w-5xl aspect-video rounded-xl overflow-hidden bg-black relative">
+          <div className="flex-1 flex items-center justify-center px-2 sm:px-4 py-3 min-h-0">
+            <div className="w-full max-w-5xl aspect-video rounded-lg sm:rounded-xl overflow-hidden bg-black relative">
               {/* Loading state */}
               {iframeLoading && !iframeLoadTimeout && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#1a1a1b]">

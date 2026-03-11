@@ -4,6 +4,7 @@ import { ThemeProvider } from 'next-themes'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import Navbar from '@/components/layout/Navbar'
+import MobileNav from '@/components/layout/MobileNav'
 import Footer from '@/components/layout/Footer'
 import AuthModal from '@/components/ui/AuthModal'
 import PageTransition from '@/components/layout/PageTransition'
@@ -50,6 +51,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               <Navbar />
               <PageTransition>{children}</PageTransition>
               <Footer />
+              <MobileNav />
               <AuthModal />
               <ScrollToTop />
               <AniPlayerModal />

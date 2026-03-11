@@ -53,7 +53,7 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
   return (
     <>
       {/* Backdrop */}
-      <div className="relative w-full h-[65vh] overflow-hidden">
+      <div className="relative w-full h-[50vh] sm:h-[65vh] overflow-hidden">
         {backdrop && (
           <Image
             src={backdrop}
@@ -70,7 +70,26 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
       </div>
 
       {/* Info block */}
-      <div className="max-w-7xl mx-auto px-4 md:px-12 -mt-24 relative z-10 flex gap-8 items-end pb-8">
+      <div className="max-w-7xl mx-auto px-4 md:px-12 -mt-20 sm:-mt-24 relative z-10 flex flex-col sm:flex-row gap-6 sm:gap-8 items-start sm:items-end pb-6 sm:pb-8">
+        {/* Mobile poster - shown only on mobile */}
+        <div className="sm:hidden w-full flex justify-center">
+          <div className="w-40 rounded-xl overflow-hidden shadow-2xl">
+            <div className="relative aspect-[2/3]">
+              {poster && (
+                <Image
+                  src={poster}
+                  alt={title || ''}
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="160px"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop poster - hidden on mobile */}
         <div className="hidden sm:block flex-shrink-0 w-40 rounded-2xl overflow-hidden shadow-2xl">
           <div className="relative aspect-[2/3]">
             {poster && (
@@ -85,31 +104,32 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
             )}
           </div>
         </div>
-        <div className="flex-1 min-w-0 pb-2">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-1 text-[var(--text-primary)]">
+
+        <div className="flex-1 min-w-0 pb-2 w-full">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-1 text-[var(--text-primary)] text-center sm:text-left">
             {title}
           </h1>
           {item.tagline && (
-            <p className="text-[var(--text-muted)] italic text-sm mb-3">{item.tagline}</p>
+            <p className="text-[var(--text-muted)] italic text-sm mb-3 text-center sm:text-left">{item.tagline}</p>
           )}
-          <div className="flex flex-wrap gap-2 mb-4">
+          <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-4">
             {item.genres?.map((g) => (
               <Badge key={g.id}>{g.name}</Badge>
             ))}
           </div>
-          <div className="flex items-center gap-4 flex-wrap mb-4">
+          <div className="flex items-center justify-center sm:justify-start gap-4 flex-wrap mb-4">
             <Rating value={item.vote_average} count={item.vote_count} />
             {year && <span className="text-[var(--text-muted)] text-sm">{year}</span>}
             {extra && <span className="text-[var(--text-muted)] text-sm">{extra}</span>}
           </div>
-          <div className="flex items-center gap-3">
-            <button className="flex items-center gap-2 bg-white text-black font-semibold rounded-full px-6 py-2.5 hover:bg-white/90 transition-colors text-sm">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <button className="flex items-center justify-center gap-2 bg-white text-black font-semibold rounded-full px-6 py-3 sm:py-2.5 hover:bg-white/90 transition-colors text-sm w-full sm:w-auto">
               <Play size={16} fill="black" />
               {t('playNow')}
             </button>
             <button
               onClick={handleWatchlist}
-              className={`flex items-center gap-2 font-semibold rounded-full px-6 py-2.5 text-sm transition-colors border ${
+              className={`flex items-center justify-center gap-2 font-semibold rounded-full px-6 py-3 sm:py-2.5 text-sm transition-colors border w-full sm:w-auto ${
                 isBookmarked
                   ? 'bg-white/15 border-white/30 text-white'
                   : 'bg-transparent border-white/20 text-white hover:bg-white/10'

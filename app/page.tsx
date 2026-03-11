@@ -37,7 +37,7 @@ async function HomePageContent() {
   return (
     <div>
       <HeroBanner movies={data.trendingMovies.results.slice(0, 5) as Movie[]} />
-      <div className="pt-8 space-y-2">
+      <div className="pt-6 sm:pt-8 space-y-4 sm:space-y-2 px-2 sm:px-0">
         <CarouselSection title={t('trendingMovies')} items={data.trendingMovies.results.slice(0, 20) as Movie[]} mediaType="movie" viewAllHref="/movies?category=trending" />
         <CarouselSection title={t('popularTVShows')} items={data.popularTV.results.slice(0, 20) as TVShow[]} mediaType="tv" viewAllHref="/tv?category=popular" />
         <CarouselSection title={t('topRatedMovies')} items={data.topRatedMovies.results.slice(0, 20) as Movie[]} mediaType="movie" viewAllHref="/movies?category=top_rated" />

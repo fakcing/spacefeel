@@ -54,10 +54,10 @@ export default async function MoviesPage({
   const baseHref = `/movies?category=${category}`
 
   return (
-    <div className="min-h-screen pt-20 px-6 md:px-10 lg:px-16 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold tracking-tight mb-6 text-[var(--text-primary)]">{label} Movies</h1>
+    <div className="min-h-screen pt-14 pb-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto">
+      <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-4 md:mb-6 text-[var(--text-primary)]">{label} Movies</h1>
 
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-8 pb-2">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-6 md:mb-8 pb-2 -mx-4 px-4 md:mx-0 md:px-0">
         {categories.map((cat) => (
           <Link
             key={cat.value}
@@ -73,7 +73,7 @@ export default async function MoviesPage({
         ))}
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 md:gap-4">
         {results.map((movie, index) => (
           <MediaCard key={movie.id} item={movie} mediaType="movie" priority={index < 6} />
         ))}

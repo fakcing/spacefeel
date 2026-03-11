@@ -49,14 +49,14 @@ export default function MediaCard({ item, mediaType, priority = false }: MediaCa
         className="group cursor-pointer overflow-visible"
         onMouseEnter={() => router.prefetch(href)}
       >
-        <div className="relative w-full aspect-[2/3] rounded-xl overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-[1.03] group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+        <div className="relative w-full aspect-[2/3] rounded-lg md:rounded-xl overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-[1.03] group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
           {poster && !imgError ? (
             <Image
               src={poster}
               fill
               className="object-cover transition-opacity duration-500"
               alt={title || 'Media'}
-              sizes="(max-width: 640px) 165px, (max-width: 768px) 170px, (max-width: 1024px) 20vw, (max-width: 1280px) 16vw, 190px"
+              sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
               onError={() => setImgError(true)}
               priority={priority}
               loading={priority ? undefined : 'lazy'}
@@ -68,7 +68,7 @@ export default function MediaCard({ item, mediaType, priority = false }: MediaCa
             />
           ) : (
             <div className="w-full h-full bg-white/[0.08] flex items-center justify-center">
-              <Film size={32} className="text-white/20" />
+              <Film size={24} className="text-white/20" />
             </div>
           )}
 
@@ -81,16 +81,16 @@ export default function MediaCard({ item, mediaType, priority = false }: MediaCa
           />
 
           {/* Rating + title + year — inside image at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 p-2 z-20">
-            <div className="inline-flex items-center bg-black/80 backdrop-blur-sm rounded-full px-2 py-0.5 text-xs font-semibold text-white mb-1">
+          <div className="absolute bottom-0 left-0 right-0 p-1.5 md:p-2 z-20">
+            <div className="inline-flex items-center bg-black/80 backdrop-blur-sm rounded-full px-1.5 md:px-2 py-0.5 text-[10px] md:text-xs font-semibold text-white mb-1">
               {item.vote_average > 0 ? item.vote_average.toFixed(1) : 'N/A'}
             </div>
             <p
-              className="text-sm font-semibold text-white truncate leading-tight"
+              className="text-xs md:text-sm font-semibold text-white truncate leading-tight"
               style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6)' }}
             >{title}</p>
             <p
-              className="text-xs text-white/60"
+              className="text-[10px] md:text-xs text-white/60"
               style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
             >{year}</p>
           </div>

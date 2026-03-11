@@ -22,7 +22,7 @@ export default function AniCard({ item }: Props) {
       onMouseEnter={() => router.prefetch(href)}
       className="group relative block w-full"
     >
-      <div className="relative aspect-[2/3] rounded-xl overflow-hidden bg-white/5">
+      <div className="relative aspect-[2/3] rounded-lg md:rounded-xl overflow-hidden bg-white/5">
         <Image
           src={poster}
           fill
@@ -30,7 +30,7 @@ export default function AniCard({ item }: Props) {
           alt={item.title}
           placeholder="blur"
           blurDataURL={BLUR_DATA_URL}
-          sizes="(max-width: 640px) 33vw, 16vw"
+          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
           loading="lazy"
         />
 
@@ -43,8 +43,8 @@ export default function AniCard({ item }: Props) {
         />
 
         {/* Title */}
-        <div className="absolute bottom-0 left-0 right-0 p-2.5 z-20">
-          <div className="inline-flex items-center bg-black/70 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-white mb-1">
+        <div className="absolute bottom-0 left-0 right-0 p-1.5 md:p-2.5 z-20">
+          <div className="inline-flex items-center bg-black/70 backdrop-blur-sm rounded-md px-1 md:px-1.5 py-0.5 text-[8px] md:text-[10px] font-semibold text-white mb-1">
             ★ {item.rating.average.toFixed(1)}
           </div>
           <p
@@ -52,7 +52,7 @@ export default function AniCard({ item }: Props) {
             style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6)' }}
           >{item.title}</p>
           <p
-            className="text-white/60 text-[10px] mt-0.5"
+            className="text-white/60 text-[8px] md:text-[10px] mt-0.5"
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
           >
             {item.year} • {item.type?.name}
