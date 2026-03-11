@@ -43,13 +43,11 @@ export default function AniCard({ item }: Props) {
           }}
         />
 
-        {/* Favorites count */}
-        <div className="absolute bottom-10 left-2 z-20 bg-black/80 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-xs font-semibold text-white">
-          ♥ {(item.added_in_users_favorites / 1000).toFixed(1)}K
-        </div>
-
         {/* Title */}
         <div className="absolute bottom-0 left-0 right-0 p-2.5 z-20">
+          <div className="inline-flex items-center bg-black/70 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-white mb-1">
+            ♥ {(item.added_in_users_favorites / 1000).toFixed(1)}K
+          </div>
           <p
             className="text-white text-xs font-semibold leading-tight line-clamp-2"
             style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6)' }}

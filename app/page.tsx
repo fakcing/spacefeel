@@ -2,13 +2,11 @@ import { Suspense } from 'react'
 import { getTranslations } from 'next-intl/server'
 import HeroBanner from '@/components/home/HeroBanner'
 import CarouselSection from '@/components/home/CarouselSection'
-import AniCarouselSection from '@/components/home/AniCarouselSection'
 import SkeletonCard from '@/components/ui/SkeletonCard'
 import {
   fetchTrending, fetchPopular, fetchTopRated,
   fetchAiringToday, fetchCartoons
 } from '@/lib/tmdb'
-import { fetchAniUpdates, fetchAniPopular } from '@/lib/anilibria'
 import { Movie, TVShow } from '@/types/tmdb'
 
 function CarouselSkeleton() {
@@ -47,19 +45,9 @@ async function TopRatedMoviesCarousel({ title }: { title: string }) {
   return <CarouselSection title={title} items={r.results.slice(0, 20) as Movie[]} mediaType="movie" viewAllHref="/movies?category=top_rated" />
 }
 
-async function NewAnimeCarousel({ title }: { title: string }) {
-  const items = await fetchAniUpdates(20, 1)
-  return <AniCarouselSection title={title} items={items} viewAllHref="/anime?category=updated" />
-}
-
 async function AiringTodayCarousel({ title }: { title: string }) {
   const r = await fetchAiringToday()
   return <CarouselSection title={title} items={r.results.slice(0, 20) as TVShow[]} mediaType="tv" viewAllHref="/tv?category=airing_today" />
-}
-
-async function PopularAnimeCarousel({ title }: { title: string }) {
-  const items = await fetchAniPopular(20, 1)
-  return <AniCarouselSection title={title} items={items} viewAllHref="/anime?category=popular" />
 }
 
 async function FamilyCartoonsCarousel({ title }: { title: string }) {
@@ -86,13 +74,7 @@ export default async function HomePage() {
           <TopRatedMoviesCarousel title={t('topRatedMovies')} />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
-          <NewAnimeCarousel title={t('trendingAnime')} />
-        </Suspense>
-        <Suspense fallback={<CarouselSkeleton />}>
           <AiringTodayCarousel title={t('airingToday')} />
-        </Suspense>
-        <Suspense fallback={<CarouselSkeleton />}>
-          <PopularAnimeCarousel title={t('topRatedAnime')} />
         </Suspense>
         <Suspense fallback={<CarouselSkeleton />}>
           <FamilyCartoonsCarousel title={t('familyCartoons')} />
