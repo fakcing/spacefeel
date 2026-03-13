@@ -193,20 +193,19 @@ export default function AniPlayerModal() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
-          {/* ── Header ── */}
-          {/* Desktop: single row | Mobile: title+close on top, controls on second scrollable row */}
-          <div className="flex-shrink-0 border-b border-white/10 flex flex-wrap sm:flex-nowrap items-center gap-2 px-3 py-2.5 overflow-visible">
+          {/* ── Header (Desktop) — original single row, hidden on mobile ── */}
+          <div className="hidden sm:flex items-center gap-2 px-3 py-2.5 flex-shrink-0 border-b border-white/10 flex-nowrap overflow-visible">
 
-            {/* Title — on mobile sits next to close (order-1), on desktop is first */}
-            <span className="text-white/70 text-sm font-medium truncate max-w-[130px] sm:max-w-[200px] flex-shrink-0 order-1 sm:order-none">
+            {/* Title */}
+            <span className="text-white/70 text-sm font-medium truncate max-w-[200px] flex-shrink-0">
               {titleName}
             </span>
 
-            {/* Controls — on mobile full-width second row (order-3), on desktop inline (order-2) */}
-            <div className="flex items-center gap-1.5 order-3 sm:order-none w-full sm:w-auto sm:flex-1 min-w-0 overflow-x-auto scrollbar-none pb-0.5 sm:pb-0">
+            {/* Controls */}
+            <div className="flex items-center gap-1.5 flex-1 min-w-0">
 
               {/* Server tabs */}
-              <div className="flex items-center gap-0.5 p-0.5 rounded-xl border border-white/10 bg-white/5 flex-shrink-0">
+              <div className="flex items-center gap-0.5 p-0.5 rounded-xl border border-white/10 bg-white/5">
                 {SERVER_DEFS.map(srv => {
                   const isActive = activeSource === srv.id
                   const srcData = sources.find(s => s.id === srv.id)
@@ -215,7 +214,6 @@ export default function AniPlayerModal() {
                     ? videos.length > 0
                     : !sourcesLoading && srcData?.available
                   const isPending = sourcesLoading && !isYummy
-
                   return (
                     <button
                       key={srv.id}
@@ -239,12 +237,12 @@ export default function AniPlayerModal() {
                 })}
               </div>
 
-              {/* Season (Yummy, multi-season) */}
+              {/* Season */}
               {isYummyActive && yummySeasons.length > 1 && (
                 <select
                   value={currentSeason}
                   onChange={e => setSeason(Number(e.target.value))}
-                  className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none flex-shrink-0"
+                  className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none"
                 >
                   {yummySeasons.map(s => (
                     <option key={s} value={s} className="bg-black">Сезон {s}</option>
@@ -254,7 +252,7 @@ export default function AniPlayerModal() {
 
               {/* Episode picker popover */}
               {episodeNumbers.length > 0 && (
-                <div className="relative flex-shrink-0" ref={epPickerRef}>
+                <div className="relative" ref={epPickerRef}>
                   <button
                     onClick={e => { e.stopPropagation(); setEpPickerOpen(p => !p) }}
                     className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-medium hover:bg-white/10 transition-colors"
@@ -263,7 +261,6 @@ export default function AniPlayerModal() {
                     <span className="text-white">{safeEpisode}</span>
                     <ChevronDown size={10} className="text-white/40" />
                   </button>
-
                   {epPickerOpen && (
                     <div className="absolute top-full left-0 mt-1.5 bg-[#111] border border-white/10 rounded-xl p-2 z-[200] shadow-2xl min-w-[200px]">
                       <p className="text-white/30 text-[10px] font-medium uppercase tracking-wide px-1 pb-1.5">
@@ -295,15 +292,13 @@ export default function AniPlayerModal() {
                 <div className="relative flex-shrink-0" ref={dubPickerRef}>
                   <button
                     onClick={e => { e.stopPropagation(); setDubPickerOpen(p => !p) }}
-                    className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors whitespace-nowrap ${
+                    className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors flex-shrink-0 ${
                       dubPickerOpen ? 'bg-white/15 border-white/20' : 'bg-white/5 border-white/10 hover:bg-white/10'
                     }`}
                   >
-                    <span className="text-white/50">Озвучка</span>
-                    <span className="text-white max-w-[80px] truncate">{currentDubbing}</span>
+                    <span className="text-white/50 whitespace-nowrap">Озвучка</span>
                     <ChevronDown size={10} className={`text-white/40 transition-transform flex-shrink-0 ${dubPickerOpen ? 'rotate-180' : ''}`} />
                   </button>
-
                   {dubPickerOpen && (
                     <div className="absolute top-full left-0 mt-1.5 bg-[#111] border border-white/10 rounded-xl z-[200] shadow-2xl overflow-hidden"
                       style={{ minWidth: '200px', maxWidth: '280px' }}>
@@ -334,14 +329,103 @@ export default function AniPlayerModal() {
               )}
             </div>
 
-            {/* Close — on mobile order-2 (next to title), on desktop last */}
+            {/* Close */}
             <button
               onClick={closePlayer}
-              className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors flex-shrink-0 order-2 sm:order-none ml-auto sm:ml-0"
+              className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors flex-shrink-0 ml-auto"
               aria-label="Закрыть"
             >
               <X size={14} className="text-white" />
             </button>
+          </div>
+
+          {/* ── Header (Mobile) — 2 rows, native selects, no ref conflicts ── */}
+          <div className="sm:hidden flex-shrink-0 border-b border-white/10">
+
+            {/* Row 1: title + close */}
+            <div className="flex items-center gap-2 px-3 pt-2.5 pb-1.5">
+              <span className="text-white/70 text-sm font-medium truncate flex-1 min-w-0">
+                {titleName}
+              </span>
+              <button
+                onClick={closePlayer}
+                className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors flex-shrink-0"
+                aria-label="Закрыть"
+              >
+                <X size={14} className="text-white" />
+              </button>
+            </div>
+
+            {/* Row 2: server tabs + native selects, horizontally scrollable */}
+            <div className="flex items-center gap-1.5 px-3 pb-2.5 overflow-x-auto scrollbar-none">
+
+              {/* Server tabs */}
+              <div className="flex items-center gap-0.5 p-0.5 rounded-xl border border-white/10 bg-white/5 flex-shrink-0">
+                {SERVER_DEFS.map(srv => {
+                  const isActive = activeSource === srv.id
+                  const srcData = sources.find(s => s.id === srv.id)
+                  const isYummy = srv.id === 'yummy'
+                  const canPlay = isYummy
+                    ? videos.length > 0
+                    : !sourcesLoading && srcData?.available
+                  return (
+                    <button
+                      key={srv.id}
+                      onClick={() => setActiveSource(srv.id)}
+                      disabled={isYummy && videos.length === 0}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                        isActive
+                          ? 'bg-white text-black shadow'
+                          : canPlay
+                          ? 'text-white/70 hover:text-white hover:bg-white/10'
+                          : 'text-white/40'
+                      }`}
+                    >
+                      {srv.label}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {/* Season — native select */}
+              {isYummyActive && yummySeasons.length > 1 && (
+                <select
+                  value={currentSeason}
+                  onChange={e => setSeason(Number(e.target.value))}
+                  className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none flex-shrink-0"
+                >
+                  {yummySeasons.map(s => (
+                    <option key={s} value={s} className="bg-black">Сезон {s}</option>
+                  ))}
+                </select>
+              )}
+
+              {/* Episode — native select */}
+              {episodeNumbers.length > 0 && (
+                <select
+                  value={safeEpisode}
+                  onChange={e => setEpisode(e.target.value)}
+                  className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none flex-shrink-0"
+                >
+                  {episodeNumbers.map(ep => (
+                    <option key={ep} value={ep} className="bg-black">Серия {ep}</option>
+                  ))}
+                </select>
+              )}
+
+              {/* Dubbing — native select */}
+              {activeDubbings.length > 1 && (
+                <select
+                  value={currentDubbing}
+                  onChange={e => setDubbing(e.target.value)}
+                  className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none flex-shrink-0 max-w-[130px]"
+                >
+                  {activeDubbings.map(dub => (
+                    <option key={dub} value={dub} className="bg-black">{dub}</option>
+                  ))}
+                </select>
+              )}
+            </div>
           </div>
 
           {/* ── Video ── */}
