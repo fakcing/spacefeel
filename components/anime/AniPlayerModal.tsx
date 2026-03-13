@@ -194,7 +194,7 @@ export default function AniPlayerModal() {
           transition={{ duration: 0.2 }}
         >
           {/* ── Header ── */}
-          <div className="flex items-center gap-2 px-3 py-2.5 flex-shrink-0 border-b border-white/10 flex-wrap sm:flex-nowrap">
+          <div className="flex items-center gap-2 px-3 py-2.5 flex-shrink-0 border-b border-white/10 flex-wrap sm:flex-nowrap overflow-visible">
 
             {/* Prev / Next */}
             <button
@@ -282,7 +282,7 @@ export default function AniPlayerModal() {
                   </button>
 
                   {epPickerOpen && (
-                    <div className="absolute top-full left-0 mt-1.5 bg-[#111] border border-white/10 rounded-xl p-2 z-20 shadow-2xl min-w-[200px]">
+                    <div className="absolute top-full left-0 mt-1.5 bg-[#111] border border-white/10 rounded-xl p-2 z-[200] shadow-2xl min-w-[200px]">
                       <p className="text-white/30 text-[10px] font-medium uppercase tracking-wide px-1 pb-1.5">
                         Серии · {episodeNumbers.length} эп.
                       </p>
@@ -320,7 +320,7 @@ export default function AniPlayerModal() {
                   </button>
 
                   {dubPickerOpen && (
-                    <div className="absolute top-full left-0 mt-1.5 bg-[#111] border border-white/10 rounded-xl p-2 z-20 shadow-2xl min-w-[160px] max-w-[260px]">
+                    <div className="absolute top-full left-0 mt-1.5 bg-[#111] border border-white/10 rounded-xl p-2 z-[200] shadow-2xl min-w-[160px] max-w-[260px]">
                       <p className="text-white/30 text-[10px] font-medium uppercase tracking-wide px-1 pb-1.5">
                         Озвучка · {activeDubbings.length}
                       </p>
