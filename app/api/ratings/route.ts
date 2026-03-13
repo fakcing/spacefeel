@@ -5,7 +5,7 @@ import { z } from 'zod'
 
 const ratingSchema = z.object({
   tmdbId: z.number(),
-  mediaType: z.enum(['movie', 'tv']),
+  mediaType: z.enum(['movie', 'tv', 'anime']),
   score: z.number().min(1).max(10),
   review: z.string().max(1000).optional(),
 })
@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
   const tmdbId = req.nextUrl.searchParams.get('tmdbId')
   const mediaType = req.nextUrl.searchParams.get('mediaType')
+  const session = await auth()
 
   try {
     const ratings = await prisma.rating.findMany({
@@ -57,8 +58,28 @@ export async function GET(req: NextRequest) {
       ? ratings.reduce((sum, r) => sum + r.score, 0) / ratings.length
       : 0
 
-    return NextResponse.json({ ratings, average: avg, count: ratings.length })
+    const myRatingId = session?.user?.id
+      ? (ratings.find((r: { userId: string; id: string }) => r.userId === session.user!.id)?.id ?? null)
+      : null
+
+    return NextResponse.json({ ratings, average: avg, count: ratings.length, myRatingId })
   } catch {
-    return NextResponse.json({ ratings: [], average: 0, count: 0 })
+    return NextResponse.json({ ratings: [], average: 0, count: 0, myRatingId: null })
   }
+}
+
+export async function DELETE(req: NextRequest) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const tmdbId = parseInt(req.nextUrl.searchParams.get('tmdbId') ?? '0')
+  const mediaType = req.nextUrl.searchParams.get('mediaType') ?? 'movie'
+
+  await prisma.rating.deleteMany({
+    where: { userId: session.user.id, tmdbId, mediaType },
+  })
+
+  return NextResponse.json({ ok: true })
 }

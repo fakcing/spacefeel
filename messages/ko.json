@@ -37,12 +37,21 @@
     "episodes": "에피소드",
     "rating": "평점",
     "dubbing": "더빙",
-    "moreLikeThis": "비슷한 애니메이션"
+    "moreLikeThis": "비슷한 애니메이션",
+    "communityRating": "커뮤니티 평점",
+    "yourRating": "내 평점",
+    "signInToRate": "로그인하여 평가",
+    "writeReview": "리뷰 작성 (선택)",
+    "submitRating": "제출",
+    "deleteRating": "삭제"
   },
   "search": {
     "placeholder": "검색...",
     "tvShow": "드라마",
-    "movie": "영화"
+    "movie": "영화",
+    "anime": "애니메이션",
+    "noResults": "결과 없음",
+    "typeHint": "제목을 입력하세요"
   },
   "watchlistPage": {
     "title": "내 목록",

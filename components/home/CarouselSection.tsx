@@ -64,8 +64,8 @@ export default function CarouselSection({
           )}
         </div>
 
-        {/* Right: page counter + arrows */}
-        <div className="flex items-center gap-2">
+        {/* Right: page counter + arrows (desktop only) */}
+        <div className="hidden md:flex items-center gap-2">
           <span className="text-sm text-[var(--color-text-muted)]">
             {currentIndex + 1} / {maxIndex + 1}
           </span>
@@ -94,7 +94,22 @@ export default function CarouselSection({
         </div>
       </div>
 
-      <div className="overflow-hidden py-3 -my-3">
+      {/* Mobile: 2-column grid showing first 8 */}
+      <div className="md:hidden grid grid-cols-2 gap-3">
+        {items.slice(0, 8).map((item, index) => (
+          <motion.div
+            key={item.id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: index * 0.04, duration: 0.3 }}
+          >
+            <MediaCard item={item} mediaType={mediaType} />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Desktop: carousel */}
+      <div className="hidden md:block overflow-hidden py-3 -my-3">
         <div
           ref={trackRef}
           className="flex gap-3 transition-transform duration-300 ease-out"

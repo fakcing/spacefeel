@@ -37,12 +37,21 @@
     "episodes": "Эпизоды",
     "rating": "Рейтинг",
     "dubbing": "Озвучка",
-    "moreLikeThis": "Похожее аниме"
+    "moreLikeThis": "Похожее аниме",
+    "communityRating": "Оценки сообщества",
+    "yourRating": "Ваша оценка",
+    "signInToRate": "Войдите, чтобы оценить",
+    "writeReview": "Написать рецензию (необязательно)",
+    "submitRating": "Отправить",
+    "deleteRating": "Удалить"
   },
   "search": {
     "placeholder": "Поиск...",
     "tvShow": "Сериал",
-    "movie": "Фильм"
+    "movie": "Фильм",
+    "anime": "Аниме",
+    "noResults": "Ничего не найдено",
+    "typeHint": "Введите название для поиска"
   },
   "watchlistPage": {
     "title": "Мой список",

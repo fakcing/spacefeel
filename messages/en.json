@@ -37,12 +37,21 @@
     "episodes": "Episodes",
     "rating": "Rating",
     "dubbing": "Dubbing",
-    "moreLikeThis": "More Like This"
+    "moreLikeThis": "More Like This",
+    "communityRating": "Community Ratings",
+    "yourRating": "Your rating",
+    "signInToRate": "Sign in to rate",
+    "writeReview": "Write a review (optional)",
+    "submitRating": "Submit",
+    "deleteRating": "Delete"
   },
   "search": {
     "placeholder": "Search...",
     "tvShow": "TV Show",
-    "movie": "Movie"
+    "movie": "Movie",
+    "anime": "Anime",
+    "noResults": "Nothing found",
+    "typeHint": "Type a title to search"
   },
   "watchlistPage": {
     "title": "My Watchlist",

@@ -37,12 +37,21 @@
     "episodes": "Episoden",
     "rating": "Bewertung",
     "dubbing": "Synchronisation",
-    "moreLikeThis": "Ähnliche Anime"
+    "moreLikeThis": "Ähnliche Anime",
+    "communityRating": "Community-Bewertungen",
+    "yourRating": "Ihre Bewertung",
+    "signInToRate": "Anmelden zum Bewerten",
+    "writeReview": "Rezension schreiben (optional)",
+    "submitRating": "Senden",
+    "deleteRating": "Löschen"
   },
   "search": {
     "placeholder": "Suchen...",
     "tvShow": "Serie",
-    "movie": "Film"
+    "movie": "Film",
+    "anime": "Anime",
+    "noResults": "Nichts gefunden",
+    "typeHint": "Titel eingeben zum Suchen"
   },
   "watchlistPage": {
     "title": "Meine Merkliste",

@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Search, X, User, LogOut, ChevronUp, Check, Sun, Moon, Monitor } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
 import { useTheme } from 'next-themes'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 const LANGUAGES = [
   { code: 'en', label: 'English',   badge: 'US' },
@@ -42,6 +42,7 @@ export default function MobileHeader() {
   const { theme, setTheme } = useTheme()
   const locale = useLocale()
   const currentLanguage = LANGUAGES.find(l => l.code === locale) ?? LANGUAGES[0]
+  const t = useTranslations()
 
   const [searchOpen, setSearchOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
@@ -57,13 +58,11 @@ export default function MobileHeader() {
     window.location.reload()
   }
 
-  // Close search on route change
   useEffect(() => {
     setSearchOpen(false)
     setProfileOpen(false)
   }, [pathname])
 
-  // Focus input when search opens
   useEffect(() => {
     if (searchOpen) {
       setTimeout(() => inputRef.current?.focus(), 100)
@@ -73,7 +72,6 @@ export default function MobileHeader() {
     }
   }, [searchOpen])
 
-  // Search debounce
   useEffect(() => {
     if (!query.trim() || query.length < 2) {
       setResults([])
@@ -90,7 +88,6 @@ export default function MobileHeader() {
     return () => clearTimeout(timeout)
   }, [query])
 
-  // Close profile on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (!profileRef.current?.contains(e.target as Node)) setProfileOpen(false)
@@ -99,14 +96,18 @@ export default function MobileHeader() {
     return () => document.removeEventListener('mousedown', handler)
   }, [])
 
+  const themeOptions = [
+    { value: 'light', label: t('profile.light'), Icon: Sun },
+    { value: 'dark',  label: t('profile.dark'),  Icon: Moon },
+    { value: 'system',label: t('profile.system'),Icon: Monitor },
+  ]
+
   return (
     <>
-      {/* Top header bar - mobile only */}
       <header
         className="fixed top-0 left-0 right-0 z-40 h-14 md:hidden flex items-center justify-between px-4 border-b"
         style={{ backgroundColor: 'var(--color-bg)', borderColor: 'var(--color-border)' }}
       >
-        {/* Logo */}
         <Link href="/" className="select-none">
           <span
             className="text-2xl tracking-[0.15em]"
@@ -116,25 +117,22 @@ export default function MobileHeader() {
           </span>
         </Link>
 
-        {/* Right actions */}
         <div className="flex items-center gap-2">
-          {/* Search icon */}
           <button
             onClick={() => setSearchOpen(true)}
             className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors"
             style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
-            aria-label="Поиск"
+            aria-label={t('search.placeholder')}
           >
             <Search size={16} style={{ color: 'var(--color-text-muted)' }} />
           </button>
 
-          {/* Profile button */}
           <div ref={profileRef} className="relative">
             <button
               onClick={() => setProfileOpen(v => !v)}
               className="w-9 h-9 rounded-xl flex items-center justify-center transition-colors overflow-hidden"
               style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
-              aria-label="Профиль"
+              aria-label={t('profile.account')}
             >
               {session?.user?.image ? (
                 <Image
@@ -149,7 +147,6 @@ export default function MobileHeader() {
               )}
             </button>
 
-            {/* Profile dropdown */}
             <AnimatePresence>
               {profileOpen && (
                 <motion.div
@@ -160,7 +157,6 @@ export default function MobileHeader() {
                   className="absolute top-full right-0 mt-2 w-64 rounded-2xl shadow-2xl p-4 z-50"
                   style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
                 >
-                  {/* Account */}
                   {session?.user && (
                     <>
                       <div className="flex items-center gap-2.5 mb-3">
@@ -182,14 +178,13 @@ export default function MobileHeader() {
                         style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
                       >
                         <LogOut size={14} />
-                        Выйти
+                        {t('profile.logout')}
                       </button>
                       <div className="border-t my-3" style={{ borderColor: 'var(--color-border)' }} />
                     </>
                   )}
 
-                  {/* Language */}
-                  <p className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-subtle)' }}>Language</p>
+                  <p className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-subtle)' }}>{t('profile.language')}</p>
                   <div className="relative mb-3">
                     <button
                       onClick={() => setLangOpen(v => !v)}
@@ -232,14 +227,9 @@ export default function MobileHeader() {
                     </AnimatePresence>
                   </div>
 
-                  {/* Theme */}
-                  <p className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-subtle)' }}>Theme</p>
+                  <p className="text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--color-text-subtle)' }}>{t('profile.theme')}</p>
                   <div className="flex flex-col gap-1">
-                    {[
-                      { value: 'light', label: 'Light', Icon: Sun },
-                      { value: 'dark',  label: 'Dark',  Icon: Moon },
-                      { value: 'system',label: 'System',Icon: Monitor },
-                    ].map(({ value, label, Icon }) => {
+                    {themeOptions.map(({ value, label, Icon }) => {
                       const isActive = theme === value
                       return (
                         <button
@@ -266,7 +256,6 @@ export default function MobileHeader() {
         </div>
       </header>
 
-      {/* Search overlay - fullscreen on mobile */}
       <AnimatePresence>
         {searchOpen && (
           <motion.div
@@ -277,7 +266,6 @@ export default function MobileHeader() {
             className="fixed inset-0 z-[60] md:hidden flex flex-col"
             style={{ backgroundColor: 'var(--color-bg)' }}
           >
-            {/* Search header */}
             <div
               className="flex items-center gap-3 px-4 h-14 border-b flex-shrink-0"
               style={{ borderColor: 'var(--color-border)' }}
@@ -288,7 +276,7 @@ export default function MobileHeader() {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Поиск фильмов, аниме..."
+                placeholder={t('search.placeholder')}
                 className="flex-1 bg-transparent text-sm outline-none"
                 style={{ color: 'var(--color-text)' }}
               />
@@ -297,7 +285,6 @@ export default function MobileHeader() {
               </button>
             </div>
 
-            {/* Results */}
             <div className="flex-1 overflow-y-auto">
               {results.length > 0 ? (
                 results.map((item) => {
@@ -316,7 +303,11 @@ export default function MobileHeader() {
                     : item.poster_path
                     ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
                     : null
-                  const typeLabel = isAnime ? 'Аниме' : item.media_type === 'tv' ? 'Сериал' : 'Фильм'
+                  const typeLabel = isAnime
+                    ? t('search.anime')
+                    : item.media_type === 'tv'
+                    ? t('search.tvShow')
+                    : t('search.movie')
 
                   return (
                     <Link
@@ -353,11 +344,11 @@ export default function MobileHeader() {
                 })
               ) : query.length >= 2 ? (
                 <div className="flex items-center justify-center h-32 text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                  Ничего не найдено
+                  {t('search.noResults')}
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-32 text-sm" style={{ color: 'var(--color-text-subtle)' }}>
-                  Введите название для поиска
+                  {t('search.typeHint')}
                 </div>
               )}
             </div>

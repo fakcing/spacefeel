@@ -37,12 +37,21 @@
     "episodes": "Épisodes",
     "rating": "Note",
     "dubbing": "Doublage",
-    "moreLikeThis": "Animes similaires"
+    "moreLikeThis": "Animes similaires",
+    "communityRating": "Avis communauté",
+    "yourRating": "Votre note",
+    "signInToRate": "Connectez-vous pour noter",
+    "writeReview": "Écrire un avis (optionnel)",
+    "submitRating": "Envoyer",
+    "deleteRating": "Supprimer"
   },
   "search": {
     "placeholder": "Rechercher...",
     "tvShow": "Série",
-    "movie": "Film"
+    "movie": "Film",
+    "anime": "Anime",
+    "noResults": "Rien trouvé",
+    "typeHint": "Tapez pour rechercher"
   },
   "watchlistPage": {
     "title": "Ma liste",

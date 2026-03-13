@@ -37,12 +37,21 @@
     "episodes": "エピソード",
     "rating": "評価",
     "dubbing": "吹き替え",
-    "moreLikeThis": "似たアニメ"
+    "moreLikeThis": "似たアニメ",
+    "communityRating": "コミュニティ評価",
+    "yourRating": "あなたの評価",
+    "signInToRate": "ログインして評価",
+    "writeReview": "レビューを書く（任意）",
+    "submitRating": "送信",
+    "deleteRating": "削除"
   },
   "search": {
     "placeholder": "検索...",
     "tvShow": "ドラマ",
-    "movie": "映画"
+    "movie": "映画",
+    "anime": "アニメ",
+    "noResults": "見つかりません",
+    "typeHint": "タイトルを入力"
   },
   "watchlistPage": {
     "title": "マイリスト",
