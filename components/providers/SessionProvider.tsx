@@ -4,12 +4,17 @@ import { SessionProvider as NextAuthSessionProvider, useSession } from 'next-aut
 import { useWatchlistStore } from '@/store/watchlistStore'
 
 function WatchlistSync() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const syncFromDB = useWatchlistStore((s) => s.syncFromDB)
+  const clearItems = useWatchlistStore((s) => s.clearItems)
 
   useEffect(() => {
-    if (session?.user) syncFromDB()
-  }, [session, syncFromDB])
+    if (status === 'authenticated' && session?.user) {
+      syncFromDB()
+    } else if (status === 'unauthenticated') {
+      clearItems()
+    }
+  }, [session, status, syncFromDB, clearItems])
 
   return null
 }

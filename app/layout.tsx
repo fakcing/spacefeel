@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import Navbar from '@/components/layout/Navbar'
 import MobileNav from '@/components/layout/MobileNav'
+import MobileHeader from '@/components/layout/MobileHeader'
 import Footer from '@/components/layout/Footer'
 import AuthModal from '@/components/ui/AuthModal'
 import PageTransition from '@/components/layout/PageTransition'
@@ -50,6 +51,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <SessionProvider>
             <NextIntlClientProvider messages={messages}>
               <Navbar />
+              <MobileHeader />
               <PageTransition>{children}</PageTransition>
               <Footer />
               <MobileNav />

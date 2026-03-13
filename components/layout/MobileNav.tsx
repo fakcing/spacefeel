@@ -6,21 +6,22 @@ import { motion } from 'framer-motion'
 import { House, Film, Tv2, Sword, Bookmark } from 'lucide-react'
 
 const navItems = [
-  { href: '/', icon: House, label: 'Home' },
-  { href: '/movies', icon: Film, label: 'Movies' },
-  { href: '/tv', icon: Tv2, label: 'TV' },
-  { href: '/anime', icon: Sword, label: 'Anime' },
-  { href: '/watchlist', icon: Bookmark, label: 'Watchlist' },
+  { href: '/', icon: House, label: 'Главная' },
+  { href: '/movies', icon: Film, label: 'Фильмы' },
+  { href: '/tv', icon: Tv2, label: 'Сериалы' },
+  { href: '/anime', icon: Sword, label: 'Аниме' },
+  { href: '/watchlist', icon: Bookmark, label: 'Список' },
 ]
 
 export default function MobileNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t h-16 safe-area-inset-bottom"
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 md:hidden border-t safe-area-inset-bottom"
       style={{ backgroundColor: 'var(--color-bg)', borderColor: 'var(--color-border)' }}
     >
-      <div className="grid grid-cols-5 h-full">
+      <div className="grid grid-cols-5 h-16">
         {navItems.map((item) => {
           const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
           const Icon = item.icon
@@ -31,27 +32,23 @@ export default function MobileNav() {
               href={item.href}
               className="flex flex-col items-center justify-center gap-1 relative"
             >
-              <div className="relative">
-                <Icon
-                  size={22}
-                  className={`transition-colors ${
-                    isActive ? 'text-[var(--color-text)]' : 'text-[var(--color-text-muted)]'
-                  }`}
-                  strokeWidth={isActive ? 2.5 : 2}
+              {isActive && (
+                <motion.div
+                  layoutId="mobileNavPill"
+                  className="absolute top-1.5 w-10 h-1 rounded-full"
+                  style={{ backgroundColor: 'var(--color-text)' }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 35 }}
                 />
-                {isActive && (
-                  <motion.div
-                    layoutId="mobileNavIndicator"
-                    className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full"
-                    style={{ backgroundColor: 'var(--color-text)' }}
-                    transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                  />
-                )}
-              </div>
+              )}
+              <Icon
+                size={22}
+                className="transition-colors"
+                style={{ color: isActive ? 'var(--color-text)' : 'var(--color-text-muted)' }}
+                strokeWidth={isActive ? 2.5 : 1.8}
+              />
               <span
-                className={`text-[10px] ${
-                  isActive ? 'text-[var(--color-text)] font-medium' : 'text-[var(--color-text-muted)]'
-                }`}
+                className="text-[10px] font-medium transition-colors"
+                style={{ color: isActive ? 'var(--color-text)' : 'var(--color-text-muted)' }}
               >
                 {item.label}
               </span>

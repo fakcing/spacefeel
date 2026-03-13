@@ -1,10 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo, useCallback } from 'react'
-import { AlertTriangle, RefreshCw, Server, Check, ChevronDown } from 'lucide-react'
-import { fetchVideoCDN, fetchVideoCDNTranslations, buildVideoCDNUrl } from '@/lib/videocdn'
-import { YaniVideo } from '@/types/yani'
-import { VideoCDNQuality } from '@/types/videocdn'
+import { AlertTriangle, RefreshCw, Server, ChevronLeft, ChevronRight } from 'lucide-react'
 
 interface UniversalPlayerProps {
   type: 'movie' | 'tv' | 'anime' | 'cartoon'
@@ -12,370 +9,222 @@ interface UniversalPlayerProps {
   shikimoriId?: number
   season?: number
   episode?: number
-  yaniVideos?: YaniVideo[]
-  yaniDubbing?: string
 }
 
-interface Episode {
-  number: number
-  title?: string
+interface PlayerServer {
+  name: string
+  iframe: string
+  source: string
 }
-
-interface Season {
-  number: number
-  episodes: Episode[]
-}
-
-type ServerType = 'yani' | 'videocdn'
-
-const STORAGE_SERVER_KEY = 'spacefeel_player_server'
-const STORAGE_DUBBING_KEY = 'spacefeel_player_dubbing'
 
 export default function UniversalPlayer({
   type,
   tmdbId,
-  shikimoriId,
-  season: propSeason,
-  episode: propEpisode,
-  yaniVideos,
-  yaniDubbing,
+  season: propSeason = 1,
+  episode: propEpisode = 1,
 }: UniversalPlayerProps) {
-  // Determine available servers based on content type
-  // Yani/Alloha only for anime, VideoCDN only for movie/tv/cartoon
-  const isAnime = type === 'anime'
-  const defaultServer: ServerType = isAnime ? 'yani' : 'videocdn'
-
-  // Server state
-  const [currentServer, setCurrentServer] = useState<ServerType>(() => {
-    if (typeof window === 'undefined') return defaultServer
-    const saved = localStorage.getItem(STORAGE_SERVER_KEY) as ServerType | null
-    // Validate saved server is available for this content type
-    if (saved && isAnime && saved === 'yani') return saved
-    if (saved && !isAnime && saved === 'videocdn') return saved
-    return defaultServer
-  })
-
-  // Loading states
+  const [servers, setServers] = useState<PlayerServer[]>([])
+  const [activeServer, setActiveServer] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
+  const [serversLoading, setServersLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [loadTimeout, setLoadTimeout] = useState(false)
+  const [iframeKey, setIframeKey] = useState(0)
+  const [selectedSeason, setSelectedSeason] = useState(propSeason)
+  const [selectedEpisode, setSelectedEpisode] = useState(propEpisode)
 
-  // Season/Episode state
-  const [selectedSeason, setSelectedSeason] = useState(propSeason || 1)
-  const [selectedEpisode, setSelectedEpisode] = useState(propEpisode || 1)
-
-  // VideoCDN state
-  const [videocdnQualities, setVideoCDNQualities] = useState<VideoCDNQuality[]>([])
-  const [videocdnTranslations, setVideoCDNTranslations] = useState<{ id: number; title: string; type: 'sub' | 'dub'; language?: string }[]>([])
-  const [selectedTranslation, setSelectedTranslation] = useState<number>(() => {
-    if (typeof window === 'undefined') return 1
-    return Number(localStorage.getItem(STORAGE_DUBBING_KEY)) || 1
-  })
-
-  // Yani seasons/episodes extraction
-  const yaniSeasons = useMemo(() => {
-    if (!yaniVideos) return []
-
-    const seasonMap = new Map<number, Set<number>>()
-    
-    yaniVideos.forEach((video) => {
-      const season = video.season ?? 1
-      const episode = Number(video.number)
-      
-      if (!seasonMap.has(season)) {
-        seasonMap.set(season, new Set())
-      }
-      seasonMap.get(season)!.add(episode)
-    })
-
-    const seasons: Season[] = []
-    seasonMap.forEach((episodes, season) => {
-      seasons.push({
-        number: season,
-        episodes: Array.from(episodes).map(num => ({ number: num })),
+  // Fetch servers from API
+  useEffect(() => {
+    if (!tmdbId) return
+    const t = type === 'cartoon' ? 'movie' : type === 'anime' ? 'tv' : type
+    setServersLoading(true)
+    fetch(`/api/player/${tmdbId}?type=${t}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.servers && data.servers.length > 0) {
+          setServers(data.servers)
+          setActiveServer(0)
+        }
       })
-    })
+      .catch(() => {})
+      .finally(() => setServersLoading(false))
+  }, [tmdbId, type])
 
-    return seasons.sort((a, b) => a.number - b.number)
-  }, [yaniVideos])
-
-  // Yani unique episodes for current season
-  const yaniEpisodes = useMemo(() => {
-    if (!yaniVideos) return []
-    
-    const episodeSet = new Set<number>()
-    yaniVideos
-      .filter((v) => (v.season ?? 1) === selectedSeason)
-      .forEach((v) => episodeSet.add(Number(v.number)))
-    
-    return Array.from(episodeSet).sort((a, b) => a - b)
-  }, [yaniVideos, selectedSeason])
-
-  // Yani iframe URL
-  const yaniIframeSrc = useMemo(() => {
-    if (!yaniVideos || !yaniDubbing) return null
-    const video = yaniVideos.find(
-      (v) => v.data.dubbing === yaniDubbing && Number(v.number) === selectedEpisode && (v.season ?? 1) === selectedSeason
-    )
-    if (!video?.iframe_url) return null
-    const url = video.iframe_url
-    return url.startsWith('//') ? `https:${url}` : url
-  }, [yaniVideos, yaniDubbing, selectedEpisode, selectedSeason])
-
-  // VideoCDN iframe URL
-  const videocdnIframeSrc = useMemo(() => {
-    if (videocdnQualities.length === 0) return null
-    const quality = videocdnQualities[0]
-    return buildVideoCDNUrl(quality)
-  }, [videocdnQualities])
-
-  // Current iframe source
-  const currentIframeSrc = currentServer === 'yani' ? yaniIframeSrc : videocdnIframeSrc
-
-  // Save server preference
-  useEffect(() => {
-    localStorage.setItem(STORAGE_SERVER_KEY, currentServer)
-  }, [currentServer])
-
-  // Save dubbing preference
-  useEffect(() => {
-    localStorage.setItem(STORAGE_DUBBING_KEY, String(selectedTranslation))
-  }, [selectedTranslation])
-
-  // Fetch VideoCDN data (only for non-anime content)
-  useEffect(() => {
-    if (isAnime) return // Don't fetch VideoCDN for anime
-
-    const fetchVideoCDNData = async () => {
-      if (!tmdbId) return
-
-      try {
-        const [qualities, translations] = await Promise.all([
-          fetchVideoCDN({
-            type: type === 'cartoon' ? 'movie' : type,
-            tmdbId,
-            season: selectedSeason,
-            episode: selectedEpisode,
-          }),
-          fetchVideoCDNTranslations({
-            type: type === 'cartoon' ? 'movie' : type,
-            tmdbId,
-          }),
-        ])
-
-        if (qualities) setVideoCDNQualities(qualities)
-        if (translations) setVideoCDNTranslations(translations)
-      } catch (error) {
-        console.error('VideoCDN fetch error:', error)
-      }
+  // Build iframe src with season/episode params for TV
+  const iframeSrc = useMemo(() => {
+    if (servers.length === 0) return null
+    const server = servers[activeServer]
+    if (!server) return null
+    let url = server.iframe
+    // Append season/episode for TV/cartoon
+    if ((type === 'tv' || type === 'cartoon') && selectedSeason && selectedEpisode) {
+      const sep = url.includes('?') ? '&' : '?'
+      url += `${sep}season=${selectedSeason}&episode=${selectedEpisode}`
     }
+    return url
+  }, [servers, activeServer, type, selectedSeason, selectedEpisode])
 
-    fetchVideoCDNData()
-  }, [isAnime, type, tmdbId, shikimoriId, selectedSeason, selectedEpisode])
-
-  // Reset loading state
+  // Reset iframe state on src change
   useEffect(() => {
     setIsLoading(true)
     setHasError(false)
     setLoadTimeout(false)
-  }, [currentIframeSrc, currentServer, selectedEpisode])
+    setIframeKey(p => p + 1)
+  }, [iframeSrc])
 
-  // Update season/episode when props change
-  useEffect(() => {
-    if (propSeason) setSelectedSeason(propSeason)
-    if (propEpisode) setSelectedEpisode(propEpisode)
-  }, [propSeason, propEpisode])
+  // Sync props
+  useEffect(() => { setSelectedSeason(propSeason) }, [propSeason])
+  useEffect(() => { setSelectedEpisode(propEpisode) }, [propEpisode])
 
-  // Handle iframe load
   const handleLoad = useCallback(() => {
     setIsLoading(false)
     setHasError(false)
     setLoadTimeout(false)
   }, [])
 
-  // Handle iframe error
   const handleError = useCallback(() => {
     setIsLoading(false)
     setHasError(true)
   }, [])
 
-  // Timeout detection (7 seconds)
+  // 10s timeout
   useEffect(() => {
     if (!isLoading) return
-
-    const timeout = setTimeout(() => {
-      if (isLoading) {
-        setLoadTimeout(true)
-      }
-    }, 7000)
-
+    const timeout = setTimeout(() => setLoadTimeout(true), 10000)
     return () => clearTimeout(timeout)
-  }, [isLoading])
+  }, [isLoading, iframeKey])
 
-  // Available servers (only one server per content type)
-  const availableServers = useMemo(() => {
-    if (isAnime) {
-      return yaniIframeSrc ? ['yani' as ServerType] : []
-    } else {
-      return videocdnQualities.length > 0 ? ['videocdn' as ServerType] : []
-    }
-  }, [isAnime, yaniIframeSrc, videocdnQualities.length])
-
-  // Switch server (for future use if we add more servers)
-  const switchServer = useCallback((server: ServerType) => {
-    setCurrentServer(server)
+  const retry = () => {
     setIsLoading(true)
     setHasError(false)
     setLoadTimeout(false)
-  }, [])
-
-  // Check if content has multiple seasons
-  const hasMultipleSeasons = yaniSeasons.length > 1 || (type === 'tv' && !isAnime)
+    setIframeKey(p => p + 1)
+  }
 
   return (
-    <div className="w-full h-full flex flex-col">
-      {/* Server Switcher - Only show if both servers available (future proofing) */}
-      {availableServers.length > 1 && (
-        <div className="flex items-center justify-between px-4 py-2 sm:py-3 border-b border-white/10 bg-black/40">
-          <div className="flex items-center gap-2">
-            <Server size={16} className="text-white/60" />
-            <span className="text-white/80 text-xs sm:text-sm font-medium">Сервер</span>
+    <div className="w-full h-full flex flex-col bg-black">
+      {/* Server selector */}
+      {(servers.length > 1 || serversLoading) && (
+        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/10 flex-shrink-0 flex-wrap">
+          <Server size={13} className="text-white/40 flex-shrink-0" />
+          <span className="text-white/40 text-xs flex-shrink-0">Сервер:</span>
+          {serversLoading ? (
+            <div className="flex gap-1.5">
+              {[0, 1, 2].map(i => (
+                <div key={i} className="h-7 w-20 rounded-lg bg-white/5 animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            servers.map((srv, idx) => (
+              <button
+                key={srv.source}
+                onClick={() => setActiveServer(idx)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  activeServer === idx
+                    ? 'bg-white text-black'
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                {srv.name}
+              </button>
+            ))
+          )}
+        </div>
+      )}
+
+      {/* Season/episode selector for TV */}
+      {(type === 'tv' || type === 'cartoon') && (
+        <div className="flex items-center gap-3 px-4 py-2.5 border-b border-white/10 flex-shrink-0 flex-wrap">
+          {/* Season */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setSelectedSeason(s => Math.max(1, s - 1))}
+              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <ChevronLeft size={14} className="text-white" />
+            </button>
+            <span className="text-white text-sm px-2 min-w-[70px] text-center">Сезон {selectedSeason}</span>
+            <button
+              onClick={() => setSelectedSeason(s => s + 1)}
+              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <ChevronRight size={14} className="text-white" />
+            </button>
           </div>
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {availableServers.includes('yani') && (
-              <button
-                onClick={() => switchServer('yani')}
-                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all min-h-[36px] sm:min-h-[40px] ${
-                  currentServer === 'yani'
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/30'
-                    : 'bg-white/10 text-white/70 hover:bg-white/20'
-                }`}
-              >
-                Сервер 1
-                {currentServer === 'yani' && <Check size={12} />}
-              </button>
-            )}
-            {availableServers.includes('videocdn') && (
-              <button
-                onClick={() => switchServer('videocdn')}
-                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all min-h-[36px] sm:min-h-[40px] ${
-                  currentServer === 'videocdn'
-                    ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/30'
-                    : 'bg-white/10 text-white/70 hover:bg-white/20'
-                }`}
-              >
-                Сервер 2
-                {currentServer === 'videocdn' && <Check size={12} />}
-              </button>
-            )}
+          <div className="w-px h-5 bg-white/10" />
+          {/* Episode */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setSelectedEpisode(e => Math.max(1, e - 1))}
+              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <ChevronLeft size={14} className="text-white" />
+            </button>
+            <span className="text-white text-sm px-2 min-w-[70px] text-center">Серия {selectedEpisode}</span>
+            <button
+              onClick={() => setSelectedEpisode(e => e + 1)}
+              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+            >
+              <ChevronRight size={14} className="text-white" />
+            </button>
           </div>
         </div>
       )}
 
-      {/* Season/Episode Selectors (for TV/Anime/Cartoon series) */}
-      {(type === 'tv' || type === 'anime' || type === 'cartoon') && hasMultipleSeasons && (
-        <div className="px-4 py-2 sm:py-3 border-b border-white/10 bg-black/30">
-          <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
-            {/* Season Selector */}
-            <div className="relative">
-              <select
-                value={selectedSeason}
-                onChange={(e) => {
-                  setSelectedSeason(Number(e.target.value))
-                  setSelectedEpisode(1)
-                }}
-                className="appearance-none bg-white/10 text-white text-sm sm:text-base px-4 py-2 sm:py-2.5 pr-10 rounded-xl border border-white/20 hover:bg-white/20 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/50 min-h-[44px] sm:min-h-[48px]"
-              >
-                {yaniSeasons.length > 0 ? yaniSeasons.map((s) => (
-                  <option key={s.number} value={s.number} className="bg-[#1a1a1b] text-white">
-                    Сезон {s.number}
-                  </option>
-                )) : (
-                  <option value={selectedSeason} className="bg-[#1a1a1b] text-white">
-                    Сезон {selectedSeason}
-                  </option>
-                )}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60 pointer-events-none" />
-            </div>
-
-            {/* Episode Selector - Horizontal scroll on mobile */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide pb-1 sm:pb-0">
-                <span className="text-white/60 text-xs sm:text-sm font-medium flex-shrink-0">Серия:</span>
-                <div className="flex items-center gap-1.5 flex-shrink-0">
-                  {yaniEpisodes.length > 0 ? yaniEpisodes.slice(0, 20).map((ep) => (
-                    <button
-                      key={ep}
-                      onClick={() => setSelectedEpisode(ep)}
-                      className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all flex-shrink-0 touch-manipulation ${
-                        selectedEpisode === ep
-                          ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/30'
-                          : 'bg-white/10 text-white/70 hover:bg-white/20 active:scale-95'
-                      }`}
-                    >
-                      {ep}
-                    </button>
-                  )) : (
-                    <button
-                      onClick={() => setSelectedEpisode(selectedEpisode)}
-                      className={`w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-lg text-xs sm:text-sm font-medium transition-all flex-shrink-0 touch-manipulation bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/30`}
-                    >
-                      {selectedEpisode}
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Iframe Container */}
-      <div className="flex-1 relative bg-black">
-        {/* Loading State */}
-        {isLoading && !loadTimeout && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/80 backdrop-blur-sm z-10">
-            <RefreshCw className="w-8 h-8 sm:w-10 sm:h-10 text-white/40 animate-spin" />
-            <p className="text-white/60 text-xs sm:text-sm">Загрузка плеера...</p>
-            <p className="text-white/40 text-[10px] sm:text-xs">
-              {currentServer === 'yani' ? 'Yani/Alloha' : 'VideoCDN'}
-            </p>
+      {/* Iframe container */}
+      <div className="flex-1 relative">
+        {/* Loading */}
+        {isLoading && !loadTimeout && iframeSrc && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black z-10">
+            <RefreshCw className="w-8 h-8 text-white/30 animate-spin" />
+            <p className="text-white/40 text-sm">Загрузка плеера...</p>
           </div>
         )}
 
-        {/* Timeout/Error State */}
+        {/* Timeout / Error */}
         {(loadTimeout || hasError) && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 sm:gap-4 bg-black/90 backdrop-blur-sm p-4 sm:p-6 text-center z-10">
-            <AlertTriangle className="w-10 h-10 sm:w-12 sm:h-12 text-yellow-400" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black p-6 text-center z-10">
+            <AlertTriangle className="w-12 h-12 text-white/30" />
             <div>
-              <p className="text-white/80 font-medium text-sm sm:text-base mb-1">
+              <p className="text-white/80 font-medium text-sm mb-1">
                 {loadTimeout ? 'Превышено время ожидания' : 'Ошибка загрузки'}
               </p>
-              <p className="text-white/40 text-xs sm:text-sm mb-3 sm:mb-4">
-                Похоже, сервер заблокирован в вашем регионе. <br className="hidden sm:block" />
-                Попробуйте сменить сервер или включить VPN.
+              <p className="text-white/40 text-xs mb-4">
+                Попробуйте другой сервер или включите VPN
               </p>
             </div>
+            <div className="flex gap-2 flex-wrap justify-center">
+              <button
+                onClick={retry}
+                className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors"
+              >
+                Повторить
+              </button>
+              {servers.length > 1 && activeServer < servers.length - 1 && (
+                <button
+                  onClick={() => setActiveServer(activeServer + 1)}
+                  className="px-4 py-2 rounded-lg bg-white/10 text-white text-sm hover:bg-white/20 transition-colors"
+                >
+                  Следующий сервер
+                </button>
+              )}
+            </div>
+          </div>
+        )}
 
-            <button
-              onClick={() => {
-                setIsLoading(true)
-                setHasError(false)
-                setLoadTimeout(false)
-              }}
-              className="flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full bg-white/10 text-white font-semibold text-xs sm:text-sm hover:bg-white/20 transition-colors active:scale-95 min-h-[44px] sm:min-h-[48px]"
-            >
-              Попробовать снова
-            </button>
+        {/* No servers available */}
+        {!serversLoading && servers.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full gap-2 text-center p-6">
+            <p className="text-white/50 text-sm">Видео недоступно</p>
+            <p className="text-white/30 text-xs">Контент может быть недоступен в вашем регионе</p>
           </div>
         )}
 
         {/* Iframe */}
-        {currentIframeSrc && !hasError && !loadTimeout && (
+        {iframeSrc && !hasError && !loadTimeout && (
           <iframe
-            key={currentIframeSrc}
-            src={currentIframeSrc}
+            key={iframeKey}
+            src={iframeSrc}
             className="w-full h-full"
             onLoad={handleLoad}
             onError={handleError}
@@ -386,40 +235,7 @@ export default function UniversalPlayer({
             title="Video Player"
           />
         )}
-
-        {/* No Source Available */}
-        {!currentIframeSrc && !isLoading && !hasError && !loadTimeout && (
-          <div className="flex items-center justify-center h-full text-white/30 text-xs sm:text-sm">
-            Нет доступного видео
-          </div>
-        )}
       </div>
-
-      {/* VideoCDN Translation Selector (only for non-anime) */}
-      {!isAnime && currentServer === 'videocdn' && videocdnTranslations.length > 1 && (
-        <div className="px-4 py-2 sm:py-3 border-t border-white/10 bg-black/40">
-          <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
-            <span className="text-white/60 text-xs sm:text-sm font-medium flex-shrink-0">Озвучка:</span>
-            <div className="flex items-center gap-1.5 flex-shrink-0">
-              {videocdnTranslations.map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => setSelectedTranslation(t.id)}
-                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap min-h-[36px] sm:min-h-[40px] ${
-                    selectedTranslation === t.id
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/30'
-                      : 'bg-white/10 text-white/70 hover:bg-white/20'
-                  }`}
-                >
-                  {t.title}
-                  {t.type === 'sub' && <span className="opacity-60 ml-0.5">[SUB]</span>}
-                  {t.type === 'dub' && <span className="opacity-60 ml-0.5">[DUB]</span>}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

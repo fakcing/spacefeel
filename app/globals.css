@@ -136,6 +136,13 @@ nav {
   border-color: var(--color-border);
 }
 
+/* ── Mobile: reserve space for fixed bottom nav (MobileNav h-16 = 64px) ─ */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: 4rem;
+  }
+}
+
 /* ── Light theme: text on poster/backdrop overlays stays white ───────── */
 /* Only override text that sits on the page background, not on dark images */
 .light .poster-overlay-text { color: #ffffff !important; }

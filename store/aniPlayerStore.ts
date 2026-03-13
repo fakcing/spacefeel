@@ -7,6 +7,7 @@ interface AniPlayerStore {
   videos: YaniVideo[]
   titleName: string
   sources: AnimeSource[]
+  sourcesLoading: boolean
   activeSource: string
   currentSeason: number
   currentDubbing: string
@@ -26,38 +27,47 @@ interface AniPlayerStore {
   setEpisode: (ep: string) => void
 }
 
+function getYummyFirstEpisode(videos: YaniVideo[], season: number, dubbing?: string): { dub: string; ep: string } {
+  const seasonVideos = videos.filter(v => (v.season ?? 1) === season)
+  const dubbings = Array.from(new Set(seasonVideos.map(v => v.data.dubbing)))
+  const dub = dubbing && dubbings.includes(dubbing) ? dubbing : (dubbings[0] ?? '')
+  const dubVideos = seasonVideos
+    .filter(v => v.data.dubbing === dub)
+    .sort((a, b) => Number(a.number) - Number(b.number))
+  return { dub, ep: dubVideos[0]?.number ?? '1' }
+}
+
 export const useAniPlayerStore = create<AniPlayerStore>((set, get) => ({
   isOpen: false,
   videos: [],
   titleName: '',
   sources: [],
+  sourcesLoading: false,
   activeSource: 'yummy',
   currentSeason: 1,
   currentDubbing: '',
   currentEpisode: '1',
 
   openPlayer: ({ videos, titleName, shikimoriId, startSeason, startEpisode }) => {
-    const dubbings = Array.from(new Set(videos.map((v) => v.data.dubbing)))
-    const firstDub = dubbings[0] ?? ''
-    const dubVideos = videos.filter((v) => v.data.dubbing === firstDub)
-    const firstEp = startEpisode ?? dubVideos[0]?.number ?? '1'
-    
-    set({ 
-      isOpen: true, 
-      videos, 
-      titleName, 
-      currentSeason: startSeason || 1,
-      currentDubbing: firstDub, 
-      currentEpisode: firstEp,
+    const season = startSeason ?? 1
+    const { dub, ep } = getYummyFirstEpisode(videos, season)
+
+    set({
+      isOpen: true,
+      videos,
+      titleName,
+      currentSeason: season,
+      currentDubbing: dub,
+      currentEpisode: startEpisode ?? ep,
       sources: [],
+      sourcesLoading: true,
       activeSource: 'yummy',
     })
 
-    // Fetch additional sources in background
     import('@/lib/animeSources').then(({ getAllAnimeSources }) => {
-      getAllAnimeSources(shikimoriId, videos).then((sources) => {
-        set({ sources })
-      })
+      getAllAnimeSources(shikimoriId, videos)
+        .then(sources => set({ sources, sourcesLoading: false }))
+        .catch(() => set({ sourcesLoading: false }))
     })
   },
 
@@ -66,33 +76,38 @@ export const useAniPlayerStore = create<AniPlayerStore>((set, get) => ({
   setSources: (sources) => set({ sources }),
 
   setActiveSource: (sourceId) => {
-    const { sources } = get()
+    const { sources, videos, currentSeason } = get()
+
+    if (sourceId === 'yummy') {
+      // Reset to first available episode in current dubbing
+      const { dub, ep } = getYummyFirstEpisode(videos, currentSeason)
+      set({ activeSource: 'yummy', currentDubbing: dub, currentEpisode: ep })
+      return
+    }
+
     const source = sources.find(s => s.id === sourceId)
     if (source && source.episodes.length > 0) {
-      set({ 
+      set({
         activeSource: sourceId,
-        currentDubbing: source.translations[0] || '',
-        currentEpisode: source.episodes[0]?.number || '1',
+        currentDubbing: source.translations[0] ?? '',
+        currentEpisode: source.episodes[0]?.number ?? '1',
       })
     }
   },
 
   setSeason: (season) => {
     const { videos } = get()
-    const seasonVideos = videos.filter((v) => (v.season ?? 1) === season)
-    const dubbings = Array.from(new Set(seasonVideos.map((v) => v.data.dubbing)))
-    const newDub = dubbings[0] ?? ''
-    const dubVideos = seasonVideos.filter((v) => v.data.dubbing === newDub)
-    const firstEp = dubVideos[0]?.number ?? '1'
-    set({ currentSeason: season, currentDubbing: newDub, currentEpisode: firstEp })
+    const { dub, ep } = getYummyFirstEpisode(videos, season)
+    set({ currentSeason: season, currentDubbing: dub, currentEpisode: ep })
   },
 
   setDubbing: (dub) => {
     const { videos, currentSeason } = get()
-    const seasonVideos = videos.filter((v) => (v.season ?? 1) === currentSeason)
-    const dubVideos = seasonVideos.filter((v) => v.data.dubbing === dub)
-    const firstEp = dubVideos[0]?.number ?? '1'
-    set({ currentDubbing: dub, currentEpisode: firstEp })
+    const seasonVideos = videos.filter(v => (v.season ?? 1) === currentSeason)
+    const dubVideos = seasonVideos
+      .filter(v => v.data.dubbing === dub)
+      .sort((a, b) => Number(a.number) - Number(b.number))
+    set({ currentDubbing: dub, currentEpisode: dubVideos[0]?.number ?? '1' })
   },
 
   setEpisode: (ep) => set({ currentEpisode: ep }),

@@ -9,6 +9,7 @@ interface WatchlistStore {
   toggleItem: (item: WatchlistItem, isLoggedIn?: boolean) => Promise<void>
   isInWatchlist: (id: number) => boolean
   syncFromDB: () => Promise<void>
+  clearItems: () => void
 }
 
 export const useWatchlistStore = create<WatchlistStore>()(
@@ -69,6 +70,8 @@ export const useWatchlistStore = create<WatchlistStore>()(
       },
 
       isInWatchlist: (id) => get().items.some((i) => i.id === id),
+
+      clearItems: () => set({ items: [] }),
     }),
     { name: 'spacefeel-watchlist' }
   )
