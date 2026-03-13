@@ -3,8 +3,8 @@
  *
  * Aggregates video sources from:
  * - Yani TV (Alloha)
- * - AniLibria API
- * - AnimeVost API
+ * - AniLibria API (anilibria.top/api/v1)
+ * - AnimeVost API (api.animetop.info/v1)
  */
 
 import { YaniVideo } from '@/types/yani'
@@ -27,7 +27,11 @@ export interface AnimeEpisode {
 }
 
 const ANILIBRIA_BASE = 'https://anilibria.top/api/v1'
-const ANIMEVOST_BASE = 'https://api.animevost.org'
+const ANIMETOP_BASE = 'https://api.animetop.info/v1'
+
+function withTimeout(ms: number): AbortSignal {
+  return AbortSignal.timeout(ms)
+}
 
 /**
  * Get Yani TV videos (already loaded from page)
@@ -54,45 +58,50 @@ export function getYaniSources(videos: YaniVideo[]): AnimeSource {
 }
 
 /**
- * Search AniLibria by Shikimori ID
+ * Search AniLibria by title name.
+ * API: GET /app/search/releases?query={name}  → pick first result alias
+ *      GET /anime/releases/{alias}?include=episodes
  */
-export async function getAniLibriaSources(shikimoriId: number): Promise<AnimeSource | null> {
+export async function getAniLibriaSources(titleName: string): Promise<AnimeSource | null> {
   try {
-    const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 8000)
-
-    const searchRes = await fetch(`${ANILIBRIA_BASE}/anime?shikimori_id=${shikimoriId}`, {
-      signal: controller.signal,
-    }).finally(() => clearTimeout(timer))
-
+    const searchRes = await fetch(
+      `${ANILIBRIA_BASE}/app/search/releases?query=${encodeURIComponent(titleName)}`,
+      { signal: withTimeout(8000) }
+    )
     if (!searchRes.ok) return null
 
-    const searchData = await searchRes.json()
-    const anime = Array.isArray(searchData) ? searchData[0] : searchData
-    if (!anime?.id) return null
+    const results = await searchRes.json()
+    const first = Array.isArray(results) ? results[0] : null
+    if (!first?.alias) return null
 
-    const episodes: AnimeEpisode[] = []
+    const releaseRes = await fetch(
+      `${ANILIBRIA_BASE}/anime/releases/${first.alias}?include=episodes`,
+      { signal: withTimeout(8000) }
+    )
+    if (!releaseRes.ok) return null
 
-    if (anime.player?.list) {
-      try {
-        const playerList = typeof anime.player.list === 'string'
-          ? JSON.parse(anime.player.list)
-          : anime.player.list
+    const release = await releaseRes.json()
+    const rawEpisodes: Record<string, unknown>[] = Array.isArray(release.episodes)
+      ? release.episodes
+      : []
 
-        if (Array.isArray(playerList)) {
-          episodes.push(
-            ...playerList.map((ep: Record<string, unknown>, idx: number) => ({
-              number: String(idx + 1),
-              title: ep.title ? String(ep.title) : `Серия ${idx + 1}`,
-              hlsUrl: ep.url ? String(ep.url) : ep.hls ? String(ep.hls) : undefined,
-              quality: 'HD' as const,
-            }))
-          )
+    const episodes: AnimeEpisode[] = rawEpisodes
+      .map((ep): AnimeEpisode | null => {
+        const hlsUrl =
+          (ep.hls_1080 as string | undefined) ??
+          (ep.hls_720 as string | undefined) ??
+          (ep.hls_480 as string | undefined)
+        if (!hlsUrl) return null
+        const number = String(ep.ordinal ?? ep.sort_order ?? 1)
+        return {
+          number,
+          title: (ep.name as string | undefined) ?? `Серия ${number}`,
+          hlsUrl,
+          quality: ep.hls_1080 ? 'HD' : 'SD',
         }
-      } catch {
-        // Ignore parse error
-      }
-    }
+      })
+      .filter((e): e is AnimeEpisode => e !== null)
+      .sort((a, b) => Number(a.number) - Number(b.number))
 
     if (episodes.length === 0) return null
 
@@ -110,45 +119,54 @@ export async function getAniLibriaSources(shikimoriId: number): Promise<AnimeSou
 }
 
 /**
- * Search AnimeVost by Shikimori ID
+ * Search AnimeVost (animetop.info) by title name.
+ * API: POST /search  name={title}  → pick first result id
+ *      POST /playlist id={id}      → array of {name, hd, std}
  */
-export async function getAnimeVostSources(shikimoriId: number): Promise<AnimeSource | null> {
+export async function getAnimeVostSources(titleName: string): Promise<AnimeSource | null> {
   try {
-    const controller = new AbortController()
-    const timer = setTimeout(() => controller.abort(), 8000)
-
-    const searchRes = await fetch(`${ANIMEVOST_BASE}/anime/list`, {
-      signal: controller.signal,
-    }).finally(() => clearTimeout(timer))
-
+    const searchRes = await fetch(`${ANIMETOP_BASE}/search`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `name=${encodeURIComponent(titleName)}`,
+      signal: withTimeout(8000),
+    })
     if (!searchRes.ok) return null
 
-    const animeList = await searchRes.json()
+    const searchData = await searchRes.json()
+    const items: Record<string, unknown>[] = Array.isArray(searchData?.data)
+      ? searchData.data
+      : []
+    if (items.length === 0) return null
 
-    const foundAnime = Array.isArray(animeList)
-      ? animeList.find((a: Record<string, unknown>) => Number(a.shikimori) === shikimoriId)
-      : null
-
-    const animeId = foundAnime ? Number(foundAnime.id) : null
+    const animeId = items[0].id as number | string
     if (!animeId) return null
 
-    const episodesRes = await fetch(`${ANIMEVOST_BASE}/anime/${animeId}/episodes`)
-    if (!episodesRes.ok) return null
+    const playlistRes = await fetch(`${ANIMETOP_BASE}/playlist`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `id=${animeId}`,
+      signal: withTimeout(8000),
+    })
+    if (!playlistRes.ok) return null
 
-    const episodesData = await episodesRes.json()
+    const playlist: Record<string, unknown>[] = await playlistRes.json()
+    if (!Array.isArray(playlist) || playlist.length === 0) return null
 
-    const episodes: AnimeEpisode[] = Array.isArray(episodesData)
-      ? episodesData
-          .map((ep: Record<string, unknown>) => ({
-            number: String(ep.episode ?? ep.num ?? 1),
-            title: ep.title ? String(ep.title) : undefined,
-            hlsUrl: ep.url ? String(ep.url) : ep.hls ? String(ep.hls) : undefined,
-            quality: 'HD' as const,
-          }))
-          .filter(ep => Boolean(ep.hlsUrl))
-      : []
-
-    if (episodes.length === 0) return null
+    const episodes: AnimeEpisode[] = playlist.map((ep, idx): AnimeEpisode => {
+      const name = (ep.name as string | undefined) ?? ''
+      const numMatch = name.match(/(\d+(?:\.\d+)?)/)
+      const number = numMatch ? numMatch[1] : String(idx + 1)
+      const hlsUrl =
+        (ep.hd as string | undefined) ??
+        (ep.std as string | undefined)
+      return {
+        number,
+        title: name || `Серия ${number}`,
+        hlsUrl,
+        quality: ep.hd ? 'HD' : 'SD',
+      }
+    })
 
     return {
       id: 'vost',
@@ -168,7 +186,8 @@ export async function getAnimeVostSources(shikimoriId: number): Promise<AnimeSou
  */
 export async function getAllAnimeSources(
   shikimoriId: number,
-  yaniVideos: YaniVideo[]
+  yaniVideos: YaniVideo[],
+  titleName: string,
 ): Promise<AnimeSource[]> {
   const sources: AnimeSource[] = []
 
@@ -176,10 +195,10 @@ export async function getAllAnimeSources(
   const yaniSource = getYaniSources(yaniVideos)
   if (yaniSource.available) sources.push(yaniSource)
 
-  // 2 & 3. AniLibria + AnimeVost in parallel
+  // 2 & 3. AniLibria + AnimeVost in parallel (both search by title name)
   const [libria, vost] = await Promise.all([
-    getAniLibriaSources(shikimoriId),
-    getAnimeVostSources(shikimoriId),
+    getAniLibriaSources(titleName),
+    getAnimeVostSources(titleName),
   ])
 
   if (libria?.available) sources.push(libria)

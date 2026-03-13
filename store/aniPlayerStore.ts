@@ -65,7 +65,7 @@ export const useAniPlayerStore = create<AniPlayerStore>((set, get) => ({
     })
 
     import('@/lib/animeSources').then(({ getAllAnimeSources }) => {
-      getAllAnimeSources(shikimoriId, videos)
+      getAllAnimeSources(shikimoriId, videos, titleName)
         .then(sources => set({ sources, sourcesLoading: false }))
         .catch(() => set({ sourcesLoading: false }))
     })
