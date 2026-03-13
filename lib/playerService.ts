@@ -11,9 +11,9 @@ function buildEmbeds(
   tmdbId: number,
   imdbId: string | null,
   type: 'movie' | 'tv' | 'cartoon'
-): { source: string; name: string; iframe: string }[] {
+): { source: string; name: string; iframe: string; seasonKey?: string; episodeKey?: string }[] {
   const isTV = type === 'tv' || type === 'cartoon'
-  const embeds: { source: string; name: string; iframe: string }[] = []
+  const embeds: { source: string; name: string; iframe: string; seasonKey?: string; episodeKey?: string }[] = []
 
   // Alloha — primary, works with IMDB ID
   // Uses 's' and 'e' query params for season/episode
