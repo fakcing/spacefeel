@@ -5,7 +5,6 @@ import { getImdbId } from '@/lib/tmdb'
  * Player Aggregator
  *
  * Uses IMDB ID (fetched via TMDB) for services that require it.
- * VoidBoost and Bazon require IMDB IDs, not TMDB IDs.
  */
 
 function buildEmbeds(
@@ -16,14 +15,26 @@ function buildEmbeds(
   const isTV = type === 'tv' || type === 'cartoon'
   const embeds: { source: string; name: string; iframe: string }[] = []
 
+  // Alloha — primary, works with IMDB ID
+  // Uses 's' and 'e' query params for season/episode
+  if (imdbId) {
+    embeds.push({
+      source: 'Alloha',
+      name: 'Alloha',
+      iframe: `https://p.alloha.tv/?imdb=${imdbId}`,
+      seasonKey: 's',
+      episodeKey: 'e',
+    })
+  }
+
   // VoidBoost — works with IMDB ID
   if (imdbId) {
     embeds.push({
       source: 'VoidBoost',
       name: 'VoidBoost',
       iframe: isTV
-        ? `https://voidboost.net/embed/${imdbId}?season=1&episode=1`
-        : `https://voidboost.net/embed/${imdbId}`,
+        ? `https://voidboost.tv/embed/${imdbId}`
+        : `https://voidboost.tv/embed/${imdbId}`,
     })
   }
 
@@ -31,9 +42,7 @@ function buildEmbeds(
   embeds.push({
     source: 'Collaps',
     name: 'Collaps',
-    iframe: isTV
-      ? `https://api.collaps.cc/v3/iframe/tmdb/${tmdbId}?season=1&episode=1`
-      : `https://api.collaps.cc/v3/iframe/tmdb/${tmdbId}`,
+    iframe: `https://api.collaps.cc/v3/iframe/tmdb/${tmdbId}`,
   })
 
   // Bazon — works with IMDB ID
@@ -42,17 +51,10 @@ function buildEmbeds(
       source: 'Bazon',
       name: 'Bazon',
       iframe: isTV
-        ? `https://bazon.cc/serial/${imdbId}/1/1/`
+        ? `https://bazon.cc/serial/${imdbId}`
         : `https://bazon.cc/film/${imdbId}/`,
     })
   }
-
-  // VDBaz fallback — accepts TMDB ID
-  embeds.push({
-    source: 'VDBaz',
-    name: 'VDBaz',
-    iframe: `https://vdbaz.net/embed/${isTV ? 'tv' : 'movie'}/${tmdbId}`,
-  })
 
   return embeds
 }

@@ -15,6 +15,8 @@ interface PlayerServer {
   name: string
   iframe: string
   source: string
+  seasonKey?: string
+  episodeKey?: string
 }
 
 export default function UniversalPlayer({
@@ -58,7 +60,9 @@ export default function UniversalPlayer({
     let url = server.iframe
     if ((type === 'tv' || type === 'cartoon') && selectedSeason && selectedEpisode) {
       const sep = url.includes('?') ? '&' : '?'
-      url += `${sep}season=${selectedSeason}&episode=${selectedEpisode}`
+      const sKey = server.seasonKey ?? 'season'
+      const eKey = server.episodeKey ?? 'episode'
+      url += `${sep}${sKey}=${selectedSeason}&${eKey}=${selectedEpisode}`
     }
     return url
   }, [servers, activeServer, type, selectedSeason, selectedEpisode])
