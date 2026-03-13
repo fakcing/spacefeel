@@ -289,36 +289,40 @@ export default function AniPlayerModal() {
                 </div>
               )}
 
-              {/* Dubbing picker popover */}
+              {/* Dubbing picker */}
               {activeDubbings.length > 1 && (
                 <div className="relative flex-shrink-0" ref={dubPickerRef}>
                   <button
                     onClick={e => { e.stopPropagation(); setDubPickerOpen(p => !p) }}
-                    className="bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-medium hover:bg-white/10 transition-colors w-[110px] flex-shrink-0"
-                    style={{ display: 'grid', gridTemplateColumns: '1fr auto', alignItems: 'center', gap: '4px' }}
+                    className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors flex-shrink-0 ${
+                      dubPickerOpen ? 'bg-white/15 border-white/20' : 'bg-white/5 border-white/10 hover:bg-white/10'
+                    }`}
                   >
-                    <span className="text-white text-left truncate block">{currentDubbing || '—'}</span>
-                    <ChevronDown size={10} className="text-white/40" />
+                    <span className="text-white/50 whitespace-nowrap">Озвучка</span>
+                    <ChevronDown size={10} className={`text-white/40 transition-transform flex-shrink-0 ${dubPickerOpen ? 'rotate-180' : ''}`} />
                   </button>
 
                   {dubPickerOpen && (
-                    <div className="absolute top-full left-0 mt-1.5 bg-[#111] border border-white/10 rounded-xl p-2 z-[200] shadow-2xl min-w-[160px] max-w-[260px]">
-                      <p className="text-white/30 text-[10px] font-medium uppercase tracking-wide px-1 pb-1.5">
-                        Озвучка · {activeDubbings.length}
-                      </p>
-                      <div className="flex flex-col gap-0.5 max-h-48 overflow-y-auto">
+                    <div className="absolute top-full left-0 mt-1.5 bg-[#111] border border-white/10 rounded-xl z-[200] shadow-2xl overflow-hidden"
+                      style={{ minWidth: '200px', maxWidth: '280px' }}>
+                      <div className="px-3 py-2 border-b border-white/10 flex items-center justify-between">
+                        <span className="text-white/40 text-[10px] font-medium uppercase tracking-wide">Озвучка · {activeDubbings.length}</span>
+                      </div>
+                      <div className="flex flex-col max-h-52 overflow-y-auto py-1">
                         {activeDubbings.map(dub => (
                           <button
                             key={dub}
                             onClick={() => { setDubbing(dub); setDubPickerOpen(false) }}
-                            className={`w-full text-left px-2.5 py-2 rounded-lg text-xs font-medium transition-all truncate ${
+                            className={`w-full text-left px-3 py-2.5 text-xs font-medium transition-colors flex items-center gap-2 ${
                               currentDubbing === dub
-                                ? 'bg-white text-black'
-                                : 'text-white/60 hover:bg-white/10 hover:text-white'
+                                ? 'bg-white/10 text-white'
+                                : 'text-white/60 hover:bg-white/5 hover:text-white'
                             }`}
-                            title={dub}
                           >
-                            {dub}
+                            {currentDubbing === dub && (
+                              <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
+                            )}
+                            <span className={currentDubbing === dub ? '' : 'ml-3.5'}>{dub}</span>
                           </button>
                         ))}
                       </div>
