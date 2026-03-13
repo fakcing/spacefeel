@@ -85,14 +85,13 @@ export const useAniPlayerStore = create<AniPlayerStore>((set, get) => ({
       return
     }
 
+    // Always switch — player will show loading/unavailable state as needed
     const source = sources.find(s => s.id === sourceId)
-    if (source && source.episodes.length > 0) {
-      set({
-        activeSource: sourceId,
-        currentDubbing: source.translations[0] ?? '',
-        currentEpisode: source.episodes[0]?.number ?? '1',
-      })
-    }
+    set({
+      activeSource: sourceId,
+      currentDubbing: source?.translations[0] ?? '',
+      currentEpisode: source?.episodes[0]?.number ?? '1',
+    })
   },
 
   setSeason: (season) => {

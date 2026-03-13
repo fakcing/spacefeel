@@ -214,28 +214,27 @@ export default function AniPlayerModal() {
                 {SERVER_DEFS.map(srv => {
                   const isActive = activeSource === srv.id
                   const srcData = sources.find(s => s.id === srv.id)
-                  const isAvailable = srv.id === 'yummy'
+                  const isYummy = srv.id === 'yummy'
+                  const canPlay = isYummy
                     ? videos.length > 0
-                    : srcData !== undefined && srcData.available
-                  const isPending = sourcesLoading && srv.id !== 'yummy' && !srcData
+                    : !sourcesLoading && srcData?.available
+                  const isPending = sourcesLoading && !isYummy
 
                   return (
                     <button
                       key={srv.id}
-                      onClick={() => isAvailable ? setActiveSource(srv.id) : undefined}
-                      disabled={!isAvailable && !isPending}
-                      title={isPending ? 'Загрузка...' : !isAvailable ? 'Недоступно' : srv.label}
+                      onClick={() => setActiveSource(srv.id)}
+                      disabled={isYummy && videos.length === 0}
+                      title={srv.label}
                       className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                         isActive
                           ? 'bg-white text-black shadow'
-                          : isAvailable
+                          : canPlay
                           ? 'text-white/70 hover:text-white hover:bg-white/10'
-                          : isPending
-                          ? 'text-white/40'
-                          : 'text-white/25 cursor-not-allowed'
+                          : 'text-white/40 hover:text-white/60 hover:bg-white/5'
                       }`}
                     >
-                      {isPending && (
+                      {isPending && !isActive && (
                         <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
                       )}
                       {srv.label}
@@ -330,8 +329,30 @@ export default function AniPlayerModal() {
           <div className="flex-1 flex items-center justify-center px-2 sm:px-4 py-3 min-h-0">
             <div className="w-full max-w-5xl aspect-video rounded-xl overflow-hidden bg-black relative">
 
+              {/* Sources still fetching for this server */}
+              {!isYummyActive && sourcesLoading && !activeSourceData && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] z-10">
+                  <div className="w-9 h-9 border-2 border-white/10 border-t-white rounded-full animate-spin" />
+                  <p className="text-white/40 text-sm">Поиск видео на сервере...</p>
+                </div>
+              )}
+
+              {/* Source loaded but unavailable */}
+              {!isYummyActive && !sourcesLoading && (!activeSourceData || !activeSourceData.available) && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] z-10">
+                  <AlertTriangle className="w-10 h-10 text-white/30" />
+                  <p className="text-white/70 font-medium text-sm">Аниме не найдено на этом сервере</p>
+                  <button
+                    onClick={() => setActiveSource('yummy')}
+                    className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors"
+                  >
+                    Вернуться на YummyAnime
+                  </button>
+                </div>
+              )}
+
               {/* Loading */}
-              {playerLoading && !loadTimeout && videoSrc && (
+              {playerLoading && !loadTimeout && videoSrc && (isYummyActive || (activeSourceData?.available)) && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] z-10">
                   <div className="w-9 h-9 border-2 border-white/10 border-t-white rounded-full animate-spin" />
                   <p className="text-white/40 text-sm">Загрузка плеера...</p>
