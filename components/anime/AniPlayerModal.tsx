@@ -1,15 +1,18 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronLeft, ChevronRight, AlertTriangle, Loader2 } from 'lucide-react'
+import { X, ChevronLeft, ChevronRight, AlertTriangle, ChevronDown } from 'lucide-react'
 import { useAniPlayerStore } from '@/store/aniPlayerStore'
-import { useEffect, useMemo, useState, useCallback } from 'react'
+import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
+import HlsPlayer from '@/components/anime/HlsPlayer'
 
 const SERVER_DEFS = [
   { id: 'yummy',  label: 'YummyAnime' },
   { id: 'libria', label: 'AniLibria' },
   { id: 'vost',   label: 'AnimeVost' },
 ]
+
+type VideoSrc = { type: 'iframe'; url: string } | { type: 'hls'; url: string } | null
 
 export default function AniPlayerModal() {
   const {
@@ -18,10 +21,14 @@ export default function AniPlayerModal() {
     closePlayer, setSeason, setDubbing, setEpisode, setActiveSource,
   } = useAniPlayerStore()
 
-  const [iframeError, setIframeError] = useState(false)
-  const [iframeLoading, setIframeLoading] = useState(true)
-  const [iframeLoadTimeout, setIframeLoadTimeout] = useState(false)
-  const [iframeKey, setIframeKey] = useState(0)
+  const [playerError, setPlayerError] = useState(false)
+  const [playerLoading, setPlayerLoading] = useState(true)
+  const [loadTimeout, setLoadTimeout] = useState(false)
+  const [playerKey, setPlayerKey] = useState(0)
+  const [isPaused, setIsPaused] = useState(false)
+  const [epPickerOpen, setEpPickerOpen] = useState(false)
+  const epPickerRef = useRef<HTMLDivElement>(null)
+  const activeEpRef = useRef<HTMLButtonElement>(null)
 
   const isYummyActive = activeSource === 'yummy'
   const activeSourceData = useMemo(
@@ -29,17 +36,24 @@ export default function AniPlayerModal() {
     [sources, activeSource]
   )
 
+  // Body scroll lock
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [isOpen])
+
   // Episodes for the current source
   const sourceEpisodes = useMemo(() => {
-    if (!isYummyActive && activeSourceData) {
-      return activeSourceData.episodes
-    }
+    if (!isYummyActive && activeSourceData) return activeSourceData.episodes
     return videos
       .filter(v => (v.season ?? 1) === currentSeason && v.data.dubbing === currentDubbing)
       .sort((a, b) => Number(a.number) - Number(b.number))
   }, [isYummyActive, activeSourceData, videos, currentSeason, currentDubbing])
 
-  // Unique episode numbers
   const episodeNumbers = useMemo(() => {
     if (!isYummyActive && activeSourceData) {
       return activeSourceData.episodes.map(e => e.number)
@@ -52,29 +66,29 @@ export default function AniPlayerModal() {
     return result
   }, [isYummyActive, activeSourceData, sourceEpisodes])
 
-  // Guard: if currentEpisode is not in available list, snap to first
   const safeEpisode = useMemo(() => {
     if (episodeNumbers.length === 0) return currentEpisode
     return episodeNumbers.includes(currentEpisode) ? currentEpisode : episodeNumbers[0]
   }, [episodeNumbers, currentEpisode])
 
-  // Dubbings for Yummy
   const yummyDubbings = useMemo(() => {
     const seasonVideos = videos.filter(v => (v.season ?? 1) === currentSeason)
     return Array.from(new Set(seasonVideos.map(v => v.data.dubbing)))
   }, [videos, currentSeason])
 
-  // Unique seasons for Yummy
   const yummySeasons = useMemo(
     () => Array.from(new Set(videos.map(v => v.season ?? 1))).sort((a, b) => a - b),
     [videos]
   )
 
-  // Iframe URL
-  const iframeSrc = useMemo(() => {
+  // Video source — iframe or HLS
+  const videoSrc = useMemo((): VideoSrc => {
     if (!isYummyActive && activeSourceData) {
       const ep = activeSourceData.episodes.find(e => e.number === safeEpisode)
-      return ep?.iframeUrl || ep?.hlsUrl || null
+      if (!ep) return null
+      if (ep.iframeUrl) return { type: 'iframe', url: ep.iframeUrl }
+      if (ep.hlsUrl)    return { type: 'hls',    url: ep.hlsUrl }
+      return null
     }
     const video = videos.find(
       v => v.data.dubbing === currentDubbing
@@ -83,33 +97,55 @@ export default function AniPlayerModal() {
     )
     if (!video?.iframe_url) return null
     const url = video.iframe_url
-    return url.startsWith('//') ? `https:${url}` : url
+    return { type: 'iframe', url: url.startsWith('//') ? `https:${url}` : url }
   }, [isYummyActive, activeSourceData, videos, safeEpisode, currentDubbing, currentSeason])
 
-  // Reset iframe on source/episode change
+  // Reset player on source/episode change
   useEffect(() => {
-    setIframeError(false)
-    setIframeLoading(true)
-    setIframeLoadTimeout(false)
-    setIframeKey(p => p + 1)
+    setPlayerError(false)
+    setPlayerLoading(true)
+    setLoadTimeout(false)
+    setIsPaused(false)
+    setPlayerKey(p => p + 1)
   }, [activeSource, safeEpisode])
 
-  const handleIframeLoad = useCallback(() => {
-    setIframeLoading(false)
-    setIframeLoadTimeout(false)
-  }, [])
-
-  const handleIframeError = useCallback(() => {
-    setIframeLoading(false)
-    setIframeError(true)
-  }, [])
-
-  // 15s timeout
+  // 15s timeout for iframe
   useEffect(() => {
-    if (!iframeLoading) return
-    const timer = setTimeout(() => setIframeLoadTimeout(true), 15000)
+    if (!playerLoading || videoSrc?.type !== 'iframe') return
+    const timer = setTimeout(() => setLoadTimeout(true), 15000)
     return () => clearTimeout(timer)
-  }, [iframeLoading, iframeKey])
+  }, [playerLoading, playerKey, videoSrc?.type])
+
+  const handleLoad = useCallback(() => {
+    setPlayerLoading(false)
+    setLoadTimeout(false)
+  }, [])
+
+  const handleError = useCallback(() => {
+    setPlayerLoading(false)
+    setPlayerError(true)
+  }, [])
+
+  const retry = () => {
+    setPlayerError(false)
+    setPlayerLoading(true)
+    setLoadTimeout(false)
+    setPlayerKey(p => p + 1)
+  }
+
+  // Episode picker close-on-outside-click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (epPickerRef.current && !epPickerRef.current.contains(e.target as Node)) {
+        setEpPickerOpen(false)
+      }
+    }
+    if (epPickerOpen) {
+      document.addEventListener('mousedown', handleClick)
+      setTimeout(() => activeEpRef.current?.scrollIntoView({ block: 'nearest' }), 10)
+    }
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [epPickerOpen])
 
   // Navigation
   const epIndex = episodeNumbers.indexOf(safeEpisode)
@@ -129,6 +165,10 @@ export default function AniPlayerModal() {
   }, [isOpen, closePlayer, prevEp, nextEp, setEpisode])
 
   if (!isOpen) return null
+
+  const activeDubbings = isYummyActive
+    ? yummyDubbings
+    : (activeSourceData?.translations ?? [])
 
   return (
     <AnimatePresence>
@@ -190,10 +230,14 @@ export default function AniPlayerModal() {
                           ? 'bg-white text-black shadow'
                           : isAvailable
                           ? 'text-white/70 hover:text-white hover:bg-white/10'
+                          : isPending
+                          ? 'text-white/40'
                           : 'text-white/25 cursor-not-allowed'
                       }`}
                     >
-                      {isPending && <Loader2 size={9} className="animate-spin shrink-0" />}
+                      {isPending && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
+                      )}
                       {srv.label}
                     </button>
                   )
@@ -213,41 +257,62 @@ export default function AniPlayerModal() {
                 </select>
               )}
 
-              {/* Episode */}
+              {/* Episode picker popover */}
               {episodeNumbers.length > 0 && (
-                <select
-                  value={safeEpisode}
-                  onChange={e => setEpisode(e.target.value)}
-                  className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none"
-                >
-                  {episodeNumbers.map(ep => (
-                    <option key={ep} value={ep} className="bg-black">Серия {ep}</option>
-                  ))}
-                </select>
+                <div className="relative" ref={epPickerRef}>
+                  <button
+                    onClick={e => { e.stopPropagation(); setEpPickerOpen(p => !p) }}
+                    className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-medium hover:bg-white/10 transition-colors"
+                  >
+                    <span className="text-white/50">Серия</span>
+                    <span className="text-white">{safeEpisode}</span>
+                    <ChevronDown size={10} className="text-white/40" />
+                  </button>
+
+                  {epPickerOpen && (
+                    <div className="absolute top-full left-0 mt-1.5 bg-[#111] border border-white/10 rounded-xl p-2 z-20 shadow-2xl min-w-[200px]">
+                      <p className="text-white/30 text-[10px] font-medium uppercase tracking-wide px-1 pb-1.5">
+                        Серии · {episodeNumbers.length} эп.
+                      </p>
+                      <div className="grid grid-cols-5 gap-1 max-h-52 overflow-y-auto">
+                        {episodeNumbers.map(ep => (
+                          <button
+                            key={ep}
+                            ref={safeEpisode === ep ? activeEpRef : undefined}
+                            onClick={() => { setEpisode(ep); setEpPickerOpen(false) }}
+                            className={`h-8 rounded-lg text-xs font-medium transition-all ${
+                              safeEpisode === ep
+                                ? 'bg-white text-black'
+                                : 'text-white/60 hover:bg-white/10 hover:text-white'
+                            }`}
+                          >
+                            {ep}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
 
-              {/* Dubbing (only when multiple) */}
-              {isYummyActive && yummyDubbings.length > 1 && (
-                <select
-                  value={currentDubbing}
-                  onChange={e => setDubbing(e.target.value)}
-                  className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none max-w-[130px]"
-                >
-                  {yummyDubbings.map(dub => (
-                    <option key={dub} value={dub} className="bg-black">{dub}</option>
+              {/* Dubbing pills */}
+              {activeDubbings.length > 1 && (
+                <div className="flex items-center gap-0.5 p-0.5 rounded-xl border border-white/10 bg-white/5">
+                  {activeDubbings.map(dub => (
+                    <button
+                      key={dub}
+                      onClick={() => setDubbing(dub)}
+                      className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all max-w-[90px] truncate ${
+                        currentDubbing === dub
+                          ? 'bg-white text-black shadow'
+                          : 'text-white/70 hover:text-white hover:bg-white/10'
+                      }`}
+                      title={dub}
+                    >
+                      {dub}
+                    </button>
                   ))}
-                </select>
-              )}
-              {!isYummyActive && activeSourceData && activeSourceData.translations.length > 1 && (
-                <select
-                  value={currentDubbing}
-                  onChange={e => setDubbing(e.target.value)}
-                  className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none max-w-[130px]"
-                >
-                  {activeSourceData.translations.map(dub => (
-                    <option key={dub} value={dub} className="bg-black">{dub}</option>
-                  ))}
-                </select>
+                </div>
               )}
             </div>
 
@@ -266,50 +331,62 @@ export default function AniPlayerModal() {
             <div className="w-full max-w-5xl aspect-video rounded-xl overflow-hidden bg-black relative">
 
               {/* Loading */}
-              {iframeLoading && !iframeLoadTimeout && iframeSrc && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a]">
+              {playerLoading && !loadTimeout && videoSrc && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] z-10">
                   <div className="w-9 h-9 border-2 border-white/10 border-t-white rounded-full animate-spin" />
                   <p className="text-white/40 text-sm">Загрузка плеера...</p>
                 </div>
               )}
 
               {/* Timeout */}
-              {iframeLoadTimeout && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] p-6 text-center">
+              {loadTimeout && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] p-6 text-center z-10">
                   <AlertTriangle className="w-10 h-10 text-white/30" />
                   <p className="text-white/70 font-medium text-sm">Превышено время ожидания</p>
                   <p className="text-white/30 text-xs mb-2">Попробуйте другой сервер</p>
-                  <button
-                    onClick={() => { setIframeLoadTimeout(false); setIframeLoading(true); setIframeKey(p => p + 1) }}
-                    className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors"
-                  >
+                  <button onClick={retry} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors">
                     Повторить
                   </button>
                 </div>
               )}
 
               {/* Error */}
-              {iframeError && !iframeLoadTimeout && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] p-6 text-center">
+              {playerError && !loadTimeout && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] p-6 text-center z-10">
                   <AlertTriangle className="w-10 h-10 text-white/30" />
                   <p className="text-white/70 font-medium text-sm">Ошибка загрузки</p>
-                  <button
-                    onClick={() => { setIframeError(false); setIframeLoading(true); setIframeKey(p => p + 1) }}
-                    className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors"
-                  >
+                  <button onClick={retry} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors">
                     Повторить
                   </button>
                 </div>
               )}
 
-              {/* Iframe */}
-              {iframeSrc && !iframeError && !iframeLoadTimeout && (
+              {/* HLS Player (with grayscale-on-pause) */}
+              {videoSrc?.type === 'hls' && !playerError && !loadTimeout && (
+                <div
+                  className="w-full h-full transition-[filter] duration-700"
+                  style={{ filter: isPaused ? 'grayscale(1)' : 'grayscale(0)' }}
+                >
+                  <HlsPlayer
+                    key={playerKey}
+                    src={videoSrc.url}
+                    playerKey={playerKey}
+                    onLoad={handleLoad}
+                    onError={handleError}
+                    onPause={() => setIsPaused(true)}
+                    onPlay={() => setIsPaused(false)}
+                  />
+                </div>
+              )}
+
+              {/* Iframe Player */}
+              {videoSrc?.type === 'iframe' && !playerError && !loadTimeout && (
                 <iframe
-                  key={iframeKey}
-                  src={iframeSrc}
+                  key={playerKey}
+                  src={videoSrc.url}
                   className="w-full h-full"
-                  onLoad={handleIframeLoad}
-                  onError={handleIframeError}
+                  onLoad={handleLoad}
+                  onError={handleError}
                   allowFullScreen
                   allow="autoplay; fullscreen; picture-in-picture"
                   frameBorder="0"
@@ -318,7 +395,7 @@ export default function AniPlayerModal() {
               )}
 
               {/* No video */}
-              {!iframeSrc && !iframeLoading && !iframeError && !iframeLoadTimeout && (
+              {!videoSrc && !playerLoading && !playerError && !loadTimeout && (
                 <div className="flex flex-col items-center justify-center h-full gap-2 text-white/30 text-sm">
                   <p>Нет доступного видео</p>
                   {!isYummyActive && videos.length > 0 && (

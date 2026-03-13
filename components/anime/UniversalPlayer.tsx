@@ -56,7 +56,6 @@ export default function UniversalPlayer({
     const server = servers[activeServer]
     if (!server) return null
     let url = server.iframe
-    // Append season/episode for TV/cartoon
     if ((type === 'tv' || type === 'cartoon') && selectedSeason && selectedEpisode) {
       const sep = url.includes('?') ? '&' : '?'
       url += `${sep}season=${selectedSeason}&episode=${selectedEpisode}`
@@ -84,15 +83,35 @@ export default function UniversalPlayer({
 
   const handleError = useCallback(() => {
     setIsLoading(false)
-    setHasError(true)
-  }, [])
+    // Auto-try next server on error
+    setServers(prev => {
+      if (activeServer < prev.length - 1) {
+        setActiveServer(s => s + 1)
+        setHasError(false)
+      } else {
+        setHasError(true)
+      }
+      return prev
+    })
+  }, [activeServer])
 
-  // 10s timeout
+  // 20s timeout — auto-advance server
   useEffect(() => {
     if (!isLoading) return
-    const timeout = setTimeout(() => setLoadTimeout(true), 10000)
+    const timeout = setTimeout(() => {
+      setServers(prev => {
+        if (activeServer < prev.length - 1) {
+          setActiveServer(s => s + 1)
+          setIsLoading(true)
+          setLoadTimeout(false)
+        } else {
+          setLoadTimeout(true)
+        }
+        return prev
+      })
+    }, 20000)
     return () => clearTimeout(timeout)
-  }, [isLoading, iframeKey])
+  }, [isLoading, iframeKey, activeServer])
 
   const retry = () => {
     setIsLoading(true)
@@ -135,7 +154,6 @@ export default function UniversalPlayer({
       {/* Season/episode selector for TV */}
       {(type === 'tv' || type === 'cartoon') && (
         <div className="flex items-center gap-3 px-4 py-2.5 border-b border-white/10 flex-shrink-0 flex-wrap">
-          {/* Season */}
           <div className="flex items-center gap-1">
             <button
               onClick={() => setSelectedSeason(s => Math.max(1, s - 1))}
@@ -152,7 +170,6 @@ export default function UniversalPlayer({
             </button>
           </div>
           <div className="w-px h-5 bg-white/10" />
-          {/* Episode */}
           <div className="flex items-center gap-1">
             <button
               onClick={() => setSelectedEpisode(e => Math.max(1, e - 1))}
@@ -178,6 +195,11 @@ export default function UniversalPlayer({
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black z-10">
             <RefreshCw className="w-8 h-8 text-white/30 animate-spin" />
             <p className="text-white/40 text-sm">Загрузка плеера...</p>
+            {servers.length > 1 && (
+              <p className="text-white/20 text-xs">
+                Сервер {activeServer + 1} / {servers.length}
+              </p>
+            )}
           </div>
         )}
 
@@ -200,14 +222,15 @@ export default function UniversalPlayer({
               >
                 Повторить
               </button>
-              {servers.length > 1 && activeServer < servers.length - 1 && (
+              {servers.map((srv, idx) => idx !== activeServer && (
                 <button
-                  onClick={() => setActiveServer(activeServer + 1)}
+                  key={srv.source}
+                  onClick={() => setActiveServer(idx)}
                   className="px-4 py-2 rounded-lg bg-white/10 text-white text-sm hover:bg-white/20 transition-colors"
                 >
-                  Следующий сервер
+                  {srv.name}
                 </button>
-              )}
+              ))}
             </div>
           </div>
         )}

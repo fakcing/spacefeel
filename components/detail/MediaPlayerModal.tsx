@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useMediaPlayerStore } from '@/store/mediaPlayerStore'
 import UniversalPlayer from '@/components/anime/UniversalPlayer'
+import { useEffect } from 'react'
 
 export default function MediaPlayerModal() {
   const {
@@ -18,14 +19,26 @@ export default function MediaPlayerModal() {
     setSeason,
   } = useMediaPlayerStore()
 
-  // Handle season change
-  const handlePrevSeason = () => {
-    if (season > 1) setSeason(season - 1)
-  }
+  // Body scroll lock
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [isOpen])
 
-  const handleNextSeason = () => {
-    setSeason(season + 1)
-  }
+  // Keyboard close
+  useEffect(() => {
+    if (!isOpen) return
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') closePlayer() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [isOpen, closePlayer])
+
+  const handlePrevSeason = () => { if (season > 1) setSeason(season - 1) }
+  const handleNextSeason = () => { setSeason(season + 1) }
 
   const title = item ? ('title' in item ? item.title : item.name) : 'Media Player'
 
