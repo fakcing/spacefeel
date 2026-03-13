@@ -294,11 +294,11 @@ export default function AniPlayerModal() {
                 <div className="relative" ref={dubPickerRef}>
                   <button
                     onClick={e => { e.stopPropagation(); setDubPickerOpen(p => !p) }}
-                    className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-medium hover:bg-white/10 transition-colors max-w-[120px]"
+                    className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-medium hover:bg-white/10 transition-colors max-w-[140px] min-w-0 overflow-hidden"
                   >
-                    <span className="text-white/50 flex-shrink-0">Озвучка</span>
-                    <span className="text-white truncate">{currentDubbing || '—'}</span>
-                    <ChevronDown size={10} className="text-white/40 flex-shrink-0" />
+                    <span className="text-white/50 flex-shrink-0 text-[10px]">Дуб</span>
+                    <span className="text-white truncate min-w-0">{currentDubbing || '—'}</span>
+                    <ChevronDown size={10} className="text-white/40 flex-shrink-0 ml-0.5" />
                   </button>
 
                   {dubPickerOpen && (
