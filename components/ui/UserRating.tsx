@@ -62,7 +62,7 @@ export default function UserRating({ tmdbId, mediaType }: UserRatingProps) {
     setSubmitted((v) => !v)
   }
 
-  const handleDelete = async (_id: string) => {
+  const handleDelete = async () => {
     if (!session) return
     setDeleting(true)
     await fetch(`/api/ratings?tmdbId=${tmdbId}&mediaType=${mediaType}`, { method: 'DELETE' })
@@ -151,7 +151,7 @@ export default function UserRating({ tmdbId, mediaType }: UserRatingProps) {
                   </div>
                   {isOwn && session && (
                     <button
-                      onClick={() => handleDelete(r.id)}
+                      onClick={() => handleDelete()}
                       disabled={deleting}
                       className="ml-1 p-1 rounded-lg transition-colors hover:bg-red-500/15 text-red-400/60 hover:text-red-400"
                       title={t('deleteRating')}
