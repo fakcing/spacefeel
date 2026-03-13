@@ -77,6 +77,7 @@ export interface WatchlistItem {
   media_type: 'movie' | 'tv' | 'anime'
   vote_average: number
   release_date: string
+  slug?: string
 }
 
 export type MediaItem = Movie | TVShow

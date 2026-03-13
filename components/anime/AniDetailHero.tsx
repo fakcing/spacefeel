@@ -39,6 +39,7 @@ export default function AniDetailHero({ title, videos }: Props) {
       media_type: 'anime',
       vote_average: title.rating.average,
       release_date: String(title.year),
+      slug: title.anime_url,
     }, true)
   }
 

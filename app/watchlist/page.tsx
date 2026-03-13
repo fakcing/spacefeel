@@ -61,6 +61,22 @@ export default function WatchlistPage() {
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {enriched.map((item) => {
+            if (item.media_type === 'anime') {
+              return (
+                <a key={item.id} href={item.slug ? `/anime/${item.slug}` : '/anime'} className="group relative block w-full">
+                  <div className="relative aspect-[2/3] rounded-lg md:rounded-xl overflow-hidden bg-white/5">
+                    {item.poster_path && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={item.poster_path} alt={item.title} className="w-full h-full object-cover" />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-2">
+                      <p className="text-white text-xs font-semibold line-clamp-2">{item.title}</p>
+                    </div>
+                  </div>
+                </a>
+              )
+            }
             const mediaItem = {
               id: item.id,
               ...(item.media_type === 'movie'
@@ -73,7 +89,7 @@ export default function WatchlistPage() {
               vote_count: 0,
               genre_ids: [],
             } as Movie | TVShow
-            return <MediaCard key={item.id} item={mediaItem} mediaType={item.media_type} />
+            return <MediaCard key={item.id} item={mediaItem} mediaType={item.media_type as 'movie' | 'tv'} />
           })}
         </div>
       )}
