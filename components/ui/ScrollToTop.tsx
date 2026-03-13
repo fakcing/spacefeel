@@ -25,11 +25,11 @@ export default function ScrollToTop() {
           transition={{ duration: 0.2 }}
           onClick={scrollToTop}
           whileTap={{ scale: 0.9 }}
-          className="fixed bottom-6 right-6 z-50 w-10 h-10
+          className="hidden sm:flex fixed bottom-6 right-6 z-50 w-10 h-10
                      bg-white/10 hover:bg-white/20
                      border border-white/20 rounded-xl
                      backdrop-blur-sm
-                     flex items-center justify-center
+                     items-center justify-center
                      transition-colors duration-200"
           aria-label="Scroll to top"
         >

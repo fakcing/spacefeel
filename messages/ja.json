@@ -31,7 +31,13 @@
     "seasons": "シーズン数",
     "language": "原語",
     "voteCount": "評価数",
-    "budget": "予算"
+    "budget": "予算",
+    "year": "年",
+    "type": "タイプ",
+    "episodes": "エピソード",
+    "rating": "評価",
+    "dubbing": "吹き替え",
+    "moreLikeThis": "似たアニメ"
   },
   "search": {
     "placeholder": "検索...",

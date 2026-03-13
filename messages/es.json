@@ -31,7 +31,13 @@
     "seasons": "Temporadas",
     "language": "Idioma original",
     "voteCount": "Votos",
-    "budget": "Presupuesto"
+    "budget": "Presupuesto",
+    "year": "Año",
+    "type": "Tipo",
+    "episodes": "Episodios",
+    "rating": "Calificación",
+    "dubbing": "Doblaje",
+    "moreLikeThis": "Más como esto"
   },
   "search": {
     "placeholder": "Buscar...",

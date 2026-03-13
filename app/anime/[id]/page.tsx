@@ -1,7 +1,8 @@
 import { notFound } from 'next/navigation'
-import Image from 'next/image'
-import { fetchYaniTitle, fetchYaniVideos, getPosterUrl } from '@/lib/yani'
-import AniPlayerButton from '@/components/anime/AniPlayerButton'
+import { getTranslations } from 'next-intl/server'
+import { fetchYaniTitle, fetchYaniVideos, fetchYaniCatalog } from '@/lib/yani'
+import AniDetailHero from '@/components/anime/AniDetailHero'
+import AniCard from '@/components/cards/AniCard'
 
 interface Props {
   params: { id: string }
@@ -24,127 +25,117 @@ export default async function AniDetailPage({ params }: Props) {
     notFound()
   }
 
-  const videos = await fetchYaniVideos(title.anime_id).catch(() => [])
-  const poster = getPosterUrl(title.poster.big || title.poster.medium)
+  const t = await getTranslations('detail')
 
-  // Unique dubbings/translators
-  const dubbings = Array.from(new Set(videos.map((v) => v.data.dubbing))).filter(Boolean)
+  const [videos, catalogResult] = await Promise.all([
+    fetchYaniVideos(title.anime_id).catch(() => []),
+    fetchYaniCatalog(1, 13).catch(() => ({ items: [], hasMore: false })),
+  ])
+
+  const similar = catalogResult.items.filter(a => a.anime_id !== title.anime_id).slice(0, 12)
+
+  const dubbings = Array.from(new Set(videos.map(v => v.data.dubbing))).filter(Boolean)
+
+  const ratings = [
+    { label: 'MyAnimeList', value: title.rating.myanimelist_rating },
+    { label: 'Shikimori',   value: title.rating.shikimori_rating },
+    { label: 'KinoPoisk',   value: title.rating.kp_rating },
+    { label: t('rating'),   value: title.rating.average },
+  ].filter(r => r.value > 0)
 
   return (
     <main className="min-h-screen" style={{ backgroundColor: 'var(--color-bg)' }}>
-      {/* Hero section */}
-      <div className="relative w-full pt-24 pb-12 px-6">
-        <div className="max-w-5xl mx-auto flex gap-8 flex-wrap sm:flex-nowrap">
-          {/* Poster */}
-          <div className="relative w-44 h-64 flex-shrink-0 rounded-2xl overflow-hidden shadow-2xl">
-            <Image
-              src={poster}
-              fill
-              className="object-cover"
-              alt={title.title}
-              priority
-            />
+      <AniDetailHero title={title} videos={videos} />
+
+      <div className="max-w-5xl mx-auto px-4 md:px-8 pb-20">
+
+        {/* Description */}
+        {title.description && (
+          <section className="mb-8">
+            <h2 className="text-lg font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
+              {t('overview')}
+            </h2>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>
+              {title.description}
+            </p>
+          </section>
+        )}
+
+        {/* Details grid */}
+        <section className="mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4">
+            {[
+              { label: t('year'),     value: title.year ? String(title.year) : null },
+              { label: t('type'),     value: title.type?.name },
+              { label: t('episodes'), value: title.episodes?.count > 0 ? String(title.episodes.count) : title.episodes?.aired > 0 ? String(title.episodes.aired) : null },
+              { label: t('status'),   value: title.anime_status?.title },
+              { label: 'Возраст',     value: title.min_age?.title },
+            ].filter(i => i.value).map(item => (
+              <div key={item.label}>
+                <p className="text-xs mb-0.5" style={{ color: 'var(--color-text-subtle)' }}>{item.label}</p>
+                <p className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>{item.value}</p>
+              </div>
+            ))}
           </div>
+        </section>
 
-          {/* Info */}
-          <div className="flex-1 min-w-0">
-            <h1
-              className="text-4xl font-black tracking-tight"
-              style={{ color: 'var(--color-text)' }}
-            >
-              {title.title}
-            </h1>
-
-            {/* Genres */}
-            <div className="flex flex-wrap gap-2 mt-4">
-              {title.genres.slice(0, 5).map((g) => (
-                <span
-                  key={g.id}
-                  className="px-3 py-1 rounded-full text-xs border"
-                  style={{
-                    borderColor: 'var(--color-border)',
-                    color: 'var(--color-text-muted)',
-                  }}
+        {/* Ratings */}
+        {ratings.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-lg font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
+              {t('rating')}
+            </h2>
+            <div className="flex flex-wrap gap-3">
+              {ratings.map(r => (
+                <div
+                  key={r.label}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl"
+                  style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
                 >
-                  {g.title}
+                  <span className="text-yellow-400 text-sm">★</span>
+                  <span className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>
+                    {r.value.toFixed(1)}
+                  </span>
+                  <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{r.label}</span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Dubbing */}
+        {dubbings.length > 0 && (
+          <section className="mb-8">
+            <h2 className="text-lg font-semibold mb-3" style={{ color: 'var(--color-text)' }}>
+              {t('dubbing')}
+            </h2>
+            <div className="flex flex-wrap gap-2">
+              {dubbings.map(dub => (
+                <span
+                  key={dub}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium"
+                  style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}
+                >
+                  {dub}
                 </span>
               ))}
             </div>
+          </section>
+        )}
 
-            {/* Meta grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-2 mt-5 text-sm">
-              {[
-                { label: 'Год', value: title.year },
-                { label: 'Тип', value: title.type?.name },
-                { label: 'Эпизоды', value: title.episodes?.count > 0 ? `${title.episodes.count} эп.` : title.episodes?.aired > 0 ? `${title.episodes.aired} эп.` : null },
-                { label: 'Статус', value: title.anime_status?.title },
-                { label: 'Возраст', value: title.min_age?.title },
-                { label: 'Рейтинг', value: title.rating.average > 0 ? `★ ${title.rating.average.toFixed(1)}` : null },
-                { label: 'MyAnimeList', value: title.rating.myanimelist_rating > 0 ? `★ ${title.rating.myanimelist_rating.toFixed(1)}` : null },
-                { label: 'Shikimori', value: title.rating.shikimori_rating > 0 ? `★ ${title.rating.shikimori_rating.toFixed(1)}` : null },
-                { label: 'KinoPoisk', value: title.rating.kp_rating > 0 ? `★ ${title.rating.kp_rating.toFixed(1)}` : null },
-              ]
-                .filter((item) => item.value)
-                .map((item) => (
-                  <div key={item.label}>
-                    <span className="text-xs" style={{ color: 'var(--color-text-subtle)' }}>{item.label}</span>
-                    <p className="font-medium" style={{ color: 'var(--color-text)' }}>{item.value}</p>
-                  </div>
-                ))}
+        {/* Similar */}
+        {similar.length > 0 && (
+          <section>
+            <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text)' }}>
+              {t('moreLikeThis')}
+            </h2>
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+              {similar.map(item => (
+                <AniCard key={item.anime_id} item={item} />
+              ))}
             </div>
-
-            {/* Description */}
-            <p
-              className="mt-5 text-sm leading-relaxed line-clamp-4"
-              style={{ color: 'var(--color-text-muted)' }}
-            >
-              {title.description}
-            </p>
-
-            {/* Voice actors / translators */}
-            {dubbings.length > 0 && (
-              <div className="mt-4">
-                <span className="text-xs" style={{ color: 'var(--color-text-subtle)' }}>Озвучка</span>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {dubbings.map((dub) => (
-                    <span
-                      key={dub}
-                      className="px-2 py-0.5 rounded text-xs"
-                      style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text-muted)' }}
-                    >
-                      {dub}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Translators list from metadata */}
-            {title.translates && title.translates.length > 0 && (
-              <div className="mt-3">
-                <span className="text-xs" style={{ color: 'var(--color-text-subtle)' }}>Переводчики</span>
-                <div className="flex flex-wrap gap-2 mt-1">
-                  {title.translates.slice(0, 6).map((t) => (
-                    <span
-                      key={t.value}
-                      className="px-2 py-0.5 rounded text-xs"
-                      style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text-muted)' }}
-                    >
-                      {t.title}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Play button */}
-            {videos.length > 0 && (
-              <div className="flex gap-3 mt-6">
-                <AniPlayerButton videos={videos} titleName={title.title} shikimoriId={title.anime_id} />
-              </div>
-            )}
-          </div>
-        </div>
+          </section>
+        )}
       </div>
     </main>
   )

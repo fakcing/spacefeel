@@ -31,7 +31,13 @@
     "seasons": "Staffeln",
     "language": "Originalsprache",
     "voteCount": "Bewertungen",
-    "budget": "Budget"
+    "budget": "Budget",
+    "year": "Jahr",
+    "type": "Typ",
+    "episodes": "Episoden",
+    "rating": "Bewertung",
+    "dubbing": "Synchronisation",
+    "moreLikeThis": "Ähnliche Anime"
   },
   "search": {
     "placeholder": "Suchen...",

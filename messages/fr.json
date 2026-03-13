@@ -31,7 +31,13 @@
     "seasons": "Saisons",
     "language": "Langue originale",
     "voteCount": "Votes",
-    "budget": "Budget"
+    "budget": "Budget",
+    "year": "Année",
+    "type": "Type",
+    "episodes": "Épisodes",
+    "rating": "Note",
+    "dubbing": "Doublage",
+    "moreLikeThis": "Animes similaires"
   },
   "search": {
     "placeholder": "Rechercher...",

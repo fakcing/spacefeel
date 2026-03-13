@@ -31,7 +31,13 @@
     "seasons": "Сезонов",
     "language": "Язык оригинала",
     "voteCount": "Оценок",
-    "budget": "Бюджет"
+    "budget": "Бюджет",
+    "year": "Год",
+    "type": "Тип",
+    "episodes": "Эпизоды",
+    "rating": "Рейтинг",
+    "dubbing": "Озвучка",
+    "moreLikeThis": "Похожее аниме"
   },
   "search": {
     "placeholder": "Поиск...",

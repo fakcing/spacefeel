@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ChevronLeft, ChevronRight, AlertTriangle, ChevronDown } from 'lucide-react'
+import { X, AlertTriangle, ChevronDown } from 'lucide-react'
 import { useAniPlayerStore } from '@/store/aniPlayerStore'
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import HlsPlayer from '@/components/anime/HlsPlayer'
@@ -195,24 +195,6 @@ export default function AniPlayerModal() {
         >
           {/* ── Header ── */}
           <div className="flex items-center gap-2 px-3 py-2.5 flex-shrink-0 border-b border-white/10 flex-wrap sm:flex-nowrap overflow-visible">
-
-            {/* Prev / Next */}
-            <button
-              onClick={() => prevEp && setEpisode(prevEp)}
-              disabled={!prevEp}
-              className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center hover:bg-white/10 disabled:opacity-20 transition-colors flex-shrink-0"
-              aria-label="Предыдущая серия"
-            >
-              <ChevronLeft size={15} className="text-white" />
-            </button>
-            <button
-              onClick={() => nextEp && setEpisode(nextEp)}
-              disabled={!nextEp}
-              className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center hover:bg-white/10 disabled:opacity-20 transition-colors flex-shrink-0"
-              aria-label="Следующая серия"
-            >
-              <ChevronRight size={15} className="text-white" />
-            </button>
 
             {/* Title */}
             <span className="text-white/70 text-sm font-medium truncate max-w-[130px] sm:max-w-[200px] flex-shrink-0">

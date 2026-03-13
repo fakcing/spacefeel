@@ -31,7 +31,13 @@
     "seasons": "시즌 수",
     "language": "원어",
     "voteCount": "평가 수",
-    "budget": "예산"
+    "budget": "예산",
+    "year": "연도",
+    "type": "유형",
+    "episodes": "에피소드",
+    "rating": "평점",
+    "dubbing": "더빙",
+    "moreLikeThis": "비슷한 애니메이션"
   },
   "search": {
     "placeholder": "검색...",

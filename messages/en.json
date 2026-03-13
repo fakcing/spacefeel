@@ -31,7 +31,13 @@
     "seasons": "Seasons",
     "language": "Original Language",
     "voteCount": "Vote Count",
-    "budget": "Budget"
+    "budget": "Budget",
+    "year": "Year",
+    "type": "Type",
+    "episodes": "Episodes",
+    "rating": "Rating",
+    "dubbing": "Dubbing",
+    "moreLikeThis": "More Like This"
   },
   "search": {
     "placeholder": "Search...",
