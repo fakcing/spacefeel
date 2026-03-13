@@ -23,15 +23,28 @@ export default function HlsPlayer({ src, playerKey, onLoad, onError, onPause, on
     const video = videoRef.current
     if (!video || !src) return
 
-    // Direct MP4 — use native video element
+    // Direct MP4 — use native video element with one silent auto-retry
     if (isMp4(src)) {
+      let retries = 0
       video.src = src
       video.load()
+
       const handleLoaded = () => { onLoad?.(); video.play().catch(() => {}) }
+      const handleError = () => {
+        if (retries < 1) {
+          retries++
+          // Small delay then reload — fixes transient CORS/network hiccups
+          setTimeout(() => { video.load() }, 800)
+        } else {
+          onError?.()
+        }
+      }
+
       video.addEventListener('loadedmetadata', handleLoaded)
-      video.addEventListener('error', () => onError?.())
+      video.addEventListener('error', handleError)
       return () => {
         video.removeEventListener('loadedmetadata', handleLoaded)
+        video.removeEventListener('error', handleError)
         video.src = ''
       }
     }

@@ -27,7 +27,9 @@ export default function AniPlayerModal() {
   const [playerKey, setPlayerKey] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
   const [epPickerOpen, setEpPickerOpen] = useState(false)
+  const [dubPickerOpen, setDubPickerOpen] = useState(false)
   const epPickerRef = useRef<HTMLDivElement>(null)
+  const dubPickerRef = useRef<HTMLDivElement>(null)
   const activeEpRef = useRef<HTMLButtonElement>(null)
 
   const isYummyActive = activeSource === 'yummy'
@@ -146,6 +148,17 @@ export default function AniPlayerModal() {
     }
     return () => document.removeEventListener('mousedown', handleClick)
   }, [epPickerOpen])
+
+  // Dub picker close-on-outside-click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (dubPickerRef.current && !dubPickerRef.current.contains(e.target as Node)) {
+        setDubPickerOpen(false)
+      }
+    }
+    if (dubPickerOpen) document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [dubPickerOpen])
 
   // Navigation
   const epIndex = episodeNumbers.indexOf(safeEpisode)
@@ -294,23 +307,41 @@ export default function AniPlayerModal() {
                 </div>
               )}
 
-              {/* Dubbing pills */}
+              {/* Dubbing picker popover */}
               {activeDubbings.length > 1 && (
-                <div className="flex items-center gap-0.5 p-0.5 rounded-xl border border-white/10 bg-white/5">
-                  {activeDubbings.map(dub => (
-                    <button
-                      key={dub}
-                      onClick={() => setDubbing(dub)}
-                      className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all max-w-[90px] truncate ${
-                        currentDubbing === dub
-                          ? 'bg-white text-black shadow'
-                          : 'text-white/70 hover:text-white hover:bg-white/10'
-                      }`}
-                      title={dub}
-                    >
-                      {dub}
-                    </button>
-                  ))}
+                <div className="relative" ref={dubPickerRef}>
+                  <button
+                    onClick={e => { e.stopPropagation(); setDubPickerOpen(p => !p) }}
+                    className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-medium hover:bg-white/10 transition-colors max-w-[120px]"
+                  >
+                    <span className="text-white/50 flex-shrink-0">Озвучка</span>
+                    <span className="text-white truncate">{currentDubbing || '—'}</span>
+                    <ChevronDown size={10} className="text-white/40 flex-shrink-0" />
+                  </button>
+
+                  {dubPickerOpen && (
+                    <div className="absolute top-full left-0 mt-1.5 bg-[#111] border border-white/10 rounded-xl p-2 z-20 shadow-2xl min-w-[160px] max-w-[260px]">
+                      <p className="text-white/30 text-[10px] font-medium uppercase tracking-wide px-1 pb-1.5">
+                        Озвучка · {activeDubbings.length}
+                      </p>
+                      <div className="flex flex-col gap-0.5 max-h-48 overflow-y-auto">
+                        {activeDubbings.map(dub => (
+                          <button
+                            key={dub}
+                            onClick={() => { setDubbing(dub); setDubPickerOpen(false) }}
+                            className={`w-full text-left px-2.5 py-2 rounded-lg text-xs font-medium transition-all truncate ${
+                              currentDubbing === dub
+                                ? 'bg-white text-black'
+                                : 'text-white/60 hover:bg-white/10 hover:text-white'
+                            }`}
+                            title={dub}
+                          >
+                            {dub}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
