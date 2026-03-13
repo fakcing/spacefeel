@@ -7,7 +7,6 @@ import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, X, User, LogOut, ChevronUp, Check, Sun, Moon, Monitor } from 'lucide-react'
 import { useSession, signOut } from 'next-auth/react'
-import { useAuthModalStore } from '@/store/authModalStore'
 import { useTheme } from 'next-themes'
 import { useLocale } from 'next-intl'
 
@@ -39,7 +38,6 @@ type SearchResult = {
 export default function MobileHeader() {
   const pathname = usePathname()
   const { data: session } = useSession()
-  const { open: openAuthModal } = useAuthModalStore()
 
   const { theme, setTheme } = useTheme()
   const locale = useLocale()
