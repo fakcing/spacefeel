@@ -35,7 +35,7 @@ export default function Pagination({ currentPage, totalPages, baseHref }: Pagina
     <div className="flex items-center justify-center gap-1.5 py-10 flex-wrap">
       {pages.map((page, i) =>
         page === '...' ? (
-          <span key={`ellipsis-${i}`} className="text-white/30 w-9 text-center text-sm select-none">
+          <span key={`ellipsis-${i}`} className="text-gray-900/30 dark:text-white/30 w-9 text-center text-sm select-none">
             ...
           </span>
         ) : (
@@ -44,8 +44,8 @@ export default function Pagination({ currentPage, totalPages, baseHref }: Pagina
             href={`${baseHref}${separator}page=${page}`}
             className={`${btn} ${
               page === currentPage
-                ? 'bg-white text-black'
-                : 'bg-white/[0.08] hover:bg-white/[0.15] text-white/70'
+                ? 'bg-gray-900 dark:bg-white text-white dark:text-black'
+                : 'bg-black/[0.08] dark:bg-white/[0.08] hover:bg-black/[0.15] dark:hover:bg-white/[0.15] text-gray-900/70 dark:text-white/70'
             }`}
           >
             {page}
@@ -56,7 +56,7 @@ export default function Pagination({ currentPage, totalPages, baseHref }: Pagina
       {currentPage < capped && (
         <Link
           href={`${baseHref}${separator}page=${currentPage + 1}`}
-          className="flex items-center justify-center h-9 px-4 rounded-full text-sm font-medium bg-white/[0.08] hover:bg-white/[0.15] text-white/70 transition-colors"
+          className="flex items-center justify-center h-9 px-4 rounded-full text-sm font-medium bg-black/[0.08] dark:bg-white/[0.08] hover:bg-black/[0.15] dark:hover:bg-white/[0.15] text-gray-900/70 dark:text-white/70 transition-colors"
         >
           Next ›
         </Link>

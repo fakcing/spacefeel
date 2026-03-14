@@ -53,7 +53,7 @@ export default function WatchlistPage() {
           </p>
           <Link
             href="/movies"
-            className="bg-white text-black font-semibold rounded-full px-8 py-3 hover:bg-white/90 transition-colors"
+            className="bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-full px-8 py-3 hover:bg-gray-800 dark:hover:bg-white/90 transition-colors"
           >
             {t('browse')}
           </Link>
@@ -64,7 +64,7 @@ export default function WatchlistPage() {
             if (item.media_type === 'anime') {
               return (
                 <a key={item.id} href={item.slug ? `/anime/${item.slug}` : '/anime'} className="group relative block w-full">
-                  <div className="relative aspect-[2/3] rounded-lg md:rounded-xl overflow-hidden bg-white/5">
+                  <div className="relative aspect-[2/3] rounded-lg md:rounded-xl overflow-hidden bg-black/5 dark:bg-white/5">
                     {item.poster_path && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={item.poster_path} alt={item.title} className="w-full h-full object-cover" />

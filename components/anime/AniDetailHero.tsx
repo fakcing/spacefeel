@@ -110,17 +110,17 @@ export default function AniDetailHero({ title, videos }: Props) {
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <button
                 onClick={handlePlay}
-                className="flex items-center justify-center gap-2 bg-white text-black font-semibold rounded-full px-6 py-3 sm:py-2.5 hover:bg-white/90 transition-colors text-sm w-full sm:w-auto cursor-pointer"
+                className="flex items-center justify-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-full px-6 py-3 sm:py-2.5 hover:bg-gray-800 dark:hover:bg-white/90 transition-colors text-sm w-full sm:w-auto cursor-pointer"
               >
-                <Play size={16} fill="black" />
+                <Play size={16} className="fill-white dark:fill-black" />
                 {t('playNow')}
               </button>
               <button
                 onClick={handleWatchlist}
                 className={`flex items-center justify-center gap-2 font-semibold rounded-full px-6 py-3 sm:py-2.5 text-sm transition-colors border w-full sm:w-auto ${
                   isBookmarked
-                    ? 'bg-white/15 border-white/30 text-white'
-                    : 'border-white/20 text-white hover:bg-white/10'
+                    ? 'bg-black/15 dark:bg-white/15 border-black/30 dark:border-white/30 text-gray-900 dark:text-white'
+                    : 'border-black/20 dark:border-white/20 text-gray-900 dark:text-white hover:bg-black/10 dark:hover:bg-white/10'
                 }`}
                 style={isBookmarked ? undefined : { borderColor: 'var(--color-border)', color: 'var(--color-text)' }}
               >

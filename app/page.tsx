@@ -10,9 +10,9 @@ import { Movie, TVShow } from '@/types/tmdb'
 
 function HeroBannerSkeleton() {
   return (
-    <div className="relative w-full h-[75vh] bg-white/[0.05]">
+    <div className="relative w-full h-[75vh] bg-black/[0.05] dark:bg-white/[0.05]">
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-24 h-24 rounded-full border-4 border-white/10 border-t-white/40 animate-spin" />
+        <div className="w-24 h-24 rounded-full border-4 border-black/10 dark:border-white/10 border-t-black/40 dark:border-t-white/40 animate-spin" />
       </div>
     </div>
   )

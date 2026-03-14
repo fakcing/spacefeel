@@ -64,8 +64,8 @@ export default function AnimeFilters({ year, type, sort }: Props) {
         onClick={() => setOpen(p => !p)}
         className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all border ${
           open || activeCount > 0
-            ? 'bg-white text-black border-white'
-            : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:border-white/20'
+            ? 'bg-gray-900 dark:bg-white text-white dark:text-black border-gray-900 dark:border-white'
+            : 'bg-black/5 dark:bg-white/5 text-gray-900/70 dark:text-white/70 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20'
         }`}
       >
         <SlidersHorizontal size={14} />
@@ -78,13 +78,13 @@ export default function AnimeFilters({ year, type, sort }: Props) {
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-72 bg-[#111] border border-white/10 rounded-2xl shadow-2xl z-50 p-4">
+        <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl z-50 p-4">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-white text-sm font-semibold">Фильтры</span>
+            <span className="text-gray-900 dark:text-white text-sm font-semibold">Фильтры</span>
             {activeCount > 0 && (
               <button
                 onClick={clearAll}
-                className="flex items-center gap-1 text-white/40 text-xs hover:text-white/70 transition-colors"
+                className="flex items-center gap-1 text-gray-900/40 dark:text-white/40 text-xs hover:text-gray-900/70 dark:hover:text-white/70 transition-colors"
               >
                 <X size={11} />
                 Сбросить
@@ -94,7 +94,7 @@ export default function AnimeFilters({ year, type, sort }: Props) {
 
           {/* Type */}
           <div className="mb-4">
-            <p className="text-white/40 text-[10px] font-medium uppercase tracking-wider mb-2">Тип</p>
+            <p className="text-gray-900/40 dark:text-white/40 text-[10px] font-medium uppercase tracking-wider mb-2">Тип</p>
             <div className="flex flex-wrap gap-1.5">
               {TYPES.map(t => (
                 <button
@@ -102,8 +102,8 @@ export default function AnimeFilters({ year, type, sort }: Props) {
                   onClick={() => update('type', t.value)}
                   className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
                     type === t.value
-                      ? 'bg-white text-black'
-                      : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
+                      ? 'bg-gray-900 dark:bg-white text-white dark:text-black'
+                      : 'bg-black/5 dark:bg-white/5 text-gray-900/60 dark:text-white/60 hover:bg-black/10 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   {t.label}
@@ -114,7 +114,7 @@ export default function AnimeFilters({ year, type, sort }: Props) {
 
           {/* Sort */}
           <div className="mb-4">
-            <p className="text-white/40 text-[10px] font-medium uppercase tracking-wider mb-2">Сортировка</p>
+            <p className="text-gray-900/40 dark:text-white/40 text-[10px] font-medium uppercase tracking-wider mb-2">Сортировка</p>
             <div className="flex flex-col gap-0.5">
               {SORTS.map(s => (
                 <button
@@ -122,8 +122,8 @@ export default function AnimeFilters({ year, type, sort }: Props) {
                   onClick={() => update('sort', s.value)}
                   className={`px-2.5 py-1.5 rounded-lg text-xs font-medium text-left transition-colors ${
                     sort === s.value
-                      ? 'bg-white/15 text-white'
-                      : 'text-white/60 hover:bg-white/5 hover:text-white'
+                      ? 'bg-black/15 dark:bg-white/15 text-gray-900 dark:text-white'
+                      : 'text-gray-900/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
                   }`}
                 >
                   {s.label}
@@ -134,15 +134,15 @@ export default function AnimeFilters({ year, type, sort }: Props) {
 
           {/* Year */}
           <div>
-            <p className="text-white/40 text-[10px] font-medium uppercase tracking-wider mb-2">Год</p>
+            <p className="text-gray-900/40 dark:text-white/40 text-[10px] font-medium uppercase tracking-wider mb-2">Год</p>
             <select
               value={year}
               onChange={e => update('year', e.target.value)}
-              className="w-full bg-white/5 border border-white/10 text-white text-xs px-3 py-2 rounded-lg cursor-pointer focus:outline-none hover:bg-white/10 transition-colors"
+              className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-gray-900 dark:text-white text-xs px-3 py-2 rounded-lg cursor-pointer focus:outline-none hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
             >
-              <option value="" className="bg-[#111]">Любой год</option>
+              <option value="" className="bg-white dark:bg-[#111]">Любой год</option>
               {Array.from({ length: CURRENT_YEAR - 1989 }, (_, i) => CURRENT_YEAR - i).map(y => (
-                <option key={y} value={String(y)} className="bg-[#111]">{y}</option>
+                <option key={y} value={String(y)} className="bg-white dark:bg-[#111]">{y}</option>
               ))}
             </select>
           </div>

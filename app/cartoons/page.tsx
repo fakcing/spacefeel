@@ -41,8 +41,8 @@ export default async function CartoonsPage({
             href={`/cartoons?category=${cat.value}`}
             className={`flex-shrink-0 px-4 py-2 rounded-full text-sm transition-colors ${
               category === cat.value
-                ? 'bg-white text-black font-semibold'
-                : 'bg-white/[0.08] hover:bg-white/[0.15] text-[var(--text-muted)]'
+                ? 'bg-gray-900 dark:bg-white text-white dark:text-black font-semibold'
+                : 'bg-black/[0.08] dark:bg-white/[0.08] hover:bg-black/[0.15] dark:hover:bg-white/[0.15] text-[var(--text-muted)]'
             }`}
           >
             {cat.label}

@@ -104,7 +104,7 @@ export default function AuthModal() {
           >
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
+              className="absolute top-4 right-4 text-gray-900/40 dark:text-white/40 hover:text-gray-900 dark:hover:text-white transition-colors"
               aria-label="Close"
             >
               <X size={18} />
@@ -121,36 +121,36 @@ export default function AuthModal() {
             <h2 className="text-2xl font-bold text-center mt-4">
               {mode === 'signin' ? 'Welcome Back' : 'Create Account'}
             </h2>
-            <p className="text-white/50 text-sm text-center mb-6">
+            <p className="text-gray-900/50 dark:text-white/50 text-sm text-center mb-6">
               {mode === 'signin' ? 'Sign in to continue to your account' : 'Sign up to get started'}
             </p>
 
             {/* OAuth buttons */}
             <button
               onClick={handleGoogle}
-              className="w-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/10 rounded-xl py-3 flex items-center justify-center gap-3 transition-colors mb-2"
+              className="w-full bg-black/[0.08] dark:bg-white/[0.08] hover:bg-black/[0.15] dark:hover:bg-white/[0.15] border border-black/10 dark:border-white/10 rounded-xl py-3 flex items-center justify-center gap-3 transition-colors mb-2"
             >
               <GoogleLogo />
               <span className="text-sm font-medium">Continue with Google</span>
             </button>
             <button
               onClick={handleGitHub}
-              className="w-full bg-white/[0.08] hover:bg-white/[0.15] border border-white/10 rounded-xl py-3 flex items-center justify-center gap-3 transition-colors mb-4"
+              className="w-full bg-black/[0.08] dark:bg-white/[0.08] hover:bg-black/[0.15] dark:hover:bg-white/[0.15] border border-black/10 dark:border-white/10 rounded-xl py-3 flex items-center justify-center gap-3 transition-colors mb-4"
             >
               <GitHubLogo />
               <span className="text-sm font-medium">Continue with GitHub</span>
             </button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="flex-1 border-t border-white/10" />
-              <span className="text-white/30 text-xs">Or continue with</span>
-              <div className="flex-1 border-t border-white/10" />
+              <div className="flex-1 border-t border-black/10 dark:border-white/10" />
+              <span className="text-gray-900/30 dark:text-white/30 text-xs">Or continue with</span>
+              <div className="flex-1 border-t border-black/10 dark:border-white/10" />
             </div>
 
             {/* Name field (sign up only) */}
             {mode === 'signup' && (
               <div className="relative mb-3">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-900/30 dark:text-white/30 pointer-events-none">
                   <User size={16} />
                 </span>
                 <input
@@ -158,14 +158,14 @@ export default function AuthModal() {
                   placeholder="Your name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 pl-10 text-sm text-white placeholder:text-white/30 outline-none focus:border-white/25 transition-colors"
+                  className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 px-4 pl-10 text-sm text-gray-900 dark:text-white placeholder:text-gray-900/30 dark:placeholder:text-white/30 outline-none focus:border-black/25 dark:focus:border-white/25 transition-colors"
                 />
               </div>
             )}
 
             {/* Email */}
             <div className="relative mb-3">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-900/30 dark:text-white/30 pointer-events-none">
                 <Mail size={16} />
               </span>
               <input
@@ -173,13 +173,13 @@ export default function AuthModal() {
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 pl-10 text-sm text-white placeholder:text-white/30 outline-none focus:border-white/25 transition-colors"
+                className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 px-4 pl-10 text-sm text-gray-900 dark:text-white placeholder:text-gray-900/30 dark:placeholder:text-white/30 outline-none focus:border-black/25 dark:focus:border-white/25 transition-colors"
               />
             </div>
 
             {/* Password */}
             <div className="relative mb-4">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30 pointer-events-none">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-900/30 dark:text-white/30 pointer-events-none">
                 <Lock size={16} />
               </span>
               <input
@@ -188,12 +188,12 @@ export default function AuthModal() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (mode === 'signin' ? handleCredentials() : handleRegister())}
-                className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 pl-10 pr-10 text-sm text-white placeholder:text-white/30 outline-none focus:border-white/25 transition-colors"
+                className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl py-3 px-4 pl-10 pr-10 text-sm text-gray-900 dark:text-white placeholder:text-gray-900/30 dark:placeholder:text-white/30 outline-none focus:border-black/25 dark:focus:border-white/25 transition-colors"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-900/30 dark:text-white/30 hover:text-gray-900/60 dark:hover:text-white/60 transition-colors"
               >
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
@@ -208,7 +208,7 @@ export default function AuthModal() {
             <motion.button
               onClick={mode === 'signin' ? handleCredentials : handleRegister}
               disabled={loading}
-              className="w-full bg-white text-black font-semibold rounded-xl py-3 hover:bg-white/90 transition-colors mb-4 flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-xl py-3 hover:bg-gray-800 dark:hover:bg-white/90 transition-colors mb-4 flex items-center justify-center gap-2 disabled:opacity-60"
               whileTap={{ scale: 0.98 }}
             >
               {loading && <Loader2 size={16} className="animate-spin" />}
@@ -216,11 +216,11 @@ export default function AuthModal() {
             </motion.button>
 
             {/* Toggle mode */}
-            <p className="text-white/40 text-sm text-center">
+            <p className="text-gray-900/40 dark:text-white/40 text-sm text-center">
               {mode === 'signin' ? "Don't have an account?" : 'Already have an account?'}{' '}
               <span
                 onClick={() => { setMode(mode === 'signin' ? 'signup' : 'signin'); setError('') }}
-                className="text-white font-semibold cursor-pointer hover:text-white/80 transition-colors"
+                className="text-gray-900 dark:text-white font-semibold cursor-pointer hover:text-gray-900/80 dark:hover:text-white/80 transition-colors"
               >
                 {mode === 'signin' ? 'Sign up' : 'Sign in'}
               </span>

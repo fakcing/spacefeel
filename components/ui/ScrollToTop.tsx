@@ -26,14 +26,14 @@ export default function ScrollToTop() {
           onClick={scrollToTop}
           whileTap={{ scale: 0.9 }}
           className="hidden sm:flex fixed bottom-6 right-6 z-50 w-10 h-10
-                     bg-white/10 hover:bg-white/20
-                     border border-white/20 rounded-xl
+                     bg-black/10 dark:bg-white/10 hover:bg-black/20 dark:hover:bg-white/20
+                     border border-black/20 dark:border-white/20 rounded-xl
                      backdrop-blur-sm
                      items-center justify-center
                      transition-colors duration-200"
           aria-label="Scroll to top"
         >
-          <ChevronUp size={18} className="text-white/70" />
+          <ChevronUp size={18} className="text-gray-900/70 dark:text-white/70" />
         </motion.button>
       )}
     </AnimatePresence>
