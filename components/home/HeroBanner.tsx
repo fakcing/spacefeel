@@ -6,8 +6,11 @@ import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Play, Info } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useSession } from 'next-auth/react'
 import { Movie } from '@/types/tmdb'
 import { getBackdrop } from '@/lib/tmdbImages'
+import { useMediaPlayerStore } from '@/store/mediaPlayerStore'
+import { useAuthModalStore } from '@/store/authModalStore'
 
 interface HeroBannerProps {
   movies: Movie[]
@@ -21,6 +24,14 @@ export default function HeroBanner({ movies }: HeroBannerProps) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const progressRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const t = useTranslations('hero')
+  const { data: session } = useSession()
+  const { openPlayer } = useMediaPlayerStore()
+  const { open: openAuthModal } = useAuthModalStore()
+
+  const handlePlay = () => {
+    if (!session) { openAuthModal(); return }
+    openPlayer({ mediaType: 'movie', item: movie, tmdbId: movie.id, season: 1, episode: 1 })
+  }
 
   const startTimers = () => {
     if (intervalRef.current) clearInterval(intervalRef.current)
@@ -124,13 +135,13 @@ export default function HeroBanner({ movies }: HeroBannerProps) {
               className="flex items-center justify-center gap-4"
             >
               <motion.div whileTap={{ scale: 0.96 }}>
-                <Link
-                  href={`/movies/${movie.id}`}
-                  className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-full px-8 py-3 hover:bg-gray-800 dark:hover:bg-white/90 transition-colors"
+                <button
+                  onClick={handlePlay}
+                  className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-full px-8 py-3 hover:bg-gray-800 dark:hover:bg-white/90 transition-colors cursor-pointer"
                 >
                   <Play size={18} className="fill-white dark:fill-black" />
                   {t('playNow')}
-                </Link>
+                </button>
               </motion.div>
               <motion.div whileTap={{ scale: 0.96 }}>
                 <Link

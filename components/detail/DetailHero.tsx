@@ -50,6 +50,7 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
   }
 
   const handlePlay = () => {
+    if (!session) { openAuthModal(); return }
     openPlayer({
       mediaType,
       item,

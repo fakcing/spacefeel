@@ -28,6 +28,7 @@ export default function AniDetailHero({ title, videos }: Props) {
   const isBookmarked = isInWatchlist(title.anime_id)
 
   const handlePlay = () => {
+    if (!session) { openAuthModal(); return }
     openPlayer({ videos, titleName: title.title, shikimoriId: title.anime_id })
   }
 
