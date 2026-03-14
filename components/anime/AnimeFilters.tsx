@@ -82,7 +82,7 @@ export default function AnimeFilters({ q, year, type, season, genre }: Props) {
   const clearAll = () => router.push(pathname)
 
   const selectClass = (active: boolean) =>
-    `appearance-none cursor-pointer text-sm px-3 py-2 pr-7 rounded-xl border outline-none transition-colors bg-transparent ${
+    `appearance-none cursor-pointer text-sm px-3 py-2 pr-7 rounded-xl border outline-none transition-colors bg-white dark:bg-[#111] ${
       active
         ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white font-medium'
         : 'border-black/15 dark:border-white/15 text-gray-900/60 dark:text-white/60 hover:border-black/30 dark:hover:border-white/30'
