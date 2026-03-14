@@ -4,7 +4,8 @@ import { getImdbId } from '@/lib/tmdb'
 /**
  * Player Aggregator
  *
- * Uses Kinobox — a public Russian streaming aggregator that works with IMDB ID.
+ * Uses public embed services that work without API keys or domain whitelisting.
+ * Note: Russian CDN services (Kodik, Alloha) require API token registration.
  */
 export async function getPlayers(
   tmdbId: number,
@@ -17,11 +18,28 @@ export async function getPlayers(
     return { servers: [], cached: false }
   }
 
-  const server: PlayerServer = {
-    name: 'Kinobox',
-    source: 'Kinobox',
-    iframe: `https://kinobox.cc/video/main?imdb=${imdbId}`,
-  }
+  const isTV = type === 'tv' || type === 'cartoon'
 
-  return { servers: [server], cached: false }
+  const servers: PlayerServer[] = [
+    {
+      name: 'VidSrc',
+      source: 'VidSrc',
+      iframe: isTV
+        ? `https://vidsrc.to/embed/tv/${imdbId}`
+        : `https://vidsrc.to/embed/movie/${imdbId}`,
+      seasonKey: 'season',
+      episodeKey: 'episode',
+    },
+    {
+      name: '2Embed',
+      source: '2Embed',
+      iframe: isTV
+        ? `https://www.2embed.cc/embedtv/${imdbId}`
+        : `https://www.2embed.cc/embed/${imdbId}`,
+      seasonKey: 's',
+      episodeKey: 'e',
+    },
+  ]
+
+  return { servers, cached: false }
 }
