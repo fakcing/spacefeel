@@ -24,7 +24,7 @@ export default async function AnimePage({
   const q = searchParams.q || ''
 
   const { items, hasMore } = await getAnimeCatalog(page, year, type, q)
-  const totalPages = hasMore ? page + 10 : page
+  const totalPages = hasMore ? Math.max(page + 99, 200) : page
 
   const filterParams = new URLSearchParams()
   if (year) filterParams.set('year', year)
