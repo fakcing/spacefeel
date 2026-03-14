@@ -4,34 +4,6 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Search, X } from 'lucide-react'
 import { useRef } from 'react'
 
-const SEASONS = [
-  { label: 'Сезон', value: '' },
-  { label: 'Зима', value: 'winter' },
-  { label: 'Весна', value: 'spring' },
-  { label: 'Лето', value: 'summer' },
-  { label: 'Осень', value: 'fall' },
-]
-
-const GENRES = [
-  { label: 'Жанр', value: '' },
-  { label: 'Экшен', value: 'action' },
-  { label: 'Романтика', value: 'romance' },
-  { label: 'Комедия', value: 'comedy' },
-  { label: 'Драма', value: 'drama' },
-  { label: 'Фэнтези', value: 'fantasy' },
-  { label: 'Ужасы', value: 'horror' },
-  { label: 'Мистика', value: 'mystery' },
-  { label: 'Психологическое', value: 'psychological' },
-  { label: 'Спорт', value: 'sport' },
-  { label: 'Сверхъестественное', value: 'supernatural' },
-  { label: 'Школа', value: 'school' },
-  { label: 'Приключения', value: 'adventure' },
-  { label: 'Меха', value: 'mecha' },
-  { label: 'Сёнен', value: 'shounen' },
-  { label: 'Сёдзё', value: 'shoujo' },
-  { label: 'Повседневность', value: 'slice_of_life' },
-]
-
 const TYPES = [
   { label: 'Тип', value: '' },
   { label: 'TV', value: 'tv' },
@@ -54,11 +26,9 @@ interface Props {
   q: string
   year: string
   type: string
-  season: string
-  genre: string
 }
 
-export default function AnimeFilters({ q, year, type, season, genre }: Props) {
+export default function AnimeFilters({ q, year, type }: Props) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -77,7 +47,7 @@ export default function AnimeFilters({ q, year, type, season, genre }: Props) {
     debounceRef.current = setTimeout(() => update('q', value), 400)
   }
 
-  const hasFilters = !!(q || year || type || season || genre)
+  const hasFilters = !!(q || year || type)
 
   const clearAll = () => router.push(pathname)
 
@@ -109,20 +79,6 @@ export default function AnimeFilters({ q, year, type, season, genre }: Props) {
 
       {/* Filter dropdowns */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative">
-          <select value={season} onChange={e => update('season', e.target.value)} className={selectClass(!!season)}>
-            {SEASONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
-          </select>
-          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-900/40 dark:text-white/40 text-xs">▾</span>
-        </div>
-
-        <div className="relative">
-          <select value={genre} onChange={e => update('genre', e.target.value)} className={selectClass(!!genre)}>
-            {GENRES.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
-          </select>
-          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-900/40 dark:text-white/40 text-xs">▾</span>
-        </div>
-
         <div className="relative">
           <select value={year} onChange={e => update('year', e.target.value)} className={selectClass(!!year)}>
             {YEARS.map(y => <option key={y.value} value={y.value}>{y.label}</option>)}

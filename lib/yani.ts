@@ -32,31 +32,29 @@ export const searchYani = cache(async (query: string, limit = 5): Promise<YaniAn
 })
 
 // Catalog with pagination and optional filters (offset-based)
+// Note: Yani API only reliably supports year and q filters server-side.
+// Type filtering is done client-side after fetching.
 export const fetchYaniCatalog = cache(async (
   page = 1,
   limit = 20,
   year = '',
   type = '',
-  sort = '',
   q = '',
-  season = '',
-  genre = '',
 ) => {
+  // Fetch extra items to account for client-side type filtering
+  const fetchLimit = type ? (limit + 1) * 5 : limit + 1
   const offset = (page - 1) * limit
-  const params = new URLSearchParams({ limit: String(limit + 1), offset: String(offset) })
+  const params = new URLSearchParams({ limit: String(fetchLimit), offset: String(offset) })
   if (year) params.set('year', year)
-  if (type) params.set('type', type)
-  if (sort) params.set('sort', sort)
   if (q) params.set('q', q)
-  if (season) params.set('season', season)
-  if (genre) params.set('genre', genre)
   const res = await fetch(
     `${BASE}/anime?${params.toString()}`,
     { headers: getHeaders(), next: { revalidate: 1800 } }
   )
   if (!res.ok) return { items: [] as YaniAnime[], hasMore: false }
   const data = await res.json()
-  const all = (data.response ?? []) as YaniAnime[]
+  let all = (data.response ?? []) as YaniAnime[]
+  if (type) all = all.filter(a => a.type?.alias === type)
   return { items: all.slice(0, limit), hasMore: all.length > limit }
 })
 

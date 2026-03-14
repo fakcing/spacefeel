@@ -8,37 +8,28 @@ const getAnimeCatalog = cache(async (
   page: number,
   year: string,
   type: string,
-  sort: string,
   q: string,
-  season: string,
-  genre: string,
 ) => {
-  return await fetchYaniCatalog(page, 20, year, type, sort, q, season, genre)
+  return await fetchYaniCatalog(page, 20, year, type, q)
 })
 
 export default async function AnimePage({
   searchParams,
 }: {
-  searchParams: { page?: string; year?: string; type?: string; sort?: string; q?: string; season?: string; genre?: string }
+  searchParams: { page?: string; year?: string; type?: string; q?: string }
 }) {
   const page = Math.max(1, parseInt(searchParams.page || '1') || 1)
   const year = searchParams.year || ''
   const type = searchParams.type || ''
-  const sort = searchParams.sort || ''
   const q = searchParams.q || ''
-  const season = searchParams.season || ''
-  const genre = searchParams.genre || ''
 
-  const { items, hasMore } = await getAnimeCatalog(page, year, type, sort, q, season, genre)
+  const { items, hasMore } = await getAnimeCatalog(page, year, type, q)
   const totalPages = hasMore ? page + 10 : page
 
   const filterParams = new URLSearchParams()
   if (year) filterParams.set('year', year)
   if (type) filterParams.set('type', type)
-  if (sort) filterParams.set('sort', sort)
   if (q) filterParams.set('q', q)
-  if (season) filterParams.set('season', season)
-  if (genre) filterParams.set('genre', genre)
   const baseHref = `/anime${filterParams.toString() ? `?${filterParams.toString()}` : ''}`
 
   return (
@@ -51,7 +42,7 @@ export default async function AnimePage({
       </div>
 
       <div className="mb-6">
-        <AnimeFilters q={q} year={year} type={type} season={season} genre={genre} />
+        <AnimeFilters q={q} year={year} type={type} />
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
