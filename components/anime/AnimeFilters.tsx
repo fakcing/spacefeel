@@ -54,12 +54,11 @@ interface Props {
   q: string
   year: string
   type: string
-  sort: string
   season: string
   genre: string
 }
 
-export default function AnimeFilters({ q, year, type, sort, season, genre }: Props) {
+export default function AnimeFilters({ q, year, type, season, genre }: Props) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
