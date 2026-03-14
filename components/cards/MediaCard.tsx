@@ -81,16 +81,16 @@ export default function MediaCard({ item, mediaType, priority = false }: MediaCa
           />
 
           {/* Rating + title + year — inside image at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 p-1.5 md:p-2 z-20">
-            <div className="inline-flex items-center bg-black/80 backdrop-blur-sm rounded-full px-1.5 md:px-2 py-0.5 text-[10px] md:text-xs font-semibold text-white mb-1">
-              {item.vote_average > 0 ? item.vote_average.toFixed(1) : 'N/A'}
+          <div className="absolute bottom-0 left-0 right-0 p-1.5 md:p-2.5 z-20">
+            <div className="inline-flex items-center bg-black/70 backdrop-blur-sm rounded-md px-1.5 py-0.5 text-[10px] font-semibold text-white mb-1">
+              ★ {item.vote_average > 0 ? item.vote_average.toFixed(1) : 'N/A'}
             </div>
             <p
-              className="text-xs md:text-sm font-semibold text-white truncate leading-tight"
+              className="text-white text-xs font-semibold leading-tight line-clamp-2"
               style={{ textShadow: '0 1px 4px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6)' }}
             >{title}</p>
             <p
-              className="text-[10px] md:text-xs text-white/60"
+              className="text-white/60 text-[10px] mt-0.5"
               style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
             >{year}</p>
           </div>

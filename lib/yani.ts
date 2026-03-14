@@ -31,11 +31,21 @@ export const searchYani = cache(async (query: string, limit = 5): Promise<YaniAn
   return data.response ?? []
 })
 
-// Catalog with pagination (offset-based)
-export const fetchYaniCatalog = cache(async (page = 1, limit = 20) => {
+// Catalog with pagination and optional filters (offset-based)
+export const fetchYaniCatalog = cache(async (
+  page = 1,
+  limit = 20,
+  year = '',
+  type = '',
+  sort = '',
+) => {
   const offset = (page - 1) * limit
+  const params = new URLSearchParams({ limit: String(limit + 1), offset: String(offset) })
+  if (year) params.set('year', year)
+  if (type) params.set('type', type)
+  if (sort) params.set('sort', sort)
   const res = await fetch(
-    `${BASE}/anime?limit=${limit + 1}&offset=${offset}`,
+    `${BASE}/anime?${params.toString()}`,
     { headers: getHeaders(), next: { revalidate: 1800 } }
   )
   if (!res.ok) return { items: [] as YaniAnime[], hasMore: false }
