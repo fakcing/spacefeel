@@ -1,11 +1,39 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { SlidersHorizontal, X } from 'lucide-react'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { Search, X } from 'lucide-react'
+import { useRef } from 'react'
+
+const SEASONS = [
+  { label: 'Сезон', value: '' },
+  { label: 'Зима', value: 'winter' },
+  { label: 'Весна', value: 'spring' },
+  { label: 'Лето', value: 'summer' },
+  { label: 'Осень', value: 'fall' },
+]
+
+const GENRES = [
+  { label: 'Жанр', value: '' },
+  { label: 'Экшен', value: 'action' },
+  { label: 'Романтика', value: 'romance' },
+  { label: 'Комедия', value: 'comedy' },
+  { label: 'Драма', value: 'drama' },
+  { label: 'Фэнтези', value: 'fantasy' },
+  { label: 'Ужасы', value: 'horror' },
+  { label: 'Мистика', value: 'mystery' },
+  { label: 'Психологическое', value: 'psychological' },
+  { label: 'Спорт', value: 'sport' },
+  { label: 'Сверхъестественное', value: 'supernatural' },
+  { label: 'Школа', value: 'school' },
+  { label: 'Приключения', value: 'adventure' },
+  { label: 'Меха', value: 'mecha' },
+  { label: 'Сёнен', value: 'shounen' },
+  { label: 'Сёдзё', value: 'shoujo' },
+  { label: 'Повседневность', value: 'slice_of_life' },
+]
 
 const TYPES = [
-  { label: 'Все', value: '' },
+  { label: 'Тип', value: '' },
   { label: 'TV', value: 'tv' },
   { label: 'Фильм', value: 'movie' },
   { label: 'OVA', value: 'ova' },
@@ -13,29 +41,29 @@ const TYPES = [
   { label: 'Спэшл', value: 'special' },
 ]
 
-const SORTS = [
-  { label: 'По умолчанию', value: '' },
-  { label: 'По рейтингу', value: 'by_rating' },
-  { label: 'По году', value: 'by_year' },
-  { label: 'По просмотрам', value: 'by_views' },
+const CURRENT_YEAR = new Date().getFullYear()
+const YEARS = [
+  { label: 'Год', value: '' },
+  ...Array.from({ length: CURRENT_YEAR - 1989 }, (_, i) => {
+    const y = String(CURRENT_YEAR - i)
+    return { label: y, value: y }
+  }),
 ]
 
-const CURRENT_YEAR = new Date().getFullYear()
-
 interface Props {
+  q: string
   year: string
   type: string
   sort: string
+  season: string
+  genre: string
 }
 
-export default function AnimeFilters({ year, type, sort }: Props) {
-  const [open, setOpen] = useState(false)
+export default function AnimeFilters({ q, year, type, sort, season, genre }: Props) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const panelRef = useRef<HTMLDivElement>(null)
-
-  const activeCount = [year, type, sort].filter(Boolean).length
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const update = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -45,109 +73,80 @@ export default function AnimeFilters({ year, type, sort }: Props) {
     router.push(`${pathname}?${params.toString()}`)
   }
 
-  const clearAll = () => {
-    router.push(pathname)
-    setOpen(false)
+  const handleSearch = (value: string) => {
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => update('q', value), 400)
   }
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (panelRef.current && !panelRef.current.contains(e.target as Node)) setOpen(false)
-    }
-    if (open) document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [open])
+  const hasFilters = !!(q || year || type || season || genre)
+
+  const clearAll = () => router.push(pathname)
+
+  const selectClass = (active: boolean) =>
+    `appearance-none cursor-pointer text-sm px-3 py-2 pr-7 rounded-xl border outline-none transition-colors bg-transparent ${
+      active
+        ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white font-medium'
+        : 'border-black/15 dark:border-white/15 text-gray-900/60 dark:text-white/60 hover:border-black/30 dark:hover:border-white/30'
+    }`
 
   return (
-    <div className="relative" ref={panelRef}>
-      <button
-        onClick={() => setOpen(p => !p)}
-        className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-all border ${
-          open || activeCount > 0
-            ? 'bg-gray-900 dark:bg-white text-white dark:text-black border-gray-900 dark:border-white'
-            : 'bg-black/5 dark:bg-white/5 text-gray-900/70 dark:text-white/70 border-black/10 dark:border-white/10 hover:bg-black/10 dark:hover:bg-white/10 hover:border-black/20 dark:hover:border-white/20'
-        }`}
-      >
-        <SlidersHorizontal size={14} />
-        <span>Фильтры</span>
-        {activeCount > 0 && (
-          <span className={`flex items-center justify-center w-4 h-4 rounded-full text-[10px] font-bold ${open ? 'bg-black text-white' : 'bg-black/80 text-white'}`}>
-            {activeCount}
-          </span>
+    <div className="space-y-3">
+      {/* Search bar */}
+      <div className="relative flex items-center border border-black/15 dark:border-white/15 rounded-xl px-4 py-2.5 gap-3 bg-black/[0.02] dark:bg-white/[0.02] focus-within:border-black/30 dark:focus-within:border-white/30 transition-colors">
+        <Search size={16} className="flex-shrink-0 text-gray-900/40 dark:text-white/40" />
+        <input
+          type="text"
+          defaultValue={q}
+          onChange={(e) => handleSearch(e.target.value)}
+          placeholder="Поиск аниме..."
+          className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-900/30 dark:placeholder:text-white/30 text-gray-900 dark:text-white"
+        />
+        {q && (
+          <button onClick={() => update('q', '')} className="flex-shrink-0 text-gray-900/40 dark:text-white/40 hover:text-gray-900 dark:hover:text-white transition-colors">
+            <X size={14} />
+          </button>
         )}
-      </button>
+      </div>
 
-      {open && (
-        <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-[#111] border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl z-50 p-4">
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-gray-900 dark:text-white text-sm font-semibold">Фильтры</span>
-            {activeCount > 0 && (
-              <button
-                onClick={clearAll}
-                className="flex items-center gap-1 text-gray-900/40 dark:text-white/40 text-xs hover:text-gray-900/70 dark:hover:text-white/70 transition-colors"
-              >
-                <X size={11} />
-                Сбросить
-              </button>
-            )}
-          </div>
-
-          {/* Type */}
-          <div className="mb-4">
-            <p className="text-gray-900/40 dark:text-white/40 text-[10px] font-medium uppercase tracking-wider mb-2">Тип</p>
-            <div className="flex flex-wrap gap-1.5">
-              {TYPES.map(t => (
-                <button
-                  key={t.value}
-                  onClick={() => update('type', t.value)}
-                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-colors ${
-                    type === t.value
-                      ? 'bg-gray-900 dark:bg-white text-white dark:text-black'
-                      : 'bg-black/5 dark:bg-white/5 text-gray-900/60 dark:text-white/60 hover:bg-black/10 dark:hover:bg-white/10 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Sort */}
-          <div className="mb-4">
-            <p className="text-gray-900/40 dark:text-white/40 text-[10px] font-medium uppercase tracking-wider mb-2">Сортировка</p>
-            <div className="flex flex-col gap-0.5">
-              {SORTS.map(s => (
-                <button
-                  key={s.value}
-                  onClick={() => update('sort', s.value)}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs font-medium text-left transition-colors ${
-                    sort === s.value
-                      ? 'bg-black/15 dark:bg-white/15 text-gray-900 dark:text-white'
-                      : 'text-gray-900/60 dark:text-white/60 hover:bg-black/5 dark:hover:bg-white/5 hover:text-gray-900 dark:hover:text-white'
-                  }`}
-                >
-                  {s.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Year */}
-          <div>
-            <p className="text-gray-900/40 dark:text-white/40 text-[10px] font-medium uppercase tracking-wider mb-2">Год</p>
-            <select
-              value={year}
-              onChange={e => update('year', e.target.value)}
-              className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-gray-900 dark:text-white text-xs px-3 py-2 rounded-lg cursor-pointer focus:outline-none hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
-            >
-              <option value="" className="bg-white dark:bg-[#111]">Любой год</option>
-              {Array.from({ length: CURRENT_YEAR - 1989 }, (_, i) => CURRENT_YEAR - i).map(y => (
-                <option key={y} value={String(y)} className="bg-white dark:bg-[#111]">{y}</option>
-              ))}
-            </select>
-          </div>
+      {/* Filter dropdowns */}
+      <div className="flex flex-wrap items-center gap-2">
+        <div className="relative">
+          <select value={season} onChange={e => update('season', e.target.value)} className={selectClass(!!season)}>
+            {SEASONS.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+          </select>
+          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-900/40 dark:text-white/40 text-xs">▾</span>
         </div>
-      )}
+
+        <div className="relative">
+          <select value={genre} onChange={e => update('genre', e.target.value)} className={selectClass(!!genre)}>
+            {GENRES.map(g => <option key={g.value} value={g.value}>{g.label}</option>)}
+          </select>
+          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-900/40 dark:text-white/40 text-xs">▾</span>
+        </div>
+
+        <div className="relative">
+          <select value={year} onChange={e => update('year', e.target.value)} className={selectClass(!!year)}>
+            {YEARS.map(y => <option key={y.value} value={y.value}>{y.label}</option>)}
+          </select>
+          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-900/40 dark:text-white/40 text-xs">▾</span>
+        </div>
+
+        <div className="relative">
+          <select value={type} onChange={e => update('type', e.target.value)} className={selectClass(!!type)}>
+            {TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+          </select>
+          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-900/40 dark:text-white/40 text-xs">▾</span>
+        </div>
+
+        {hasFilters && (
+          <button
+            onClick={clearAll}
+            className="text-sm px-3 py-2 rounded-xl border border-black/15 dark:border-white/15 text-gray-900/60 dark:text-white/60 hover:border-black/30 dark:hover:border-white/30 hover:text-gray-900 dark:hover:text-white transition-colors"
+          >
+            Сброс
+          </button>
+        )}
+      </div>
     </div>
   )
 }

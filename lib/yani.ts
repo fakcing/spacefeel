@@ -38,12 +38,18 @@ export const fetchYaniCatalog = cache(async (
   year = '',
   type = '',
   sort = '',
+  q = '',
+  season = '',
+  genre = '',
 ) => {
   const offset = (page - 1) * limit
   const params = new URLSearchParams({ limit: String(limit + 1), offset: String(offset) })
   if (year) params.set('year', year)
   if (type) params.set('type', type)
   if (sort) params.set('sort', sort)
+  if (q) params.set('q', q)
+  if (season) params.set('season', season)
+  if (genre) params.set('genre', genre)
   const res = await fetch(
     `${BASE}/anime?${params.toString()}`,
     { headers: getHeaders(), next: { revalidate: 1800 } }
