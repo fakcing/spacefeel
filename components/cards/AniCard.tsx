@@ -2,10 +2,14 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
 import { YaniAnime } from '@/types/yani'
+import { WatchlistItem } from '@/types/tmdb'
 import { getPosterUrl } from '@/lib/yani'
 import { BLUR_DATA_URL } from '@/lib/blurhash'
+
+const BookmarkButton = dynamic(() => import('@/components/ui/BookmarkButton'), { ssr: false })
 
 interface Props {
   item: YaniAnime
@@ -15,6 +19,15 @@ export default function AniCard({ item }: Props) {
   const router = useRouter()
   const poster = getPosterUrl(item.poster.medium || item.poster.big)
   const href = `/anime/${item.anime_url}`
+
+  const watchlistItem: WatchlistItem = {
+    id: item.anime_id,
+    poster_path: item.poster.medium || item.poster.big || null,
+    media_type: 'anime',
+    vote_average: item.rating.average,
+    release_date: item.year.toString(),
+    slug: item.anime_url,
+  }
 
   return (
     <Link
@@ -33,6 +46,9 @@ export default function AniCard({ item }: Props) {
           sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
           loading="lazy"
         />
+
+        {/* Bookmark button — top right */}
+        <BookmarkButton item={watchlistItem} />
 
         {/* Gradient overlay */}
         <div
