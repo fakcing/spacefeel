@@ -62,7 +62,7 @@ export default function AniCard({ item }: Props) {
               className="text-white/35 text-[10px] mt-0.5 truncate"
               style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
             >
-              {item.translates.slice(0, 2).map(t => t.title).filter(Boolean).join(', ')}
+              Озвучка: {item.translates.slice(0, 2).map(t => t.title).filter(Boolean).join(', ')}
               {item.translates.length > 2 ? ` +${item.translates.length - 2}` : ''}
             </p>
           )}
