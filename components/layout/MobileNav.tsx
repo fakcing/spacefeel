@@ -1,9 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { House, Film, Tv2, Sword, Bookmark } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { useAuthModalStore } from '@/store/authModalStore'
 
 const navItems = [
   { href: '/', icon: House, label: 'Главная' },
@@ -15,6 +17,9 @@ const navItems = [
 
 export default function MobileNav() {
   const pathname = usePathname()
+  const router = useRouter()
+  const { data: session } = useSession()
+  const { open: openAuthModal } = useAuthModalStore()
 
   return (
     <nav
@@ -26,10 +31,17 @@ export default function MobileNav() {
           const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
           const Icon = item.icon
 
+          const isWatchlist = item.href === '/watchlist'
+
+          const handleClick = isWatchlist
+            ? (e: React.MouseEvent) => { e.preventDefault(); if (!session) { openAuthModal(); return } router.push('/watchlist') }
+            : undefined
+
           return (
             <Link
               key={item.href}
               href={item.href}
+              onClick={handleClick}
               className="flex flex-col items-center justify-center gap-1 relative"
             >
               {isActive && (

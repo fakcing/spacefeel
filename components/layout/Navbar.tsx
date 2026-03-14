@@ -11,6 +11,9 @@ import {
   TrendingUp, Heart, Calendar, Play, Star, Compass, Radio,
   Sparkles, Clock, Users, X,
 } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import { useAuthModalStore } from '@/store/authModalStore'
 import ProfileDropdown from '@/components/ui/ProfileDropdown'
 
 type SearchResult = {
@@ -83,9 +86,17 @@ void [Sparkles, Clock, Users]
 
 export default function Navbar() {
   const pathname = usePathname()
+  const router = useRouter()
+  const { data: session } = useSession()
+  const { open: openAuthModal } = useAuthModalStore()
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const navTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const t = useTranslations('nav')
+
+  const handleWatchlistClick = () => {
+    if (!session) { openAuthModal(); return }
+    router.push('/watchlist')
+  }
   const td = useTranslations('dropdown')
   const ts = useTranslations('search')
 
@@ -294,16 +305,16 @@ export default function Navbar() {
             </AnimatePresence>
           </div>
 
-          <Link
-            href="/watchlist"
-            className="w-9 h-9 flex items-center justify-center rounded-xl transition-colors"
+          <button
+            onClick={handleWatchlistClick}
+            className="w-9 h-9 flex items-center justify-center rounded-xl transition-colors cursor-pointer"
             style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
             aria-label={t('watchlist')}
             onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
             onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--color-overlay)')}
           >
             <Bookmark size={16} style={{ color: 'var(--color-text-muted)' }} />
-          </Link>
+          </button>
 
           <ProfileDropdown />
         </div>
