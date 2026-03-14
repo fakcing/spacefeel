@@ -58,7 +58,12 @@ export default function UniversalPlayer({
     const server = servers[activeServer]
     if (!server) return null
     let url = server.iframe
-    if ((type === 'tv' || type === 'cartoon') && selectedSeason && selectedEpisode) {
+    // Some services (e.g. 2embed) use {season}/{episode} placeholders in the URL
+    if (url.includes('{season}') || url.includes('{episode}')) {
+      url = url
+        .replace('{season}', String(selectedSeason))
+        .replace('{episode}', String(selectedEpisode))
+    } else if ((type === 'tv' || type === 'cartoon') && selectedSeason && selectedEpisode) {
       const sep = url.includes('?') ? '&' : '?'
       const sKey = server.seasonKey ?? 'season'
       const eKey = server.episodeKey ?? 'episode'

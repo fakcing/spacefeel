@@ -1,12 +1,6 @@
 import { PlayerServer, PlayerResponse } from '@/types/player'
 import { getImdbId } from '@/lib/tmdb'
 
-/**
- * Player Aggregator
- *
- * Uses public embed services that work without API keys or domain whitelisting.
- * Note: Russian CDN services (Kodik, Alloha) require API token registration.
- */
 export async function getPlayers(
   tmdbId: number,
   type: 'movie' | 'tv' | 'cartoon'
@@ -20,26 +14,15 @@ export async function getPlayers(
 
   const isTV = type === 'tv' || type === 'cartoon'
 
-  const servers: PlayerServer[] = [
-    {
-      name: 'VidSrc',
-      source: 'VidSrc',
-      iframe: isTV
-        ? `https://vidsrc.to/embed/tv/${imdbId}`
-        : `https://vidsrc.to/embed/movie/${imdbId}`,
-      seasonKey: 'season',
-      episodeKey: 'episode',
-    },
-    {
-      name: '2Embed',
-      source: '2Embed',
-      iframe: isTV
-        ? `https://www.2embed.cc/embedtv/${imdbId}`
-        : `https://www.2embed.cc/embed/${imdbId}`,
-      seasonKey: 's',
-      episodeKey: 'e',
-    },
-  ]
+  // 2embed uses &s=&e= directly appended (not ?s=&e=)
+  // Use {season}/{episode} placeholders — replaced in UniversalPlayer
+  const server: PlayerServer = {
+    name: '2Embed',
+    source: '2Embed',
+    iframe: isTV
+      ? `https://www.2embed.cc/embedtv/${imdbId}&s={season}&e={episode}`
+      : `https://www.2embed.cc/embed/${imdbId}`,
+  }
 
-  return { servers, cached: false }
+  return { servers: [server], cached: false }
 }
