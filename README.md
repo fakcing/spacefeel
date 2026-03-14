@@ -1,4 +1,4 @@
-# SpaceFeel
+# spacefeel
 
 A modern streaming platform for anime, movies, TV shows and cartoons — built with Next.js 14.
 

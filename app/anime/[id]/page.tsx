@@ -13,9 +13,9 @@ interface Props {
 export async function generateMetadata({ params }: Props) {
   try {
     const title = await fetchYaniTitle(params.id)
-    return { title: `${title.title} — SpaceFeel` }
+    return { title: `${title.title} — spacefeel` }
   } catch {
-    return { title: 'SpaceFeel' }
+    return { title: 'spacefeel' }
   }
 }
 
