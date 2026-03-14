@@ -104,7 +104,7 @@ export default function UniversalPlayer({
     })
   }, [activeServer])
 
-  // 20s timeout — auto-advance server
+  // 10s timeout — auto-advance server
   useEffect(() => {
     if (!isLoading) return
     const timeout = setTimeout(() => {
@@ -118,7 +118,7 @@ export default function UniversalPlayer({
         }
         return prev
       })
-    }, 20000)
+    }, 10000)
     return () => clearTimeout(timeout)
   }, [isLoading, iframeKey, activeServer])
 

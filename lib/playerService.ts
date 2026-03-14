@@ -14,15 +14,30 @@ export async function getPlayers(
 
   const isTV = type === 'tv' || type === 'cartoon'
 
-  // 2embed uses &s=&e= directly appended (not ?s=&e=)
-  // Use {season}/{episode} placeholders — replaced in UniversalPlayer
-  const server: PlayerServer = {
-    name: '2Embed',
-    source: '2Embed',
-    iframe: isTV
-      ? `https://www.2embed.cc/embedtv/${imdbId}&s={season}&e={episode}`
-      : `https://www.2embed.cc/embed/${imdbId}`,
-  }
+  // {season} and {episode} placeholders are replaced client-side in UniversalPlayer
+  const servers: PlayerServer[] = [
+    {
+      name: 'EmbedSu',
+      source: 'EmbedSu',
+      iframe: isTV
+        ? `https://embed.su/embed/tv/${imdbId}/{season}/{episode}`
+        : `https://embed.su/embed/movie/${imdbId}`,
+    },
+    {
+      name: 'AutoEmbed',
+      source: 'AutoEmbed',
+      iframe: isTV
+        ? `https://autoembed.cc/tv/imdb/${imdbId}-{season}-{episode}`
+        : `https://autoembed.cc/movie/imdb/${imdbId}`,
+    },
+    {
+      name: '2Embed',
+      source: '2Embed',
+      iframe: isTV
+        ? `https://www.2embed.cc/embedtv/${imdbId}&s={season}&e={episode}`
+        : `https://www.2embed.cc/embed/${imdbId}`,
+    },
+  ]
 
-  return { servers: [server], cached: false }
+  return { servers, cached: false }
 }
