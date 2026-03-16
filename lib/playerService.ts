@@ -17,20 +17,6 @@ export async function getPlayers(
   // {season} and {episode} placeholders are replaced client-side in UniversalPlayer
   const servers: PlayerServer[] = [
     {
-      name: 'EmbedSu',
-      source: 'EmbedSu',
-      iframe: isTV
-        ? `https://embed.su/embed/tv/${imdbId}/{season}/{episode}`
-        : `https://embed.su/embed/movie/${imdbId}`,
-    },
-    {
-      name: 'AutoEmbed',
-      source: 'AutoEmbed',
-      iframe: isTV
-        ? `https://autoembed.cc/tv/imdb/${imdbId}-{season}-{episode}`
-        : `https://autoembed.cc/movie/imdb/${imdbId}`,
-    },
-    {
       name: '2Embed',
       source: '2Embed',
       iframe: isTV
