@@ -329,7 +329,10 @@ export default function AniPlayerModal() {
                       color: 'var(--color-text-muted)',
                     }}
                   >
-                    <span className="whitespace-nowrap">Озвучка</span>
+                    <span className="whitespace-nowrap" style={{ color: 'var(--color-text-subtle)' }}>Озвучка</span>
+                    {currentDubbing && (
+                      <span className="whitespace-nowrap truncate max-w-[120px]" style={{ color: 'var(--color-text)' }}>{currentDubbing}</span>
+                    )}
                     <ChevronDown
                       size={10}
                       className={`transition-transform flex-shrink-0 ${dubPickerOpen ? 'rotate-180' : ''}`}
