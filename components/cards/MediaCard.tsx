@@ -46,15 +46,15 @@ export default function MediaCard({ item, mediaType, priority = false }: MediaCa
   return (
     <Link href={href}>
       <div
-        className="group cursor-pointer overflow-visible"
+        className="group cursor-pointer"
         onMouseEnter={() => router.prefetch(href)}
       >
-        <div className="relative w-full aspect-[2/3] rounded-lg md:rounded-xl overflow-hidden transition-transform duration-300 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-[1.03] group-hover:shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
+        <div className="relative w-full aspect-[2/3] rounded-lg md:rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--color-overlay)' }}>
           {poster && !imgError ? (
             <Image
               src={poster}
               fill
-              className="object-cover transition-opacity duration-500"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
               alt={title || 'Media'}
               sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
               onError={() => setImgError(true)}
@@ -64,7 +64,6 @@ export default function MediaCard({ item, mediaType, priority = false }: MediaCa
               fetchPriority={priority ? 'high' : 'auto'}
               placeholder="blur"
               blurDataURL={BLUR_DATA_URL}
-              onLoad={(e) => { (e.target as HTMLImageElement).style.opacity = '1' }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-overlay)' }}>
