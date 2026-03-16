@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, AlertTriangle, ChevronDown, ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
+import { X, AlertTriangle, ChevronDown, RefreshCw } from 'lucide-react'
 import { useMediaPlayerStore } from '@/store/mediaPlayerStore'
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
 
@@ -35,7 +35,9 @@ export default function MediaPlayerModal() {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
   const [loadTimeout, setLoadTimeout] = useState(false)
+  const [seasonPickerOpen, setSeasonPickerOpen] = useState(false)
   const [epPickerOpen, setEpPickerOpen] = useState(false)
+  const seasonPickerRef = useRef<HTMLDivElement>(null)
   const epPickerRef = useRef<HTMLDivElement>(null)
 
   const isTV = mediaType === 'tv'
@@ -142,6 +144,17 @@ export default function MediaPlayerModal() {
     setIframeKey(p => p + 1)
   }
 
+  // Season picker close on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (seasonPickerRef.current && !seasonPickerRef.current.contains(e.target as Node)) {
+        setSeasonPickerOpen(false)
+      }
+    }
+    if (seasonPickerOpen) document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [seasonPickerOpen])
+
   // Episode picker close on outside click
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {
@@ -205,27 +218,52 @@ export default function MediaPlayerModal() {
 
               {/* Season picker (TV only) */}
               {isTV && (
-                <div className="flex items-center gap-0.5">
+                <div className="relative" ref={seasonPickerRef}>
                   <button
-                    onClick={() => setSeason(Math.max(1, selectedSeason - 1))}
-                    className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
-                    style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
+                    onClick={e => { e.stopPropagation(); setSeasonPickerOpen(p => !p) }}
+                    className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors"
+                    style={{
+                      backgroundColor: 'var(--color-overlay)',
+                      border: '1px solid var(--color-border)',
+                      color: 'var(--color-text)',
+                    }}
                   >
-                    <ChevronLeft size={13} />
+                    <span style={{ color: 'var(--color-text-muted)' }}>Сезон</span>
+                    <span style={{ color: 'var(--color-text)' }}>{selectedSeason}</span>
+                    <ChevronDown size={10} style={{ color: 'var(--color-text-subtle)' }} />
                   </button>
-                  <span
-                    className="text-xs px-1.5 min-w-[52px] text-center whitespace-nowrap"
-                    style={{ color: 'var(--color-text)' }}
-                  >
-                    Сезон {selectedSeason}
-                  </span>
-                  <button
-                    onClick={() => setSeason(selectedSeason + 1)}
-                    className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
-                    style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
-                  >
-                    <ChevronRight size={13} />
-                  </button>
+                  {seasonPickerOpen && (
+                    <div
+                      className="absolute top-full left-0 mt-1.5 rounded-xl p-2 z-[200] shadow-2xl min-w-[160px]"
+                      style={{
+                        backgroundColor: 'var(--color-surface)',
+                        border: '1px solid var(--color-border)',
+                      }}
+                    >
+                      <p
+                        className="text-[10px] font-medium uppercase tracking-wide px-1 pb-1.5"
+                        style={{ color: 'var(--color-text-subtle)' }}
+                      >
+                        Сезоны
+                      </p>
+                      <div className="grid grid-cols-4 gap-1 max-h-52 overflow-y-auto">
+                        {Array.from({ length: 20 }, (_, i) => i + 1).map(s => (
+                          <button
+                            key={s}
+                            onClick={() => { setSeason(s); setSeasonPickerOpen(false) }}
+                            className="h-8 rounded-lg text-xs font-medium transition-all"
+                            style={
+                              selectedSeason === s
+                                ? { backgroundColor: 'var(--color-text)', color: 'var(--color-bg)' }
+                                : { color: 'var(--color-text-muted)' }
+                            }
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
