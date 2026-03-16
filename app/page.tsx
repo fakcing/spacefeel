@@ -20,14 +20,14 @@ function HeroBannerSkeleton() {
 
 // Cache home data at component level
 const getCachedHomeData = cache(async () => {
-  const [trendingMovies, popularTV, topRatedMovies, airingToday, familyCartoons] = await Promise.all([
+  const [trendingMovies, popularTV, topRatedMovies, airingToday, popularCartoons] = await Promise.all([
     fetchTrending('movie'),
     fetchPopular('tv'),
     fetchTopRated('movie'),
     fetchAiringToday(),
-    fetchCartoons('family'),
+    fetchCartoons('popular'),
   ])
-  return { trendingMovies, popularTV, topRatedMovies, airingToday, familyCartoons }
+  return { trendingMovies, popularTV, topRatedMovies, airingToday, popularCartoons }
 })
 
 async function HomePageContent() {
@@ -42,7 +42,7 @@ async function HomePageContent() {
         <CarouselSection title={t('popularTVShows')} items={data.popularTV.results.slice(0, 20) as TVShow[]} mediaType="tv" viewAllHref="/tv?category=popular" />
         <CarouselSection title={t('topRatedMovies')} items={data.topRatedMovies.results.slice(0, 20) as Movie[]} mediaType="movie" viewAllHref="/movies?category=top_rated" />
         <CarouselSection title={t('airingToday')} items={data.airingToday.results.slice(0, 20) as TVShow[]} mediaType="tv" viewAllHref="/tv?category=airing_today" />
-        <CarouselSection title={t('familyCartoons')} items={data.familyCartoons.results.slice(0, 20) as TVShow[]} mediaType="tv" viewAllHref="/cartoons?category=family" />
+        <CarouselSection title={t('popularCartoons')} items={data.popularCartoons.results.slice(0, 20) as TVShow[]} mediaType="tv" viewAllHref="/cartoons?category=popular" />
       </div>
     </div>
   )

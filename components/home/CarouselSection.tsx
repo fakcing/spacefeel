@@ -25,7 +25,8 @@ export default function CarouselSection({
 }: CarouselSectionProps) {
   const trackRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
-  const totalCards = items.length
+  const filteredItems = items.filter(item => item.poster_path)
+  const totalCards = filteredItems.length
   const visibleCount = 6
   const maxIndex = Math.max(0, totalCards - visibleCount)
   const t = useTranslations('home')
@@ -96,7 +97,7 @@ export default function CarouselSection({
 
       {/* Mobile: 2-column grid showing first 8 */}
       <div className="md:hidden grid grid-cols-2 gap-3">
-        {items.slice(0, 8).map((item, index) => (
+        {filteredItems.slice(0, 8).map((item, index) => (
           <motion.div
             key={item.id}
             initial={{ opacity: 0 }}
@@ -115,7 +116,7 @@ export default function CarouselSection({
           className="flex gap-3 transition-transform duration-300 ease-out"
           style={{ transform: `translateX(calc(-${currentIndex} * (100% / 6 + 2px)))` }}
         >
-          {items.map((item, index) => (
+          {filteredItems.map((item, index) => (
             <motion.div
               key={item.id}
               className="w-[calc((100%-60px)/6)] min-w-[calc((100%-60px)/6)] flex-shrink-0 flex-grow-0"
