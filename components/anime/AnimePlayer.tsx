@@ -169,7 +169,7 @@ export default function AnimePlayer({
   // Toggle play/pause
   const togglePlay = () => {
     if (!videoRef.current) return
-    
+
     if (isPlaying) {
       videoRef.current.pause()
     } else {
@@ -234,30 +234,36 @@ export default function AnimePlayer({
   // Loading skeleton
   if (isLoadingSources) {
     return (
-      <div className="w-full aspect-video bg-[#1a1a1b] rounded-2xl overflow-hidden animate-pulse">
-        <div className="h-full w-full bg-gradient-to-br from-white/[0.05] to-white/[0.02]" />
+      <div
+        className="w-full aspect-video rounded-2xl overflow-hidden animate-pulse"
+        style={{ backgroundColor: 'var(--color-card)' }}
+      >
+        <div className="h-full w-full" style={{ background: 'linear-gradient(135deg, var(--color-overlay) 0%, transparent 100%)' }} />
       </div>
     )
   }
 
   return (
-    <div ref={containerRef} className="w-full bg-[#1a1a1b] rounded-2xl overflow-hidden">
+    <div ref={containerRef} className="w-full rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--color-card)' }}>
       {/* Server Selector */}
-      <div className="flex items-center gap-2 p-4 border-b border-white/10">
+      <div className="flex items-center gap-2 p-4 border-b" style={{ borderColor: 'var(--color-border)' }}>
         {(['yummy', 'libria', 'vost'] as ServerType[]).map((server) => {
           const source = sources[server]
           const isActive = activeServer === server
-          
+
           return (
             <button
               key={server}
               onClick={() => handleServerChange(server)}
               disabled={!source?.available}
               className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all ${
+                !source?.available ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+              style={
                 isActive
-                  ? 'bg-gradient-to-r from-indigo-500 to-purple-500 text-white shadow-lg shadow-indigo-500/30'
-                  : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
-              } ${!source?.available ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  ? { background: 'linear-gradient(to right, #6366f1, #a855f7)', color: '#ffffff' }
+                  : { backgroundColor: 'var(--color-overlay)', color: 'var(--color-text-muted)' }
+              }
             >
               {source?.name || server}
             </button>
@@ -311,7 +317,7 @@ export default function AnimePlayer({
                 <button onClick={togglePlay} className="text-white hover:text-indigo-400">
                   {isPlaying ? <Pause size={20} /> : <Play size={20} />}
                 </button>
-                
+
                 <div className="flex items-center gap-2">
                   <Volume2 size={20} className="text-white" />
                   <input
@@ -344,19 +350,24 @@ export default function AnimePlayer({
       </div>
 
       {/* Episode & Translation Selector */}
-      <div className="p-4 border-t border-white/10">
+      <div className="p-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
         <div className="flex flex-wrap gap-4">
           {/* Translation Selector */}
           {translations.length > 1 && (
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-white/60 text-sm mb-2">Озвучка</label>
+              <label className="block text-sm mb-2" style={{ color: 'var(--color-text-muted)' }}>Озвучка</label>
               <select
                 value={currentTranslation}
                 onChange={(e) => setCurrentTranslation(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                style={{
+                  backgroundColor: 'var(--color-overlay)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-text)',
+                }}
               >
                 {translations.map((t) => (
-                  <option key={t} value={t} className="bg-[#1a1a1b]">
+                  <option key={t} value={t} style={{ backgroundColor: 'var(--color-surface)' }}>
                     {t}
                   </option>
                 ))}
@@ -367,14 +378,19 @@ export default function AnimePlayer({
           {/* Episode Selector */}
           {episodes.length > 0 && (
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-white/60 text-sm mb-2">Серия</label>
+              <label className="block text-sm mb-2" style={{ color: 'var(--color-text-muted)' }}>Серия</label>
               <select
                 value={currentEpisode}
                 onChange={(e) => setCurrentEpisode(e.target.value)}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="w-full rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                style={{
+                  backgroundColor: 'var(--color-overlay)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-text)',
+                }}
               >
                 {episodes.map((ep) => (
-                  <option key={ep.number} value={ep.number} className="bg-[#1a1a1b]">
+                  <option key={ep.number} value={ep.number} style={{ backgroundColor: 'var(--color-surface)' }}>
                     {ep.title || `Серия ${ep.number}`}
                   </option>
                 ))}

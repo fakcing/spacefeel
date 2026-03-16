@@ -147,10 +147,10 @@ export default function YaniPlayer({ tmdbId, shikimoriId, title }: Props) {
   // Loading state
   if (loading) {
     return (
-      <div className="relative w-full aspect-video bg-[#1a1a1b] rounded-lg overflow-hidden">
+      <div className="relative w-full aspect-video rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--color-card)' }}>
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-          <Loader2 className="w-10 h-10 text-white/40 animate-spin" />
-          <p className="text-white/40 text-sm">Loading player...</p>
+          <Loader2 className="w-10 h-10 animate-spin" style={{ color: 'var(--color-text-subtle)' }} />
+          <p className="text-sm" style={{ color: 'var(--color-text-subtle)' }}>Loading player...</p>
         </div>
       </div>
     )
@@ -159,16 +159,17 @@ export default function YaniPlayer({ tmdbId, shikimoriId, title }: Props) {
   // Error state
   if (error) {
     return (
-      <div className="relative w-full aspect-video bg-[#1a1a1b] rounded-lg overflow-hidden">
+      <div className="relative w-full aspect-video rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--color-card)' }}>
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
           <AlertCircle className="w-10 h-10 text-red-400" />
           <p className="text-red-400 text-sm">{error}</p>
           {title && (
             <button
               onClick={() => window.location.reload()}
-              className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white text-sm hover:bg-white/20 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm transition-colors"
+              style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
             >
-              <Play size={14} fill="white" />
+              <Play size={14} style={{ fill: 'currentColor' }} />
               Try Again
             </button>
           )}
@@ -180,17 +181,17 @@ export default function YaniPlayer({ tmdbId, shikimoriId, title }: Props) {
   // No content state
   if (videos.length === 0) {
     return (
-      <div className="relative w-full aspect-video bg-[#1a1a1b] rounded-lg overflow-hidden">
+      <div className="relative w-full aspect-video rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--color-card)' }}>
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-          <Play className="w-10 h-10 text-white/20" />
-          <p className="text-white/40 text-sm">No videos available</p>
+          <Play className="w-10 h-10" style={{ color: 'var(--color-text-subtle)' }} />
+          <p className="text-sm" style={{ color: 'var(--color-text-subtle)' }}>No videos available</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="relative w-full aspect-video bg-[#1a1a1b] rounded-lg overflow-hidden">
+    <div className="relative w-full aspect-video rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--color-card)' }}>
       {/* Controls Header */}
       <div className="absolute top-0 left-0 right-0 z-10 flex items-center gap-2 px-3 py-2 bg-gradient-to-b from-black/80 to-transparent">
         {/* Episode selector */}
@@ -201,7 +202,7 @@ export default function YaniPlayer({ tmdbId, shikimoriId, title }: Props) {
             className="appearance-none bg-white/10 text-white text-sm px-3 py-1.5 pr-8 rounded-lg border border-white/20 hover:bg-white/20 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30"
           >
             {dubVideos.map((ep) => (
-              <option key={ep.video_id} value={ep.number} className="bg-[#1a1a1b]">
+              <option key={ep.video_id} value={ep.number} style={{ backgroundColor: 'var(--color-surface)' }}>
                 Episode {ep.number}
               </option>
             ))}
@@ -218,7 +219,7 @@ export default function YaniPlayer({ tmdbId, shikimoriId, title }: Props) {
               className="appearance-none bg-white/10 text-white text-sm px-3 py-1.5 pr-8 rounded-lg border border-white/20 hover:bg-white/20 transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-white/30"
             >
               {dubbings.map((dub) => (
-                <option key={dub} value={dub} className="bg-[#1a1a1b]">
+                <option key={dub} value={dub} style={{ backgroundColor: 'var(--color-surface)' }}>
                   {dub}
                 </option>
               ))}

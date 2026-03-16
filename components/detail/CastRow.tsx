@@ -26,7 +26,7 @@ export default function CastRow({ cast }: CastRowProps) {
                     loading="lazy"
                   />
                 ) : (
-                  <div className="w-full h-full bg-white/10" />
+                  <div className="w-full h-full" style={{ backgroundColor: 'var(--color-overlay)' }} />
                 )}
                 {person.character && (
                   <div className="absolute inset-0 bg-black/70 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">

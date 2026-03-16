@@ -67,8 +67,8 @@ export default function MediaCard({ item, mediaType, priority = false }: MediaCa
               onLoad={(e) => { (e.target as HTMLImageElement).style.opacity = '1' }}
             />
           ) : (
-            <div className="w-full h-full bg-white/[0.08] flex items-center justify-center">
-              <Film size={24} className="text-white/20" />
+            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-overlay)' }}>
+              <Film size={24} style={{ color: 'var(--color-text-subtle)' }} />
             </div>
           )}
 

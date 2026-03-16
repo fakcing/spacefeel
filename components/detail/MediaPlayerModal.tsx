@@ -46,50 +46,63 @@ export default function MediaPlayerModal() {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[100] bg-black flex flex-col"
+          className="fixed inset-0 z-[100] flex flex-col"
+          style={{ backgroundColor: 'var(--color-bg)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
           {/* Header */}
-          <div className="flex items-center gap-3 px-4 py-3 flex-shrink-0 border-b border-white/10">
+          <div
+            className="flex items-center gap-3 px-4 py-3 flex-shrink-0 border-b"
+            style={{ borderColor: 'var(--color-border)' }}
+          >
             {(mediaType === 'tv' || mediaType === 'anime') && (
               <>
                 <button
                   onClick={handlePrevSeason}
-                  className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors flex-shrink-0"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
+                  style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-overlay)')}
                   title="Предыдущий сезон"
                 >
-                  <ChevronLeft size={16} className="text-white" />
+                  <ChevronLeft size={16} />
                 </button>
                 <button
                   onClick={handleNextSeason}
-                  className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors flex-shrink-0"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
+                  style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-overlay)')}
                   title="Следующий сезон"
                 >
-                  <ChevronRight size={16} className="text-white" />
+                  <ChevronRight size={16} />
                 </button>
               </>
             )}
 
             <div className="flex items-center gap-2 flex-1 min-w-0">
-              <span className="text-white font-semibold text-sm truncate">{title}</span>
-              <span className="text-white/40 text-sm">·</span>
+              <span className="font-semibold text-sm truncate" style={{ color: 'var(--color-text)' }}>{title}</span>
+              <span className="text-sm" style={{ color: 'var(--color-text-subtle)' }}>·</span>
               {mediaType === 'tv' || mediaType === 'anime' ? (
-                <span className="text-white/80 text-sm">
+                <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                   Сезон {season} · Серия {episode}
                 </span>
               ) : (
-                <span className="text-white/80 text-sm">Фильм</span>
+                <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Фильм</span>
               )}
             </div>
 
             <button
               onClick={closePlayer}
-              className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors flex-shrink-0"
+              className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
+              style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-overlay)')}
             >
-              <X size={14} className="text-white" />
+              <X size={14} />
             </button>
           </div>
 

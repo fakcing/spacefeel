@@ -95,7 +95,8 @@ export default function AuthModal() {
           onClick={handleClose}
         >
           <motion.div
-            className="relative bg-[#1a1a1a] border border-white/10 rounded-2xl p-8 w-full max-w-md"
+            className="relative rounded-2xl p-8 w-full max-w-md"
+            style={{ backgroundColor: 'var(--color-surface)', border: '1px solid var(--color-border)' }}
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}

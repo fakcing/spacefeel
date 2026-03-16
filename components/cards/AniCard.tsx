@@ -35,7 +35,7 @@ export default function AniCard({ item }: Props) {
       onMouseEnter={() => router.prefetch(href)}
       className="group relative block w-full"
     >
-      <div className="relative aspect-[2/3] rounded-lg md:rounded-xl overflow-hidden bg-white/5">
+      <div className="relative aspect-[2/3] rounded-lg md:rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--color-overlay)' }}>
         <Image
           src={poster}
           fill

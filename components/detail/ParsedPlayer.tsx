@@ -87,22 +87,22 @@ export default function ParsedPlayer({
 
   if (isLoading) {
     return (
-      <div className="w-full aspect-video bg-black flex flex-col items-center justify-center gap-3">
-        <RefreshCw className="w-10 h-10 text-white/40 animate-spin" />
-        <p className="text-white/60 text-sm">Loading video sources...</p>
+      <div className="w-full aspect-video flex flex-col items-center justify-center gap-3" style={{ backgroundColor: 'var(--color-card)' }}>
+        <RefreshCw className="w-10 h-10 animate-spin" style={{ color: 'var(--color-text-subtle)' }} />
+        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Loading video sources...</p>
       </div>
     )
   }
 
   if (error || servers.length === 0) {
     return (
-      <div className="w-full aspect-video bg-black flex flex-col items-center justify-center gap-4 p-6 text-center">
+      <div className="w-full aspect-video flex flex-col items-center justify-center gap-4 p-6 text-center" style={{ backgroundColor: 'var(--color-card)' }}>
         <AlertTriangle className="w-12 h-12 text-yellow-400" />
         <div>
-          <p className="text-white/80 font-medium mb-1">
+          <p className="font-medium mb-1" style={{ color: 'var(--color-text)' }}>
             {error || 'No video sources available'}
           </p>
-          <p className="text-white/40 text-sm">
+          <p className="text-sm" style={{ color: 'var(--color-text-subtle)' }}>
             This title may not have available sources yet.
           </p>
         </div>
@@ -115,12 +115,15 @@ export default function ParsedPlayer({
   return (
     <div className="w-full flex flex-col">
       {/* Server Selector */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-black/40">
+      <div
+        className="flex items-center justify-between px-4 py-3 border-b"
+        style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
+      >
         <div className="flex items-center gap-2">
-          <Server size={16} className="text-white/60" />
-          <span className="text-white/80 text-sm font-medium">Server</span>
+          <Server size={16} style={{ color: 'var(--color-text-muted)' }} />
+          <span className="text-sm font-medium" style={{ color: 'var(--color-text)' }}>Server</span>
           {cached && (
-            <span className="text-xs text-green-400 ml-2">(cached)</span>
+            <span className="text-xs text-green-500 ml-2">(cached)</span>
           )}
         </div>
         <div className="flex items-center gap-2 overflow-x-auto">
@@ -128,11 +131,12 @@ export default function ParsedPlayer({
             <button
               key={server.source}
               onClick={() => setSelectedServer(index)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap ${
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all whitespace-nowrap"
+              style={
                 selectedServer === index
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg shadow-blue-500/30'
-                  : 'bg-white/10 text-white/70 hover:bg-white/20'
-              }`}
+                  ? { background: 'linear-gradient(to right, #3b82f6, #a855f7)', color: '#ffffff' }
+                  : { backgroundColor: 'var(--color-overlay)', color: 'var(--color-text-muted)' }
+              }
             >
               {server.name}
             </button>

@@ -97,7 +97,7 @@ export default function UserRating({ tmdbId, mediaType }: UserRatingProps) {
               <Star
                 size={22}
                 className={`transition-colors ${
-                  n <= (hover || score) ? 'fill-yellow-400 text-yellow-400' : 'text-white/20'
+                  n <= (hover || score) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-900/20 dark:text-white/20'
                 }`}
               />
             </button>
@@ -111,13 +111,13 @@ export default function UserRating({ tmdbId, mediaType }: UserRatingProps) {
               onChange={(e) => setReview(e.target.value)}
               placeholder={t('writeReview')}
               rows={3}
-              className="w-full bg-white/5 border border-white/10 rounded-xl p-3 text-sm placeholder:text-white/30 outline-none focus:border-white/25 transition-colors resize-none mb-2"
+              className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl p-3 text-sm placeholder:text-black/30 dark:placeholder:text-white/30 outline-none focus:border-black/25 dark:focus:border-white/25 transition-colors resize-none mb-2"
               style={{ color: 'var(--color-text)' }}
             />
             <button
               onClick={handleSubmit}
               disabled={submitting}
-              className="flex items-center gap-2 bg-white text-black font-semibold rounded-full px-5 py-2 text-sm hover:bg-white/90 transition-colors disabled:opacity-60"
+              className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-full px-5 py-2 text-sm hover:bg-gray-800 dark:hover:bg-white/90 transition-colors disabled:opacity-60"
             >
               {submitting && <Loader2 size={14} className="animate-spin" />}
               {t('submitRating')}
@@ -140,7 +140,7 @@ export default function UserRating({ tmdbId, mediaType }: UserRatingProps) {
                   {r.user.image ? (
                     <Image src={r.user.image} width={28} height={28} className="rounded-full flex-shrink-0" alt="" />
                   ) : (
-                    <div className="w-7 h-7 rounded-full bg-white/10 flex-shrink-0" />
+                    <div className="w-7 h-7 rounded-full flex-shrink-0" style={{ backgroundColor: 'var(--color-overlay)' }} />
                   )}
                   <span className="text-sm font-medium flex-1 min-w-0 truncate" style={{ color: 'var(--color-text)' }}>
                     {r.user.name ?? 'User'}

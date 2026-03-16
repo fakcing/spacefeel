@@ -187,17 +187,23 @@ export default function AniPlayerModal() {
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[100] bg-black flex flex-col"
+          className="fixed inset-0 z-[100] flex flex-col"
+          style={{ backgroundColor: 'var(--color-bg)' }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
         >
           {/* ── Header (Desktop) — original single row, hidden on mobile ── */}
-          <div className="hidden sm:flex items-center gap-2 px-3 py-2.5 flex-shrink-0 border-b border-white/10 flex-nowrap overflow-visible">
-
+          <div
+            className="hidden sm:flex items-center gap-2 px-3 py-2.5 flex-shrink-0 border-b flex-nowrap overflow-visible"
+            style={{ borderColor: 'var(--color-border)' }}
+          >
             {/* Title */}
-            <span className="text-white/70 text-sm font-medium truncate max-w-[200px] flex-shrink-0">
+            <span
+              className="text-sm font-medium truncate max-w-[200px] flex-shrink-0"
+              style={{ color: 'var(--color-text-muted)' }}
+            >
               {titleName}
             </span>
 
@@ -205,7 +211,10 @@ export default function AniPlayerModal() {
             <div className="flex items-center gap-1.5 flex-1 min-w-0">
 
               {/* Server tabs */}
-              <div className="flex items-center gap-0.5 p-0.5 rounded-xl border border-white/10 bg-white/5">
+              <div
+                className="flex items-center gap-0.5 p-0.5 rounded-xl"
+                style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-overlay)' }}
+              >
                 {SERVER_DEFS.map(srv => {
                   const isActive = activeSource === srv.id
                   const srcData = sources.find(s => s.id === srv.id)
@@ -220,13 +229,14 @@ export default function AniPlayerModal() {
                       onClick={() => setActiveSource(srv.id)}
                       disabled={isYummy && videos.length === 0}
                       title={srv.label}
-                      className={`flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap"
+                      style={
                         isActive
-                          ? 'bg-white text-black shadow'
+                          ? { backgroundColor: 'var(--color-text)', color: 'var(--color-bg)' }
                           : canPlay
-                          ? 'text-white/70 hover:text-white hover:bg-white/10'
-                          : 'text-white/40 hover:text-white/60 hover:bg-white/5'
-                      }`}
+                          ? { color: 'var(--color-text-muted)' }
+                          : { color: 'var(--color-text-subtle)', opacity: 0.6 }
+                      }
                     >
                       {isPending && !isActive && (
                         <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
@@ -242,10 +252,15 @@ export default function AniPlayerModal() {
                 <select
                   value={currentSeason}
                   onChange={e => setSeason(Number(e.target.value))}
-                  className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none"
+                  className="text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none"
+                  style={{
+                    backgroundColor: 'var(--color-overlay)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-text)',
+                  }}
                 >
                   {yummySeasons.map(s => (
-                    <option key={s} value={s} className="bg-black">Сезон {s}</option>
+                    <option key={s} value={s} style={{ backgroundColor: 'var(--color-surface)' }}>Сезон {s}</option>
                   ))}
                 </select>
               )}
@@ -255,15 +270,29 @@ export default function AniPlayerModal() {
                 <div className="relative" ref={epPickerRef}>
                   <button
                     onClick={e => { e.stopPropagation(); setEpPickerOpen(p => !p) }}
-                    className="flex items-center gap-1.5 bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs font-medium hover:bg-white/10 transition-colors"
+                    className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors"
+                    style={{
+                      backgroundColor: 'var(--color-overlay)',
+                      border: '1px solid var(--color-border)',
+                      color: 'var(--color-text)',
+                    }}
                   >
-                    <span className="text-white/50">Серия</span>
-                    <span className="text-white">{safeEpisode}</span>
-                    <ChevronDown size={10} className="text-white/40" />
+                    <span style={{ color: 'var(--color-text-muted)' }}>Серия</span>
+                    <span style={{ color: 'var(--color-text)' }}>{safeEpisode}</span>
+                    <ChevronDown size={10} style={{ color: 'var(--color-text-subtle)' }} />
                   </button>
                   {epPickerOpen && (
-                    <div className="absolute top-full left-0 mt-1.5 bg-[#111] border border-white/10 rounded-xl p-2 z-[200] shadow-2xl min-w-[200px]">
-                      <p className="text-white/30 text-[10px] font-medium uppercase tracking-wide px-1 pb-1.5">
+                    <div
+                      className="absolute top-full left-0 mt-1.5 rounded-xl p-2 z-[200] shadow-2xl min-w-[200px]"
+                      style={{
+                        backgroundColor: 'var(--color-surface)',
+                        border: '1px solid var(--color-border)',
+                      }}
+                    >
+                      <p
+                        className="text-[10px] font-medium uppercase tracking-wide px-1 pb-1.5"
+                        style={{ color: 'var(--color-text-subtle)' }}
+                      >
                         Серии · {episodeNumbers.length} эп.
                       </p>
                       <div className="grid grid-cols-5 gap-1 max-h-52 overflow-y-auto">
@@ -272,11 +301,12 @@ export default function AniPlayerModal() {
                             key={ep}
                             ref={safeEpisode === ep ? activeEpRef : undefined}
                             onClick={() => { setEpisode(ep); setEpPickerOpen(false) }}
-                            className={`h-8 rounded-lg text-xs font-medium transition-all ${
+                            className="h-8 rounded-lg text-xs font-medium transition-all"
+                            style={
                               safeEpisode === ep
-                                ? 'bg-white text-black'
-                                : 'text-white/60 hover:bg-white/10 hover:text-white'
-                            }`}
+                                ? { backgroundColor: 'var(--color-text)', color: 'var(--color-bg)' }
+                                : { color: 'var(--color-text-muted)' }
+                            }
                           >
                             {ep}
                           </button>
@@ -292,32 +322,60 @@ export default function AniPlayerModal() {
                 <div className="relative flex-shrink-0" ref={dubPickerRef}>
                   <button
                     onClick={e => { e.stopPropagation(); setDubPickerOpen(p => !p) }}
-                    className={`flex items-center gap-1.5 border rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors flex-shrink-0 ${
-                      dubPickerOpen ? 'bg-white/15 border-white/20' : 'bg-white/5 border-white/10 hover:bg-white/10'
-                    }`}
+                    className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-colors flex-shrink-0"
+                    style={{
+                      backgroundColor: dubPickerOpen ? 'var(--color-hover)' : 'var(--color-overlay)',
+                      border: '1px solid var(--color-border)',
+                      color: 'var(--color-text-muted)',
+                    }}
                   >
-                    <span className="text-white/50 whitespace-nowrap">Озвучка</span>
-                    <ChevronDown size={10} className={`text-white/40 transition-transform flex-shrink-0 ${dubPickerOpen ? 'rotate-180' : ''}`} />
+                    <span className="whitespace-nowrap">Озвучка</span>
+                    <ChevronDown
+                      size={10}
+                      className={`transition-transform flex-shrink-0 ${dubPickerOpen ? 'rotate-180' : ''}`}
+                      style={{ color: 'var(--color-text-subtle)' }}
+                    />
                   </button>
                   {dubPickerOpen && (
-                    <div className="absolute top-full left-0 mt-1.5 bg-[#111] border border-white/10 rounded-xl z-[200] shadow-2xl overflow-hidden"
-                      style={{ minWidth: '200px', maxWidth: '280px' }}>
-                      <div className="px-3 py-2 border-b border-white/10 flex items-center justify-between">
-                        <span className="text-white/40 text-[10px] font-medium uppercase tracking-wide">Озвучка · {activeDubbings.length}</span>
+                    <div
+                      className="absolute top-full left-0 mt-1.5 rounded-xl z-[200] shadow-2xl overflow-hidden"
+                      style={{
+                        minWidth: '200px',
+                        maxWidth: '280px',
+                        backgroundColor: 'var(--color-surface)',
+                        border: '1px solid var(--color-border)',
+                      }}
+                    >
+                      <div
+                        className="px-3 py-2 flex items-center justify-between"
+                        style={{ borderBottom: '1px solid var(--color-border)' }}
+                      >
+                        <span
+                          className="text-[10px] font-medium uppercase tracking-wide"
+                          style={{ color: 'var(--color-text-subtle)' }}
+                        >
+                          Озвучка · {activeDubbings.length}
+                        </span>
                       </div>
                       <div className="flex flex-col max-h-52 overflow-y-auto py-1">
                         {activeDubbings.map(dub => (
                           <button
                             key={dub}
                             onClick={() => { setDubbing(dub); setDubPickerOpen(false) }}
-                            className={`w-full text-left px-3 py-2.5 text-xs font-medium transition-colors flex items-center gap-2 ${
+                            className="w-full text-left px-3 py-2.5 text-xs font-medium transition-colors flex items-center gap-2"
+                            style={
                               currentDubbing === dub
-                                ? 'bg-white/10 text-white'
-                                : 'text-white/60 hover:bg-white/5 hover:text-white'
-                            }`}
+                                ? { backgroundColor: 'var(--color-hover)', color: 'var(--color-text)' }
+                                : { color: 'var(--color-text-muted)' }
+                            }
+                            onMouseEnter={e => { if (currentDubbing !== dub) (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--color-overlay)' }}
+                            onMouseLeave={e => { if (currentDubbing !== dub) (e.currentTarget as HTMLButtonElement).style.backgroundColor = '' }}
                           >
                             {currentDubbing === dub && (
-                              <span className="w-1.5 h-1.5 rounded-full bg-white flex-shrink-0" />
+                              <span
+                                className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                style={{ backgroundColor: 'var(--color-text)' }}
+                              />
                             )}
                             <span className={currentDubbing === dub ? '' : 'ml-3.5'}>{dub}</span>
                           </button>
@@ -332,27 +390,38 @@ export default function AniPlayerModal() {
             {/* Close */}
             <button
               onClick={closePlayer}
-              className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors flex-shrink-0 ml-auto"
+              className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors flex-shrink-0 ml-auto"
+              style={{ border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
+              onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
+              onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
               aria-label="Закрыть"
             >
-              <X size={14} className="text-white" />
+              <X size={14} />
             </button>
           </div>
 
           {/* ── Header (Mobile) — 2 rows, native selects, no ref conflicts ── */}
-          <div className="sm:hidden flex-shrink-0 border-b border-white/10">
-
+          <div
+            className="sm:hidden flex-shrink-0"
+            style={{ borderBottom: '1px solid var(--color-border)' }}
+          >
             {/* Row 1: title + close */}
             <div className="flex items-center gap-2 px-3 pt-2.5 pb-1.5">
-              <span className="text-white/70 text-sm font-medium truncate flex-1 min-w-0">
+              <span
+                className="text-sm font-medium truncate flex-1 min-w-0"
+                style={{ color: 'var(--color-text-muted)' }}
+              >
                 {titleName}
               </span>
               <button
                 onClick={closePlayer}
-                className="w-8 h-8 rounded-lg border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors flex-shrink-0"
+                className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
+                style={{ border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
+                onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
+                onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
                 aria-label="Закрыть"
               >
-                <X size={14} className="text-white" />
+                <X size={14} />
               </button>
             </div>
 
@@ -360,7 +429,10 @@ export default function AniPlayerModal() {
             <div className="flex items-center gap-1.5 px-3 pb-2.5 overflow-x-auto scrollbar-none">
 
               {/* Server tabs */}
-              <div className="flex items-center gap-0.5 p-0.5 rounded-xl border border-white/10 bg-white/5 flex-shrink-0">
+              <div
+                className="flex items-center gap-0.5 p-0.5 rounded-xl flex-shrink-0"
+                style={{ border: '1px solid var(--color-border)', backgroundColor: 'var(--color-overlay)' }}
+              >
                 {SERVER_DEFS.map(srv => {
                   const isActive = activeSource === srv.id
                   const srcData = sources.find(s => s.id === srv.id)
@@ -373,13 +445,14 @@ export default function AniPlayerModal() {
                       key={srv.id}
                       onClick={() => setActiveSource(srv.id)}
                       disabled={isYummy && videos.length === 0}
-                      className={`px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                      className="px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap"
+                      style={
                         isActive
-                          ? 'bg-white text-black shadow'
+                          ? { backgroundColor: 'var(--color-text)', color: 'var(--color-bg)' }
                           : canPlay
-                          ? 'text-white/70 hover:text-white hover:bg-white/10'
-                          : 'text-white/40'
-                      }`}
+                          ? { color: 'var(--color-text-muted)' }
+                          : { color: 'var(--color-text-subtle)', opacity: 0.6 }
+                      }
                     >
                       {srv.label}
                     </button>
@@ -392,10 +465,15 @@ export default function AniPlayerModal() {
                 <select
                   value={currentSeason}
                   onChange={e => setSeason(Number(e.target.value))}
-                  className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none flex-shrink-0"
+                  className="text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none flex-shrink-0"
+                  style={{
+                    backgroundColor: 'var(--color-overlay)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-text)',
+                  }}
                 >
                   {yummySeasons.map(s => (
-                    <option key={s} value={s} className="bg-black">Сезон {s}</option>
+                    <option key={s} value={s} style={{ backgroundColor: 'var(--color-surface)' }}>Сезон {s}</option>
                   ))}
                 </select>
               )}
@@ -405,10 +483,15 @@ export default function AniPlayerModal() {
                 <select
                   value={safeEpisode}
                   onChange={e => setEpisode(e.target.value)}
-                  className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none flex-shrink-0"
+                  className="text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none flex-shrink-0"
+                  style={{
+                    backgroundColor: 'var(--color-overlay)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-text)',
+                  }}
                 >
                   {episodeNumbers.map(ep => (
-                    <option key={ep} value={ep} className="bg-black">Серия {ep}</option>
+                    <option key={ep} value={ep} style={{ backgroundColor: 'var(--color-surface)' }}>Серия {ep}</option>
                   ))}
                 </select>
               )}
@@ -418,10 +501,15 @@ export default function AniPlayerModal() {
                 <select
                   value={currentDubbing}
                   onChange={e => setDubbing(e.target.value)}
-                  className="bg-white/5 border border-white/10 text-white text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none flex-shrink-0 max-w-[130px]"
+                  className="text-xs px-2 py-1.5 rounded-lg cursor-pointer focus:outline-none flex-shrink-0 max-w-[130px]"
+                  style={{
+                    backgroundColor: 'var(--color-overlay)',
+                    border: '1px solid var(--color-border)',
+                    color: 'var(--color-text)',
+                  }}
                 >
                   {activeDubbings.map(dub => (
-                    <option key={dub} value={dub} className="bg-black">{dub}</option>
+                    <option key={dub} value={dub} style={{ backgroundColor: 'var(--color-surface)' }}>{dub}</option>
                   ))}
                 </select>
               )}
