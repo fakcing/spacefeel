@@ -167,6 +167,7 @@ export default function MediaPlayerModal() {
   }, [epPickerOpen])
 
   const title = item ? ('title' in item ? item.title : item.name) : 'Media Player'
+  const totalSeasons = item && !('title' in item) ? (item.number_of_seasons ?? 1) : 1
 
   return (
     <AnimatePresence>
@@ -247,7 +248,7 @@ export default function MediaPlayerModal() {
                         Сезоны
                       </p>
                       <div className="grid grid-cols-4 gap-1 max-h-52 overflow-y-auto">
-                        {Array.from({ length: 20 }, (_, i) => i + 1).map(s => (
+                        {Array.from({ length: totalSeasons }, (_, i) => i + 1).map(s => (
                           <button
                             key={s}
                             onClick={() => { setSeason(s); setSeasonPickerOpen(false) }}
@@ -397,7 +398,7 @@ export default function MediaPlayerModal() {
                     color: 'var(--color-text)',
                   }}
                 >
-                  {Array.from({ length: 20 }, (_, i) => i + 1).map(s => (
+                  {Array.from({ length: totalSeasons }, (_, i) => i + 1).map(s => (
                     <option key={s} value={s} style={{ backgroundColor: 'var(--color-surface)' }}>Сезон {s}</option>
                   ))}
                 </select>
