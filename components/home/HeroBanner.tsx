@@ -137,7 +137,7 @@ export default function HeroBanner({ movies }: HeroBannerProps) {
               <motion.div whileTap={{ scale: 0.96 }}>
                 <button
                   onClick={handlePlay}
-                  className="flex items-center gap-2 bg-gray-900 dark:bg-white text-white dark:text-black font-semibold rounded-full px-8 py-3 hover:bg-gray-800 dark:hover:bg-white/90 transition-colors cursor-pointer"
+                  className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black font-semibold rounded-full px-8 py-3 hover:bg-black/80 dark:hover:bg-white/90 transition-colors cursor-pointer"
                 >
                   <Play size={18} className="fill-white dark:fill-black" />
                   {t('playNow')}

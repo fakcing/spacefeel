@@ -130,16 +130,19 @@ export default function UniversalPlayer({
   }
 
   return (
-    <div className="w-full h-full flex flex-col bg-black">
+    <div className="w-full h-full flex flex-col" style={{ backgroundColor: 'var(--color-bg)' }}>
       {/* Server selector */}
       {(servers.length > 1 || serversLoading) && (
-        <div className="flex items-center gap-2 px-4 py-2.5 border-b border-white/10 flex-shrink-0 flex-wrap">
-          <Server size={13} className="text-white/40 flex-shrink-0" />
-          <span className="text-white/40 text-xs flex-shrink-0">Сервер:</span>
+        <div
+          className="flex items-center gap-2 px-4 py-2.5 border-b flex-shrink-0 flex-wrap"
+          style={{ borderColor: 'var(--color-border)' }}
+        >
+          <Server size={13} className="flex-shrink-0" style={{ color: 'var(--color-text-subtle)' }} />
+          <span className="text-xs flex-shrink-0" style={{ color: 'var(--color-text-subtle)' }}>Сервер:</span>
           {serversLoading ? (
             <div className="flex gap-1.5">
               {[0, 1, 2].map(i => (
-                <div key={i} className="h-7 w-20 rounded-lg bg-white/5 animate-pulse" />
+                <div key={i} className="h-7 w-20 rounded-lg animate-pulse" style={{ backgroundColor: 'var(--color-overlay)' }} />
               ))}
             </div>
           ) : (
@@ -147,11 +150,12 @@ export default function UniversalPlayer({
               <button
                 key={srv.source}
                 onClick={() => setActiveServer(idx)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                className="px-3 py-1.5 rounded-lg text-xs font-medium transition-all"
+                style={
                   activeServer === idx
-                    ? 'bg-white text-black'
-                    : 'bg-white/10 text-white/70 hover:bg-white/20'
-                }`}
+                    ? { backgroundColor: 'var(--color-text)', color: 'var(--color-bg)' }
+                    : { backgroundColor: 'var(--color-overlay)', color: 'var(--color-text-muted)' }
+                }
               >
                 {srv.name}
               </button>
@@ -162,43 +166,50 @@ export default function UniversalPlayer({
 
       {/* Season/episode selector for TV */}
       {(type === 'tv' || type === 'cartoon') && (
-        <div className="flex items-center gap-3 px-4 py-2.5 border-b border-white/10 flex-shrink-0 flex-wrap">
+        <div
+          className="flex items-center gap-3 px-4 py-2.5 border-b flex-shrink-0 flex-wrap"
+          style={{ borderColor: 'var(--color-border)' }}
+        >
           <div className="flex items-center gap-1">
             <button
               onClick={() => setSelectedSeason(s => Math.max(1, s - 1))}
-              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
+              style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
             >
-              <ChevronLeft size={14} className="text-white" />
+              <ChevronLeft size={14} />
             </button>
-            <span className="text-white text-sm px-2 min-w-[70px] text-center">Сезон {selectedSeason}</span>
+            <span className="text-sm px-2 min-w-[70px] text-center" style={{ color: 'var(--color-text)' }}>Сезон {selectedSeason}</span>
             <button
               onClick={() => setSelectedSeason(s => s + 1)}
-              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
+              style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
             >
-              <ChevronRight size={14} className="text-white" />
+              <ChevronRight size={14} />
             </button>
           </div>
-          <div className="w-px h-5 bg-white/10" />
+          <div className="w-px h-5" style={{ backgroundColor: 'var(--color-border)' }} />
           <div className="flex items-center gap-1">
             <button
               onClick={() => setSelectedEpisode(e => Math.max(1, e - 1))}
-              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
+              style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
             >
-              <ChevronLeft size={14} className="text-white" />
+              <ChevronLeft size={14} />
             </button>
-            <span className="text-white text-sm px-2 min-w-[70px] text-center">Серия {selectedEpisode}</span>
+            <span className="text-sm px-2 min-w-[70px] text-center" style={{ color: 'var(--color-text)' }}>Серия {selectedEpisode}</span>
             <button
               onClick={() => setSelectedEpisode(e => e + 1)}
-              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+              className="w-7 h-7 flex items-center justify-center rounded-lg transition-colors"
+              style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
             >
-              <ChevronRight size={14} className="text-white" />
+              <ChevronRight size={14} />
             </button>
           </div>
         </div>
       )}
 
       {/* Iframe container */}
-      <div className="flex-1 relative">
+      <div className="flex-1 relative bg-black">
         {/* Loading */}
         {isLoading && !loadTimeout && iframeSrc && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black z-10">
