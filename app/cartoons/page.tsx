@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { getTranslations } from 'next-intl/server'
 import { fetchDiscover } from '@/lib/tmdb'
 import { TVShow, TMDBResponse } from '@/types/tmdb'
 import MediaCard from '@/components/cards/MediaCard'
@@ -72,6 +73,7 @@ export default async function CartoonsPage({
   if (min_vote)  { overrides['vote_average.gte'] = min_vote; overrides['vote_count.gte'] = '100' }
   if (language)  overrides.with_original_language = language
 
+  const t = await getTranslations('pages.cartoons')
   const params = buildCartoonParams(category, page, overrides)
   const r = await fetchDiscover('tv', params) as TMDBResponse<TVShow>
   const results = r.results
@@ -83,9 +85,14 @@ export default async function CartoonsPage({
 
   return (
     <div className="min-h-screen pt-14 pb-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto">
-      <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-4 md:mb-6 text-[var(--text-primary)]">
-        {label}
-      </h1>
+      <div className="mb-4 md:mb-6 pt-6">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[var(--text-primary)] mb-1">
+          {hasFilters ? label : t('title')}
+        </h1>
+        {!hasFilters && (
+          <p className="text-sm text-gray-900/50 dark:text-white/50 max-w-xl">{t('description')}</p>
+        )}
+      </div>
 
       <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-6 pb-2 -mx-4 px-4 md:mx-0 md:px-0">
         {categories.map((cat) => (

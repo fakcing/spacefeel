@@ -80,6 +80,24 @@
     "playNow": "Play Now",
     "details": "Details"
   },
+  "pages": {
+    "movies": {
+      "title": "Movies",
+      "description": "Discover hidden gems and new releases in the world of cinema. Dive into a sea of movies waiting to be found by you."
+    },
+    "tv": {
+      "title": "TV Shows",
+      "description": "Explore thousands of series from around the world. From gripping dramas to laugh-out-loud comedies."
+    },
+    "anime": {
+      "title": "Anime",
+      "description": "Discover and explore a vast collection of anime series and films. From popular hits to hidden gems."
+    },
+    "cartoons": {
+      "title": "Cartoons",
+      "description": "Fun for all ages. Animated classics and the latest releases all in one place."
+    }
+  },
   "dropdown": {
     "trendingMovies": "Trending Movies",
     "popular": "Popular",

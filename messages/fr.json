@@ -80,6 +80,24 @@
     "playNow": "Regarder",
     "details": "Détails"
   },
+  "pages": {
+    "movies": {
+      "title": "Films",
+      "description": "Découvrez des pépites cachées et les dernières sorties du monde du cinéma. Plongez dans un océan de films qui vous attend."
+    },
+    "tv": {
+      "title": "Séries",
+      "description": "Explorez des milliers de séries du monde entier. Des drames captivants aux comédies hilarantes."
+    },
+    "anime": {
+      "title": "Anime",
+      "description": "Découvrez et explorez une vaste collection de séries et films d'anime. Des succès populaires aux joyaux cachés."
+    },
+    "cartoons": {
+      "title": "Dessins animés",
+      "description": "Pour toute la famille. Des classiques de l'animation aux dernières sorties, tout en un seul endroit."
+    }
+  },
   "dropdown": {
     "trendingMovies": "Films tendance",
     "popular": "Populaire",

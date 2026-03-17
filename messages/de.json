@@ -80,6 +80,24 @@
     "playNow": "Jetzt abspielen",
     "details": "Details"
   },
+  "pages": {
+    "movies": {
+      "title": "Filme",
+      "description": "Entdecke verborgene Schätze und Neuerscheinungen in der Welt des Kinos. Tauche ein in ein Meer von Filmen."
+    },
+    "tv": {
+      "title": "Serien",
+      "description": "Erkunde Tausende von Serien aus aller Welt. Von fesselnden Dramen bis hin zu witzigen Komödien."
+    },
+    "anime": {
+      "title": "Anime",
+      "description": "Entdecke und erkunde eine riesige Sammlung von Anime-Serien und -Filmen. Von beliebten Hits bis zu versteckten Schätzen."
+    },
+    "cartoons": {
+      "title": "Zeichentrick",
+      "description": "Spaß für die ganze Familie. Animationsklassiker und aktuelle Neuheiten an einem Ort."
+    }
+  },
   "dropdown": {
     "trendingMovies": "Trendfilme",
     "popular": "Beliebt",

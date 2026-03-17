@@ -1,4 +1,5 @@
 import { cache } from 'react'
+import { getTranslations } from 'next-intl/server'
 import { fetchYaniCatalog } from '@/lib/yani'
 import AniCard from '@/components/cards/AniCard'
 import Pagination from '@/components/ui/Pagination'
@@ -23,6 +24,7 @@ export default async function AnimePage({
   const type = searchParams.type || ''
   const q = searchParams.q || ''
 
+  const t = await getTranslations('pages.anime')
   const { items, hasMore } = await getAnimeCatalog(page, year, type, q)
   const totalPages = hasMore ? Math.max(page + 99, 200) : page
 
@@ -35,10 +37,8 @@ export default async function AnimePage({
   return (
     <div className="min-h-screen pt-14 pb-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto">
       <div className="mb-6 md:mb-8 pt-6">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[var(--text-primary)] mb-1">Аниме</h1>
-        <p className="text-sm text-gray-900/50 dark:text-white/50 max-w-xl">
-          Открывай и исследуй огромную коллекцию аниме-сериалов и фильмов. От популярных хитов до скрытых жемчужин.
-        </p>
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[var(--text-primary)] mb-1">{t('title')}</h1>
+        <p className="text-sm text-gray-900/50 dark:text-white/50 max-w-xl">{t('description')}</p>
       </div>
 
       <div className="mb-6">

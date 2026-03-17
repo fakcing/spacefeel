@@ -80,6 +80,24 @@
     "playNow": "Reproducir",
     "details": "Detalles"
   },
+  "pages": {
+    "movies": {
+      "title": "Películas",
+      "description": "Descubre joyas ocultas y nuevos estrenos en el mundo del cine. Sumérgete en un mar de películas esperándote."
+    },
+    "tv": {
+      "title": "Series",
+      "description": "Explora miles de series de todo el mundo. Desde dramas apasionantes hasta comedias irresistibles."
+    },
+    "anime": {
+      "title": "Anime",
+      "description": "Descubre y explora una enorme colección de series y películas de anime. Desde éxitos populares hasta joyas ocultas."
+    },
+    "cartoons": {
+      "title": "Dibujos animados",
+      "description": "Para toda la familia. Clásicos de la animación y los últimos estrenos en un solo lugar."
+    }
+  },
   "dropdown": {
     "trendingMovies": "Películas en tendencia",
     "popular": "Popular",

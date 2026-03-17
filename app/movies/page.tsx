@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { cache } from 'react'
+import { getTranslations } from 'next-intl/server'
 import { fetchTrending, fetchPopular, fetchTopRated, fetchUpcoming, fetchNowPlaying, fetchDiscover, fetchSearchMovies } from '@/lib/tmdb'
 import { Movie, TMDBResponse } from '@/types/tmdb'
 import MediaCard from '@/components/cards/MediaCard'
@@ -71,6 +72,7 @@ export default async function MoviesPage({
 
   const hasFilters = !!(q || genres || sort_by || year_from || year_to || min_vote || language)
 
+  const t = await getTranslations('pages.movies')
   const ANIMATION_GENRE = 16
   const selectedGenreIds = genres ? genres.split(',').filter(Boolean).map(Number) : []
   const animationSelected = selectedGenreIds.includes(ANIMATION_GENRE)
@@ -120,9 +122,14 @@ export default async function MoviesPage({
 
   return (
     <div className="min-h-screen pt-14 pb-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto">
-      <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-4 md:mb-6 text-[var(--text-primary)]">
-        {label}
-      </h1>
+      <div className="mb-4 md:mb-6 pt-6">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[var(--text-primary)] mb-1">
+          {hasFilters ? label : t('title')}
+        </h1>
+        {!hasFilters && (
+          <p className="text-sm text-gray-900/50 dark:text-white/50 max-w-xl">{t('description')}</p>
+        )}
+      </div>
 
       <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-6 pb-2 -mx-4 px-4 md:mx-0 md:px-0">
         {categories.map((cat) => (
