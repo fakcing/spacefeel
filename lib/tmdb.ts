@@ -102,6 +102,13 @@ export const fetchSearchMovies = cache(async (query: string, page = 1): Promise<
   })
 })
 
+export const fetchSearchTV = cache(async (query: string, page = 1): Promise<TMDBResponse<TVShow>> => {
+  return tmdbFetch<TMDBResponse<TVShow>>('/search/tv', {
+    query,
+    page: String(page),
+  })
+})
+
 export const fetchCartoons = cache(async (category = 'trending', page = 1): Promise<TMDBResponse<TVShow>> => {
   const base: Record<string, string> = {
     with_genres: '16,10751',

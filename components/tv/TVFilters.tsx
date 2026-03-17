@@ -5,22 +5,18 @@ import { Search, X } from 'lucide-react'
 import { useRef } from 'react'
 
 const GENRES = [
-  { id: 28,    name: 'Action' },
-  { id: 12,    name: 'Adventure' },
+  { id: 10759, name: 'Action & Adventure' },
   { id: 35,    name: 'Comedy' },
   { id: 80,    name: 'Crime' },
   { id: 99,    name: 'Documentary' },
   { id: 18,    name: 'Drama' },
   { id: 10751, name: 'Family' },
-  { id: 14,    name: 'Fantasy' },
-  { id: 36,    name: 'History' },
-  { id: 27,    name: 'Horror' },
-  { id: 10402, name: 'Music' },
+  { id: 10762, name: 'Kids' },
   { id: 9648,  name: 'Mystery' },
-  { id: 10749, name: 'Romance' },
-  { id: 878,   name: 'Sci-Fi' },
+  { id: 10764, name: 'Reality' },
+  { id: 10765, name: 'Sci-Fi & Fantasy' },
   { id: 53,    name: 'Thriller' },
-  { id: 10752, name: 'War' },
+  { id: 10768, name: 'War & Politics' },
   { id: 37,    name: 'Western' },
 ]
 
@@ -30,9 +26,8 @@ const SORT_OPTIONS = [
   { label: 'Популярные ↑', value: 'popularity.asc' },
   { label: 'Рейтинг ↓', value: 'vote_average.desc' },
   { label: 'Рейтинг ↑', value: 'vote_average.asc' },
-  { label: 'Новые', value: 'primary_release_date.desc' },
-  { label: 'Старые', value: 'primary_release_date.asc' },
-  { label: 'Кассовые', value: 'revenue.desc' },
+  { label: 'Новые', value: 'first_air_date.desc' },
+  { label: 'Старые', value: 'first_air_date.asc' },
 ]
 
 const RATINGS = [
@@ -59,7 +54,7 @@ const LANGUAGES = [
 ]
 
 const CURRENT_YEAR = new Date().getFullYear()
-const YEARS = Array.from({ length: CURRENT_YEAR - 1899 }, (_, i) => String(CURRENT_YEAR - i))
+const YEARS = Array.from({ length: CURRENT_YEAR - 1939 }, (_, i) => String(CURRENT_YEAR - i))
 
 interface Props {
   q: string
@@ -71,7 +66,7 @@ interface Props {
   language: string
 }
 
-export default function MovieFilters({ q, genres, sort_by, year_from, year_to, min_vote, language }: Props) {
+export default function TVFilters({ q, genres, sort_by, year_from, year_to, min_vote, language }: Props) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
@@ -131,7 +126,7 @@ export default function MovieFilters({ q, genres, sort_by, year_from, year_to, m
           type="text"
           defaultValue={q}
           onChange={(e) => handleSearch(e.target.value)}
-          placeholder="Поиск фильмов..."
+          placeholder="Поиск сериалов..."
           className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white"
         />
         {q && (
@@ -165,16 +160,12 @@ export default function MovieFilters({ q, genres, sort_by, year_from, year_to, m
       <div>
         <SectionLabel>Параметры</SectionLabel>
         <div className="flex flex-wrap items-center gap-2">
-          {[
-            { value: sort_by, key: 'sort_by', options: SORT_OPTIONS },
-          ].map(({ value, key, options }) => (
-            <div key={key} className="relative">
-              <select value={value} onChange={e => update({ [key]: e.target.value })} className={selectCls(!!value)}>
-                {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-              <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
-            </div>
-          ))}
+          <div className="relative">
+            <select value={sort_by} onChange={e => update({ sort_by: e.target.value })} className={selectCls(!!sort_by)}>
+              {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            </select>
+            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
+          </div>
 
           <div className="relative">
             <select value={year_from} onChange={e => update({ year_from: e.target.value })} className={selectCls(!!year_from)}>

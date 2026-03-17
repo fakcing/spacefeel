@@ -129,8 +129,8 @@ export default function Navbar() {
     { label: t('home'),     href: '/',         icon: <House size={16} />,    dropdown: null },
     { label: t('movies'),   href: '/movies',   icon: <Film size={16} />,     dropdown: moviesItems },
     { label: t('tvShows'),  href: '/tv',       icon: <Tv2 size={16} />,      dropdown: tvItems },
-    { label: t('anime'),    href: '/anime',    icon: <Sword size={16} />,    dropdown: null },
     { label: t('cartoons'), href: '/cartoons', icon: <Wand2 size={16} />,    dropdown: null },
+    { label: t('anime'),    href: '/anime',    icon: <Sword size={16} />,    dropdown: null },
   ]
 
   const handleMouseEnter = (label: string) => {

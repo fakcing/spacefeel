@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import { cache } from 'react'
-import { fetchCartoons } from '@/lib/tmdb'
-import { TVShow } from '@/types/tmdb'
+import { fetchDiscover } from '@/lib/tmdb'
+import { TVShow, TMDBResponse } from '@/types/tmdb'
 import MediaCard from '@/components/cards/MediaCard'
 import Pagination from '@/components/ui/Pagination'
+import CartoonFilters from '@/components/cartoons/CartoonFilters'
 
 
 const categories = [
@@ -15,32 +15,85 @@ const categories = [
   { value: 'classics',  label: 'Classics' },
 ]
 
-const getCartoons = cache(async (category: string, page: number) => {
-  return await fetchCartoons(category, page)
-})
+function buildCartoonParams(category: string, page: number, overrides: Record<string, string> = {}): Record<string, string> {
+  const base: Record<string, string> = {
+    with_genres: '16',
+    page: String(page),
+    ...overrides,
+  }
+  if (!overrides.sort_by) {
+    switch (category) {
+      case 'top_rated':
+        base.sort_by = 'vote_average.desc'
+        base['vote_count.gte'] = '100'
+        break
+      case 'new':
+        base.sort_by = 'first_air_date.desc'
+        break
+      case 'classics':
+        base.sort_by = 'vote_average.desc'
+        base['first_air_date.lte'] = '2000-01-01'
+        break
+      default:
+        base.sort_by = 'popularity.desc'
+    }
+  }
+  return base
+}
 
 export default async function CartoonsPage({
   searchParams,
 }: {
-  searchParams: { category?: string; page?: string }
+  searchParams: {
+    category?: string
+    page?: string
+    sort_by?: string
+    year_from?: string
+    year_to?: string
+    min_vote?: string
+    language?: string
+  }
 }) {
-  const category = searchParams.category || 'popular'
-  const page = Math.max(1, parseInt(searchParams.page || '1') || 1)
-  const { results, total_pages } = await getCartoons(category, page)
-  const label = categories.find((c) => c.value === category)?.label || 'Popular'
-  const baseHref = `/cartoons?category=${category}`
+  const category  = searchParams.category  || 'popular'
+  const page      = Math.max(1, parseInt(searchParams.page || '1') || 1)
+
+  const sort_by   = searchParams.sort_by   || ''
+  const year_from = searchParams.year_from || ''
+  const year_to   = searchParams.year_to   || ''
+  const min_vote  = searchParams.min_vote  || ''
+  const language  = searchParams.language  || ''
+
+  const hasFilters = !!(sort_by || year_from || year_to || min_vote || language)
+
+  const overrides: Record<string, string> = {}
+  if (sort_by)   overrides.sort_by = sort_by
+  if (year_from) overrides['first_air_date.gte'] = `${year_from}-01-01`
+  if (year_to)   overrides['first_air_date.lte'] = `${year_to}-12-31`
+  if (min_vote)  { overrides['vote_average.gte'] = min_vote; overrides['vote_count.gte'] = '100' }
+  if (language)  overrides.with_original_language = language
+
+  const params = buildCartoonParams(category, page, overrides)
+  const r = await fetchDiscover('tv', params) as TMDBResponse<TVShow>
+  const results = r.results
+  const total_pages = r.total_pages
+
+  const label = (categories.find(c => c.value === category)?.label || 'Popular') + ' Cartoons'
+
+  const baseHref = `/cartoons?category=${category}${sort_by ? `&sort_by=${sort_by}` : ''}${year_from ? `&year_from=${year_from}` : ''}${year_to ? `&year_to=${year_to}` : ''}${min_vote ? `&min_vote=${min_vote}` : ''}${language ? `&language=${language}` : ''}`
 
   return (
-    <div className="min-h-screen pt-20 px-6 md:px-10 lg:px-16 max-w-7xl mx-auto">
-      <h1 className="text-3xl font-bold tracking-tight mb-6 text-[var(--text-primary)]">{label} Cartoons</h1>
+    <div className="min-h-screen pt-14 pb-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto">
+      <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-4 md:mb-6 text-[var(--text-primary)]">
+        {label}
+      </h1>
 
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-8 pb-2">
+      <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-6 pb-2 -mx-4 px-4 md:mx-0 md:px-0">
         {categories.map((cat) => (
           <Link
             key={cat.value}
             href={`/cartoons?category=${cat.value}`}
             className={`flex-shrink-0 px-4 py-2 rounded-full text-sm transition-colors ${
-              category === cat.value
+              category === cat.value && !hasFilters
                 ? 'bg-gray-900 dark:bg-white text-white dark:text-black font-semibold'
                 : 'bg-black/[0.08] dark:bg-white/[0.08] hover:bg-black/[0.15] dark:hover:bg-white/[0.15] text-[var(--text-muted)]'
             }`}
@@ -50,11 +103,25 @@ export default async function CartoonsPage({
         ))}
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {(results as TVShow[]).map((item, index) => (
+      <CartoonFilters
+        sort_by={sort_by}
+        year_from={year_from}
+        year_to={year_to}
+        min_vote={min_vote}
+        language={language}
+      />
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+        {results.map((item, index) => (
           <MediaCard key={item.id} item={item} mediaType="tv" priority={index < 6} />
         ))}
       </div>
+
+      {results.length === 0 && (
+        <div className="text-center py-20 text-gray-500 dark:text-gray-400">
+          Ничего не найдено. Попробуйте изменить фильтры.
+        </div>
+      )}
 
       <Pagination currentPage={page} totalPages={total_pages} baseHref={baseHref} />
     </div>

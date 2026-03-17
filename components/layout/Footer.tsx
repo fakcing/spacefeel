@@ -10,8 +10,8 @@ export default async function Footer() {
     { href: '/', label: t('home') },
     { href: '/movies', label: t('movies') },
     { href: '/tv', label: t('tvShows') },
-    { href: '/anime', label: t('anime') },
     { href: '/cartoons', label: t('cartoons') },
+    { href: '/anime', label: t('anime') },
     { href: '/watchlist', label: t('watchlist') },
   ]
 
