@@ -153,9 +153,7 @@ nav {
 /* ── Light search focus ──────────────────────────────────────────────── */
 .light .search-focused {
   border-color: rgba(0, 0, 0, 0.55) !important;
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.08) !important;
 }
 .dark .search-focused {
   border-color: rgba(255, 255, 255, 0.70) !important;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.08) !important;
 }
