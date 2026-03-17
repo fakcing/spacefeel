@@ -71,6 +71,10 @@ export default async function MoviesPage({
 
   const hasFilters = !!(q || genres || sort_by || year_from || year_to || min_vote || language)
 
+  const ANIMATION_GENRE = 16
+  const selectedGenreIds = genres ? genres.split(',').filter(Boolean).map(Number) : []
+  const animationSelected = selectedGenreIds.includes(ANIMATION_GENRE)
+
   let results: Movie[]
   let total_pages: number
 
@@ -85,7 +89,8 @@ export default async function MoviesPage({
     }
     if (genres) {
       params.with_genres = genres
-    } else {
+    }
+    if (!animationSelected) {
       params.without_genres = '16'
     }
     if (year_from) params['primary_release_date.gte'] = `${year_from}-01-01`
@@ -100,6 +105,11 @@ export default async function MoviesPage({
     const r = await getByCategory(category, page)
     results = r.results
     total_pages = r.total_pages
+  }
+
+  // Filter out animation from all endpoints (trending/popular/etc don't support without_genres)
+  if (!animationSelected) {
+    results = results.filter(m => !m.genre_ids?.includes(ANIMATION_GENRE))
   }
 
   const label = hasFilters
