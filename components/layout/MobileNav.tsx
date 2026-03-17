@@ -6,20 +6,22 @@ import { motion } from 'framer-motion'
 import { House, Film, Tv2, Sword, Bookmark } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { useAuthModalStore } from '@/store/authModalStore'
-
-const navItems = [
-  { href: '/', icon: House, label: 'Главная' },
-  { href: '/movies', icon: Film, label: 'Фильмы' },
-  { href: '/tv', icon: Tv2, label: 'Сериалы' },
-  { href: '/anime', icon: Sword, label: 'Аниме' },
-  { href: '/watchlist', icon: Bookmark, label: 'Список' },
-]
+import { useTranslations } from 'next-intl'
 
 export default function MobileNav() {
+  const t = useTranslations('nav')
   const pathname = usePathname()
   const router = useRouter()
   const { data: session } = useSession()
   const { open: openAuthModal } = useAuthModalStore()
+
+  const navItems = [
+    { href: '/', icon: House, label: t('home') },
+    { href: '/movies', icon: Film, label: t('movies') },
+    { href: '/tv', icon: Tv2, label: t('tvShows') },
+    { href: '/anime', icon: Sword, label: t('anime') },
+    { href: '/watchlist', icon: Bookmark, label: t('watchlist') },
+  ]
 
   return (
     <nav

@@ -8,6 +8,7 @@ import { YaniAnime } from '@/types/yani'
 import { WatchlistItem } from '@/types/tmdb'
 import { getPosterUrl } from '@/lib/yani'
 import { BLUR_DATA_URL } from '@/lib/blurhash'
+import { useTranslations } from 'next-intl'
 
 const BookmarkButton = dynamic(() => import('@/components/ui/BookmarkButton'), { ssr: false })
 
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export default function AniCard({ item }: Props) {
+  const t = useTranslations('player')
   const router = useRouter()
   const poster = getPosterUrl(item.poster.medium || item.poster.big)
   const href = `/anime/${item.anime_url}`
@@ -78,7 +80,7 @@ export default function AniCard({ item }: Props) {
               className="text-white/35 text-[10px] mt-0.5 truncate"
               style={{ textShadow: '0 1px 3px rgba(0,0,0,0.9)' }}
             >
-              Озвучка: {item.translates.slice(0, 2).map(t => t.title).filter(Boolean).join(', ')}
+              {t('dubbing')}: {item.translates.slice(0, 2).map(tr => tr.title).filter(Boolean).join(', ')}
               {item.translates.length > 2 ? ` +${item.translates.length - 2}` : ''}
             </p>
           )}

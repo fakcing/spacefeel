@@ -274,7 +274,7 @@ export default function Navbar() {
                         ? `https://image.tmdb.org/t/p/w92${item.poster_path}`
                         : null
                     const typeLabel = isAnime
-                      ? 'Аниме'
+                      ? ts('anime')
                       : item.media_type === 'tv' ? ts('tvShow') : ts('movie')
                     return (
                       <Link

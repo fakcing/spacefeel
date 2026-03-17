@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { YaniAnime } from '@/types/yani'
 import AniCard from '@/components/cards/AniCard'
+import { useTranslations } from 'next-intl'
 
 interface AniCarouselSectionProps {
   title: string
@@ -20,6 +21,7 @@ export default function AniCarouselSection({
   items,
   viewAllHref,
 }: AniCarouselSectionProps) {
+  const t = useTranslations('home')
   const trackRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const totalCards = items.length
@@ -54,7 +56,7 @@ export default function AniCarouselSection({
                 onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')}
                 onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}
               >
-                Все
+                {t('viewAll')}
               </Link>
             </>
           )}

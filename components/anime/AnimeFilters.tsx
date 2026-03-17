@@ -3,24 +3,9 @@
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Search, X } from 'lucide-react'
 import { useRef } from 'react'
-
-const TYPES = [
-  { label: 'Тип', value: '' },
-  { label: 'TV', value: 'tv' },
-  { label: 'Фильм', value: 'movie' },
-  { label: 'OVA', value: 'ova' },
-  { label: 'ONA', value: 'ona' },
-  { label: 'Спэшл', value: 'special' },
-]
+import { useTranslations } from 'next-intl'
 
 const CURRENT_YEAR = new Date().getFullYear()
-const YEARS = [
-  { label: 'Год', value: '' },
-  ...Array.from({ length: CURRENT_YEAR - 1989 }, (_, i) => {
-    const y = String(CURRENT_YEAR - i)
-    return { label: y, value: y }
-  }),
-]
 
 interface Props {
   q: string
@@ -29,10 +14,28 @@ interface Props {
 }
 
 export default function AnimeFilters({ q, year, type }: Props) {
+  const t = useTranslations('filters')
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const TYPES = [
+    { label: t('typeDefault'), value: '' },
+    { label: 'TV', value: 'tv' },
+    { label: t('typeMovie'), value: 'movie' },
+    { label: 'OVA', value: 'ova' },
+    { label: 'ONA', value: 'ona' },
+    { label: t('typeSpecial'), value: 'special' },
+  ]
+
+  const YEARS = [
+    { label: t('yearDefault'), value: '' },
+    ...Array.from({ length: CURRENT_YEAR - 1989 }, (_, i) => {
+      const y = String(CURRENT_YEAR - i)
+      return { label: y, value: y }
+    }),
+  ]
 
   const update = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -67,7 +70,7 @@ export default function AnimeFilters({ q, year, type }: Props) {
           type="text"
           defaultValue={q}
           onChange={(e) => handleSearch(e.target.value)}
-          placeholder="Поиск аниме..."
+          placeholder={t('searchAnime')}
           className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-900/30 dark:placeholder:text-white/30 text-gray-900 dark:text-white"
         />
         {q && (
@@ -88,7 +91,7 @@ export default function AnimeFilters({ q, year, type }: Props) {
 
         <div className="relative">
           <select value={type} onChange={e => update('type', e.target.value)} className={selectClass(!!type)}>
-            {TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+            {TYPES.map(tp => <option key={tp.value} value={tp.value}>{tp.label}</option>)}
           </select>
           <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-900/40 dark:text-white/40 text-xs">▾</span>
         </div>
@@ -98,7 +101,7 @@ export default function AnimeFilters({ q, year, type }: Props) {
             onClick={clearAll}
             className="text-sm px-3 py-2 rounded-xl border border-black/15 dark:border-white/15 text-gray-900/60 dark:text-white/60 hover:border-black/30 dark:hover:border-white/30 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
-            Сброс
+            {t('reset')}
           </button>
         )}
       </div>

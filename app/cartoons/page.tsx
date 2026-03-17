@@ -74,6 +74,7 @@ export default async function CartoonsPage({
   if (language)  overrides.with_original_language = language
 
   const t = await getTranslations('pages.cartoons')
+  const tf = await getTranslations('filters')
   const params = buildCartoonParams(category, page, overrides)
   const r = await fetchDiscover('tv', params) as TMDBResponse<TVShow>
   const results = r.results
@@ -126,7 +127,7 @@ export default async function CartoonsPage({
 
       {results.length === 0 && (
         <div className="text-center py-20 text-gray-500 dark:text-gray-400">
-          Ничего не найдено. Попробуйте изменить фильтры.
+          {tf('noResults')}
         </div>
       )}
 

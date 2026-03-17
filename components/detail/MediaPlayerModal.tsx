@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, AlertTriangle, ChevronDown, RefreshCw } from 'lucide-react'
 import { useMediaPlayerStore } from '@/store/mediaPlayerStore'
 import { useEffect, useState, useMemo, useCallback, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 
 interface PlayerServer {
   name: string
@@ -40,6 +41,7 @@ export default function MediaPlayerModal() {
   const seasonPickerRef = useRef<HTMLDivElement>(null)
   const epPickerRef = useRef<HTMLDivElement>(null)
 
+  const t = useTranslations('player')
   const isTV = mediaType === 'tv'
 
   // Body scroll lock
@@ -229,7 +231,7 @@ export default function MediaPlayerModal() {
                       color: 'var(--color-text)',
                     }}
                   >
-                    <span style={{ color: 'var(--color-text-muted)' }}>Сезон</span>
+                    <span style={{ color: 'var(--color-text-muted)' }}>{t('season')}</span>
                     <span style={{ color: 'var(--color-text)' }}>{selectedSeason}</span>
                     <ChevronDown size={10} style={{ color: 'var(--color-text-subtle)' }} />
                   </button>
@@ -245,7 +247,7 @@ export default function MediaPlayerModal() {
                         className="text-[10px] font-medium uppercase tracking-wide px-1 pb-1.5"
                         style={{ color: 'var(--color-text-subtle)' }}
                       >
-                        Сезоны
+                        {t('seasons')}
                       </p>
                       <div className="grid grid-cols-4 gap-1 max-h-52 overflow-y-auto">
                         {Array.from({ length: totalSeasons }, (_, i) => i + 1).map(s => (
@@ -280,7 +282,7 @@ export default function MediaPlayerModal() {
                       color: 'var(--color-text)',
                     }}
                   >
-                    <span style={{ color: 'var(--color-text-muted)' }}>Серия</span>
+                    <span style={{ color: 'var(--color-text-muted)' }}>{t('episode')}</span>
                     <span style={{ color: 'var(--color-text)' }}>{selectedEpisode}</span>
                     <ChevronDown size={10} style={{ color: 'var(--color-text-subtle)' }} />
                   </button>
@@ -296,7 +298,7 @@ export default function MediaPlayerModal() {
                         className="text-[10px] font-medium uppercase tracking-wide px-1 pb-1.5"
                         style={{ color: 'var(--color-text-subtle)' }}
                       >
-                        Серии
+                        {t('episodes')}
                       </p>
                       <div className="grid grid-cols-5 gap-1 max-h-52 overflow-y-auto">
                         {Array.from({ length: 50 }, (_, i) => i + 1).map(ep => (
@@ -321,7 +323,7 @@ export default function MediaPlayerModal() {
 
               {/* Movie label */}
               {!isTV && (
-                <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>Фильм</span>
+                <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{t('movie')}</span>
               )}
             </div>
 
@@ -332,7 +334,7 @@ export default function MediaPlayerModal() {
               style={{ border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
-              aria-label="Закрыть"
+              aria-label={t('close')}
             >
               <X size={14} />
             </button>
@@ -355,7 +357,7 @@ export default function MediaPlayerModal() {
                 onClick={closePlayer}
                 className="w-8 h-8 rounded-lg flex items-center justify-center transition-colors flex-shrink-0"
                 style={{ border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
-                aria-label="Закрыть"
+                aria-label={t('close')}
               >
                 <X size={14} />
               </button>
@@ -399,7 +401,7 @@ export default function MediaPlayerModal() {
                   }}
                 >
                   {Array.from({ length: totalSeasons }, (_, i) => i + 1).map(s => (
-                    <option key={s} value={s} style={{ backgroundColor: 'var(--color-surface)' }}>Сезон {s}</option>
+                    <option key={s} value={s} style={{ backgroundColor: 'var(--color-surface)' }}>{t('season')} {s}</option>
                   ))}
                 </select>
               )}
@@ -417,7 +419,7 @@ export default function MediaPlayerModal() {
                   }}
                 >
                   {Array.from({ length: 50 }, (_, i) => i + 1).map(ep => (
-                    <option key={ep} value={ep} style={{ backgroundColor: 'var(--color-surface)' }}>Серия {ep}</option>
+                    <option key={ep} value={ep} style={{ backgroundColor: 'var(--color-surface)' }}>{t('episode')} {ep}</option>
                   ))}
                 </select>
               )}
@@ -432,7 +434,7 @@ export default function MediaPlayerModal() {
               {isLoading && !loadTimeout && iframeSrc && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] z-10">
                   <RefreshCw className="w-9 h-9 text-white/30 animate-spin" />
-                  <p className="text-white/40 text-sm">Загрузка плеера...</p>
+                  <p className="text-white/40 text-sm">{t('loading')}</p>
                 </div>
               )}
 
@@ -442,16 +444,16 @@ export default function MediaPlayerModal() {
                   <AlertTriangle className="w-12 h-12 text-white/30" />
                   <div>
                     <p className="text-white/80 font-medium text-sm mb-1">
-                      {loadTimeout ? 'Превышено время ожидания' : 'Ошибка загрузки'}
+                      {loadTimeout ? t('timeout') : t('loadError')}
                     </p>
-                    <p className="text-white/40 text-xs mb-4">Попробуйте другой сервер или включите VPN</p>
+                    <p className="text-white/40 text-xs mb-4">{t('tryVPN')}</p>
                   </div>
                   <div className="flex gap-2 flex-wrap justify-center">
                     <button
                       onClick={retry}
                       className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors"
                     >
-                      Повторить
+                      {t('retry')}
                     </button>
                     {servers.map((srv, idx) => idx !== activeServer && (
                       <button
@@ -469,8 +471,8 @@ export default function MediaPlayerModal() {
               {/* No servers */}
               {!serversLoading && servers.length === 0 && (
                 <div className="flex flex-col items-center justify-center h-full gap-2 text-center p-6">
-                  <p className="text-white/50 text-sm">Видео недоступно</p>
-                  <p className="text-white/30 text-xs">Контент может быть недоступен в вашем регионе</p>
+                  <p className="text-white/50 text-sm">{t('unavailable')}</p>
+                  <p className="text-white/30 text-xs">{t('regionBlocked')}</p>
                 </div>
               )}
 

@@ -2,28 +2,12 @@
 
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
-const SORT_OPTIONS = [
-  { label: 'Сортировка', value: '' },
-  { label: 'Популярные ↓', value: 'popularity.desc' },
-  { label: 'Популярные ↑', value: 'popularity.asc' },
-  { label: 'Рейтинг ↓', value: 'vote_average.desc' },
-  { label: 'Рейтинг ↑', value: 'vote_average.asc' },
-  { label: 'Новые', value: 'first_air_date.desc' },
-  { label: 'Старые', value: 'first_air_date.asc' },
-]
+const CURRENT_YEAR = new Date().getFullYear()
+const YEARS = Array.from({ length: CURRENT_YEAR - 1939 }, (_, i) => String(CURRENT_YEAR - i))
 
-const RATINGS = [
-  { label: 'Рейтинг', value: '' },
-  { label: '5+', value: '5' },
-  { label: '6+', value: '6' },
-  { label: '7+', value: '7' },
-  { label: '8+', value: '8' },
-  { label: '9+', value: '9' },
-]
-
-const LANGUAGES = [
-  { label: 'Язык', value: '' },
+const LANGUAGE_OPTIONS = [
   { label: 'English', value: 'en' },
   { label: 'Japanese', value: 'ja' },
   { label: 'Korean', value: 'ko' },
@@ -35,9 +19,6 @@ const LANGUAGES = [
   { label: 'Russian', value: 'ru' },
 ]
 
-const CURRENT_YEAR = new Date().getFullYear()
-const YEARS = Array.from({ length: CURRENT_YEAR - 1939 }, (_, i) => String(CURRENT_YEAR - i))
-
 interface Props {
   sort_by: string
   year_from: string
@@ -47,9 +28,34 @@ interface Props {
 }
 
 export default function CartoonFilters({ sort_by, year_from, year_to, min_vote, language }: Props) {
+  const t = useTranslations('filters')
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+
+  const SORT_OPTIONS = [
+    { label: t('sortDefault'), value: '' },
+    { label: t('sortPopularDesc'), value: 'popularity.desc' },
+    { label: t('sortPopularAsc'), value: 'popularity.asc' },
+    { label: t('sortRatingDesc'), value: 'vote_average.desc' },
+    { label: t('sortRatingAsc'), value: 'vote_average.asc' },
+    { label: t('sortNewest'), value: 'first_air_date.desc' },
+    { label: t('sortOldest'), value: 'first_air_date.asc' },
+  ]
+
+  const RATINGS = [
+    { label: t('ratingDefault'), value: '' },
+    { label: '5+', value: '5' },
+    { label: '6+', value: '6' },
+    { label: '7+', value: '7' },
+    { label: '8+', value: '8' },
+    { label: '9+', value: '9' },
+  ]
+
+  const LANGUAGES = [
+    { label: t('languageDefault'), value: '' },
+    ...LANGUAGE_OPTIONS,
+  ]
 
   const update = (updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -79,7 +85,7 @@ export default function CartoonFilters({ sort_by, year_from, year_to, min_vote, 
   return (
     <div className="mb-6 md:mb-8">
       <p className="text-[10px] font-semibold uppercase tracking-widest mb-2.5 text-gray-400 dark:text-gray-500">
-        Параметры
+        {t('params')}
       </p>
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative">
@@ -91,7 +97,7 @@ export default function CartoonFilters({ sort_by, year_from, year_to, min_vote, 
 
         <div className="relative">
           <select value={year_from} onChange={e => update({ year_from: e.target.value })} className={selectCls(!!year_from)}>
-            <option value="">С года</option>
+            <option value="">{t('yearFrom')}</option>
             {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
           <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
@@ -99,7 +105,7 @@ export default function CartoonFilters({ sort_by, year_from, year_to, min_vote, 
 
         <div className="relative">
           <select value={year_to} onChange={e => update({ year_to: e.target.value })} className={selectCls(!!year_to)}>
-            <option value="">По год</option>
+            <option value="">{t('yearTo')}</option>
             {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
           <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
@@ -125,7 +131,7 @@ export default function CartoonFilters({ sort_by, year_from, year_to, min_vote, 
             className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl border border-black/10 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-black/25 dark:hover:border-white/25 hover:text-gray-900 dark:hover:text-white transition-all"
           >
             <X size={11} />
-            Сброс
+            {t('reset')}
           </button>
         )}
       </div>

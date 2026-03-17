@@ -4,6 +4,7 @@ import { Play } from 'lucide-react'
 import { YaniVideo } from '@/types/yani'
 import { useAniPlayerStore } from '@/store/aniPlayerStore'
 import { useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 
 interface Props {
   videos: YaniVideo[]
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export default function AniEpisodesGrid({ videos, titleName, shikimoriId }: Props) {
+  const t = useTranslations('player')
   const { openPlayer } = useAniPlayerStore()
 
   // Unique dubbings
@@ -33,7 +35,7 @@ export default function AniEpisodesGrid({ videos, titleName, shikimoriId }: Prop
   return (
     <section className="max-w-5xl mx-auto px-6 pb-16">
       <h2 className="text-lg font-bold mb-4" style={{ color: 'var(--color-text)' }}>
-        Серии ({episodes.length})
+        {t('episodes')} ({episodes.length})
       </h2>
 
       <div className="grid grid-cols-6 sm:grid-cols-8 md:grid-cols-10 lg:grid-cols-12 gap-2">

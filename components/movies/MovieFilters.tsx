@@ -3,6 +3,7 @@
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Search, X } from 'lucide-react'
 import { useRef } from 'react'
+import { useTranslations } from 'next-intl'
 
 const GENRES = [
   { id: 28,    name: 'Action' },
@@ -24,28 +25,10 @@ const GENRES = [
   { id: 37,    name: 'Western' },
 ]
 
-const SORT_OPTIONS = [
-  { label: 'Сортировка', value: '' },
-  { label: 'Популярные ↓', value: 'popularity.desc' },
-  { label: 'Популярные ↑', value: 'popularity.asc' },
-  { label: 'Рейтинг ↓', value: 'vote_average.desc' },
-  { label: 'Рейтинг ↑', value: 'vote_average.asc' },
-  { label: 'Новые', value: 'primary_release_date.desc' },
-  { label: 'Старые', value: 'primary_release_date.asc' },
-  { label: 'Кассовые', value: 'revenue.desc' },
-]
+const CURRENT_YEAR = new Date().getFullYear()
+const YEARS = Array.from({ length: CURRENT_YEAR - 1899 }, (_, i) => String(CURRENT_YEAR - i))
 
-const RATINGS = [
-  { label: 'Рейтинг', value: '' },
-  { label: '5+', value: '5' },
-  { label: '6+', value: '6' },
-  { label: '7+', value: '7' },
-  { label: '8+', value: '8' },
-  { label: '9+', value: '9' },
-]
-
-const LANGUAGES = [
-  { label: 'Язык', value: '' },
+const LANGUAGE_OPTIONS = [
   { label: 'English', value: 'en' },
   { label: 'Japanese', value: 'ja' },
   { label: 'Korean', value: 'ko' },
@@ -58,9 +41,6 @@ const LANGUAGES = [
   { label: 'Russian', value: 'ru' },
 ]
 
-const CURRENT_YEAR = new Date().getFullYear()
-const YEARS = Array.from({ length: CURRENT_YEAR - 1899 }, (_, i) => String(CURRENT_YEAR - i))
-
 interface Props {
   q: string
   genres: string
@@ -72,12 +52,38 @@ interface Props {
 }
 
 export default function MovieFilters({ q, genres, sort_by, year_from, year_to, min_vote, language }: Props) {
+  const t = useTranslations('filters')
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const selectedGenres = genres ? genres.split(',').filter(Boolean).map(Number) : []
+
+  const SORT_OPTIONS = [
+    { label: t('sortDefault'), value: '' },
+    { label: t('sortPopularDesc'), value: 'popularity.desc' },
+    { label: t('sortPopularAsc'), value: 'popularity.asc' },
+    { label: t('sortRatingDesc'), value: 'vote_average.desc' },
+    { label: t('sortRatingAsc'), value: 'vote_average.asc' },
+    { label: t('sortNewest'), value: 'primary_release_date.desc' },
+    { label: t('sortOldest'), value: 'primary_release_date.asc' },
+    { label: t('sortRevenue'), value: 'revenue.desc' },
+  ]
+
+  const RATINGS = [
+    { label: t('ratingDefault'), value: '' },
+    { label: '5+', value: '5' },
+    { label: '6+', value: '6' },
+    { label: '7+', value: '7' },
+    { label: '8+', value: '8' },
+    { label: '9+', value: '9' },
+  ]
+
+  const LANGUAGES = [
+    { label: t('languageDefault'), value: '' },
+    ...LANGUAGE_OPTIONS,
+  ]
 
   const update = (updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -131,7 +137,7 @@ export default function MovieFilters({ q, genres, sort_by, year_from, year_to, m
           type="text"
           defaultValue={q}
           onChange={(e) => handleSearch(e.target.value)}
-          placeholder="Поиск фильмов..."
+          placeholder={t('searchMovies')}
           className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white"
         />
         {q && (
@@ -143,7 +149,7 @@ export default function MovieFilters({ q, genres, sort_by, year_from, year_to, m
 
       {/* Genres */}
       <div>
-        <SectionLabel>Жанры</SectionLabel>
+        <SectionLabel>{t('genres')}</SectionLabel>
         <div className="flex flex-wrap gap-1.5">
           {GENRES.map(g => (
             <button
@@ -163,7 +169,7 @@ export default function MovieFilters({ q, genres, sort_by, year_from, year_to, m
 
       {/* Dropdowns */}
       <div>
-        <SectionLabel>Параметры</SectionLabel>
+        <SectionLabel>{t('params')}</SectionLabel>
         <div className="flex flex-wrap items-center gap-2">
           {[
             { value: sort_by, key: 'sort_by', options: SORT_OPTIONS },
@@ -178,7 +184,7 @@ export default function MovieFilters({ q, genres, sort_by, year_from, year_to, m
 
           <div className="relative">
             <select value={year_from} onChange={e => update({ year_from: e.target.value })} className={selectCls(!!year_from)}>
-              <option value="">С года</option>
+              <option value="">{t('yearFrom')}</option>
               {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
             <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
@@ -186,7 +192,7 @@ export default function MovieFilters({ q, genres, sort_by, year_from, year_to, m
 
           <div className="relative">
             <select value={year_to} onChange={e => update({ year_to: e.target.value })} className={selectCls(!!year_to)}>
-              <option value="">По год</option>
+              <option value="">{t('yearTo')}</option>
               {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
             </select>
             <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
@@ -212,7 +218,7 @@ export default function MovieFilters({ q, genres, sort_by, year_from, year_to, m
               className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl border border-black/10 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-black/25 dark:hover:border-white/25 hover:text-gray-900 dark:hover:text-white transition-all"
             >
               <X size={11} />
-              Сброс
+              {t('reset')}
             </button>
           )}
         </div>

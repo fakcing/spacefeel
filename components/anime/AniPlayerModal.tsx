@@ -5,6 +5,7 @@ import { X, AlertTriangle, ChevronDown } from 'lucide-react'
 import { useAniPlayerStore } from '@/store/aniPlayerStore'
 import { useEffect, useMemo, useState, useCallback, useRef } from 'react'
 import HlsPlayer from '@/components/anime/HlsPlayer'
+import { useTranslations } from 'next-intl'
 
 const SERVER_DEFS = [
   { id: 'yummy',  label: 'YummyAnime' },
@@ -177,6 +178,8 @@ export default function AniPlayerModal() {
     return () => window.removeEventListener('keydown', handler)
   }, [isOpen, closePlayer, prevEp, nextEp, setEpisode])
 
+  const t = useTranslations('player')
+
   if (!isOpen) return null
 
   const activeDubbings = isYummyActive
@@ -260,7 +263,7 @@ export default function AniPlayerModal() {
                   }}
                 >
                   {yummySeasons.map(s => (
-                    <option key={s} value={s} style={{ backgroundColor: 'var(--color-surface)' }}>Сезон {s}</option>
+                    <option key={s} value={s} style={{ backgroundColor: 'var(--color-surface)' }}>{t('season')} {s}</option>
                   ))}
                 </select>
               )}
@@ -277,7 +280,7 @@ export default function AniPlayerModal() {
                       color: 'var(--color-text)',
                     }}
                   >
-                    <span style={{ color: 'var(--color-text-muted)' }}>Серия</span>
+                    <span style={{ color: 'var(--color-text-muted)' }}>{t('episode')}</span>
                     <span style={{ color: 'var(--color-text)' }}>{safeEpisode}</span>
                     <ChevronDown size={10} style={{ color: 'var(--color-text-subtle)' }} />
                   </button>
@@ -293,7 +296,7 @@ export default function AniPlayerModal() {
                         className="text-[10px] font-medium uppercase tracking-wide px-1 pb-1.5"
                         style={{ color: 'var(--color-text-subtle)' }}
                       >
-                        Серии · {episodeNumbers.length} эп.
+                        {t('episodeCount', { count: episodeNumbers.length })}
                       </p>
                       <div className="grid grid-cols-5 gap-1 max-h-52 overflow-y-auto">
                         {episodeNumbers.map(ep => (
@@ -329,7 +332,7 @@ export default function AniPlayerModal() {
                       color: 'var(--color-text-muted)',
                     }}
                   >
-                    <span className="whitespace-nowrap" style={{ color: 'var(--color-text-subtle)' }}>Озвучка</span>
+                    <span className="whitespace-nowrap" style={{ color: 'var(--color-text-subtle)' }}>{t('dubbing')}</span>
                     {currentDubbing && (
                       <span className="whitespace-nowrap truncate max-w-[120px]" style={{ color: 'var(--color-text)' }}>{currentDubbing}</span>
                     )}
@@ -397,7 +400,7 @@ export default function AniPlayerModal() {
               style={{ border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
               onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
               onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
-              aria-label="Закрыть"
+              aria-label={t('close')}
             >
               <X size={14} />
             </button>
@@ -422,7 +425,7 @@ export default function AniPlayerModal() {
                 style={{ border: '1px solid var(--color-border)', color: 'var(--color-text)' }}
                 onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
                 onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
-                aria-label="Закрыть"
+                aria-label={t('close')}
               >
                 <X size={14} />
               </button>
@@ -476,7 +479,7 @@ export default function AniPlayerModal() {
                   }}
                 >
                   {yummySeasons.map(s => (
-                    <option key={s} value={s} style={{ backgroundColor: 'var(--color-surface)' }}>Сезон {s}</option>
+                    <option key={s} value={s} style={{ backgroundColor: 'var(--color-surface)' }}>{t('season')} {s}</option>
                   ))}
                 </select>
               )}
@@ -494,7 +497,7 @@ export default function AniPlayerModal() {
                   }}
                 >
                   {episodeNumbers.map(ep => (
-                    <option key={ep} value={ep} style={{ backgroundColor: 'var(--color-surface)' }}>Серия {ep}</option>
+                    <option key={ep} value={ep} style={{ backgroundColor: 'var(--color-surface)' }}>{t('episode')} {ep}</option>
                   ))}
                 </select>
               )}
@@ -527,7 +530,7 @@ export default function AniPlayerModal() {
               {!isYummyActive && sourcesLoading && !activeSourceData && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] z-10">
                   <div className="w-9 h-9 border-2 border-white/10 border-t-white rounded-full animate-spin" />
-                  <p className="text-white/40 text-sm">Поиск видео на сервере...</p>
+                  <p className="text-white/40 text-sm">{t('searching')}</p>
                 </div>
               )}
 
@@ -535,12 +538,12 @@ export default function AniPlayerModal() {
               {!isYummyActive && !sourcesLoading && (!activeSourceData || !activeSourceData.available) && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] z-10">
                   <AlertTriangle className="w-10 h-10 text-white/30" />
-                  <p className="text-white/70 font-medium text-sm">Аниме не найдено на этом сервере</p>
+                  <p className="text-white/70 font-medium text-sm">{t('notFound')}</p>
                   <button
                     onClick={() => setActiveSource('yummy')}
                     className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors"
                   >
-                    Вернуться на YummyAnime
+                    {t('backToYummy')}
                   </button>
                 </div>
               )}
@@ -549,7 +552,7 @@ export default function AniPlayerModal() {
               {playerLoading && !loadTimeout && videoSrc && (isYummyActive || (activeSourceData?.available)) && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] z-10">
                   <div className="w-9 h-9 border-2 border-white/10 border-t-white rounded-full animate-spin" />
-                  <p className="text-white/40 text-sm">Загрузка плеера...</p>
+                  <p className="text-white/40 text-sm">{t('loading')}</p>
                 </div>
               )}
 
@@ -557,10 +560,10 @@ export default function AniPlayerModal() {
               {loadTimeout && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] p-6 text-center z-10">
                   <AlertTriangle className="w-10 h-10 text-white/30" />
-                  <p className="text-white/70 font-medium text-sm">Превышено время ожидания</p>
-                  <p className="text-white/30 text-xs mb-2">Попробуйте другой сервер</p>
+                  <p className="text-white/70 font-medium text-sm">{t('timeout')}</p>
+                  <p className="text-white/30 text-xs mb-2">{t('tryVPN')}</p>
                   <button onClick={retry} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors">
-                    Повторить
+                    {t('retry')}
                   </button>
                 </div>
               )}
@@ -569,9 +572,9 @@ export default function AniPlayerModal() {
               {playerError && !loadTimeout && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#0a0a0a] p-6 text-center z-10">
                   <AlertTriangle className="w-10 h-10 text-white/30" />
-                  <p className="text-white/70 font-medium text-sm">Ошибка загрузки</p>
+                  <p className="text-white/70 font-medium text-sm">{t('loadError')}</p>
                   <button onClick={retry} className="px-4 py-2 rounded-lg bg-white text-black text-sm font-medium hover:bg-white/90 transition-colors">
-                    Повторить
+                    {t('retry')}
                   </button>
                 </div>
               )}
@@ -605,20 +608,20 @@ export default function AniPlayerModal() {
                   allowFullScreen
                   allow="autoplay; fullscreen; picture-in-picture"
                   frameBorder="0"
-                  title={`${titleName} — Серия ${safeEpisode}`}
+                  title={`${titleName} — ${t('episode')} ${safeEpisode}`}
                 />
               )}
 
               {/* No video */}
               {!videoSrc && !playerLoading && !playerError && !loadTimeout && (
                 <div className="flex flex-col items-center justify-center h-full gap-2 text-white/30 text-sm">
-                  <p>Нет доступного видео</p>
+                  <p>{t('noVideo')}</p>
                   {!isYummyActive && videos.length > 0 && (
                     <button
                       onClick={() => setActiveSource('yummy')}
                       className="px-3 py-1.5 rounded-lg bg-white/10 text-white/50 text-xs hover:bg-white/15 transition-colors"
                     >
-                      Попробовать YummyAnime
+                      {t('tryYummy')}
                     </button>
                   )}
                 </div>

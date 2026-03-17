@@ -73,6 +73,7 @@ export default async function MoviesPage({
   const hasFilters = !!(q || genres || sort_by || year_from || year_to || min_vote || language)
 
   const t = await getTranslations('pages.movies')
+  const tf = await getTranslations('filters')
   const ANIMATION_GENRE = 16
   const selectedGenreIds = genres ? genres.split(',').filter(Boolean).map(Number) : []
   const animationSelected = selectedGenreIds.includes(ANIMATION_GENRE)
@@ -115,7 +116,7 @@ export default async function MoviesPage({
   }
 
   const label = hasFilters
-    ? q ? `Результаты: "${q}"` : 'Фильтры'
+    ? q ? tf('resultsFor', { q }) : tf('activeFilters')
     : (categories.find((c) => c.value === category)?.label || 'Trending') + ' Movies'
 
   const baseHref = `/movies?category=${category}${q ? `&q=${q}` : ''}${genres ? `&genres=${genres}` : ''}${sort_by ? `&sort_by=${sort_by}` : ''}${year_from ? `&year_from=${year_from}` : ''}${year_to ? `&year_to=${year_to}` : ''}${min_vote ? `&min_vote=${min_vote}` : ''}${language ? `&language=${language}` : ''}`
@@ -165,7 +166,7 @@ export default async function MoviesPage({
 
       {results.length === 0 && (
         <div className="text-center py-20 text-gray-500 dark:text-gray-400">
-          Ничего не найдено. Попробуйте изменить фильтры.
+          {tf('noResults')}
         </div>
       )}
 
