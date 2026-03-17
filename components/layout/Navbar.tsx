@@ -221,7 +221,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <div ref={containerRef} className="relative">
             <div
-              className={`flex items-center border-[1.5px] rounded-xl px-3 py-2 gap-2 w-48 md:w-64 h-9 transition-all duration-200${isFocused ? ' search-focused' : ''}`}
+              className={`flex items-center rounded-xl px-3 py-2 gap-2 w-48 md:w-64 h-9 transition-all duration-200${isFocused ? ' search-focused border-[2px]' : ' border-[1.5px]'}`}
               style={{ backgroundColor: 'var(--color-overlay)', borderColor: isFocused ? undefined : 'var(--color-border-strong)' }}
             >
               <Search size={14} className="flex-shrink-0" style={{ color: 'var(--color-text-subtle)' }} />
