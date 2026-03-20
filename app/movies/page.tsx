@@ -8,14 +8,6 @@ import Pagination from '@/components/ui/Pagination'
 import MovieFilters from '@/components/movies/MovieFilters'
 
 
-const categories = [
-  { value: 'trending',    label: 'Trending' },
-  { value: 'popular',     label: 'Popular' },
-  { value: 'upcoming',    label: 'Upcoming' },
-  { value: 'now_playing', label: 'Now Playing' },
-  { value: 'top_rated',   label: 'Top Rated' },
-  { value: 'discover',    label: 'Discover' },
-]
 
 const getByCategory = cache(async (category: string, page: number): Promise<{ results: Movie[]; total_pages: number }> => {
   let r: TMDBResponse<Movie>
@@ -74,6 +66,16 @@ export default async function MoviesPage({
 
   const t = await getTranslations('pages.movies')
   const tf = await getTranslations('filters')
+  const td = await getTranslations('dropdown')
+
+  const categories = [
+    { value: 'trending',    label: td('trending') },
+    { value: 'popular',     label: td('popular') },
+    { value: 'upcoming',    label: td('upcoming') },
+    { value: 'now_playing', label: td('nowPlaying') },
+    { value: 'top_rated',   label: td('topRated') },
+    { value: 'discover',    label: td('discover') },
+  ]
   const ANIMATION_GENRE = 16
   const selectedGenreIds = genres ? genres.split(',').filter(Boolean).map(Number) : []
   const animationSelected = selectedGenreIds.includes(ANIMATION_GENRE)
@@ -83,7 +85,7 @@ export default async function MoviesPage({
 
   if (q) {
     const r = await fetchSearchMovies(q, page)
-    results = r.results
+    results = r.results.filter(m => animationSelected || !m.genre_ids?.includes(ANIMATION_GENRE))
     total_pages = r.total_pages
   } else if (hasFilters || category === 'discover') {
     const params: Record<string, string> = {
@@ -104,20 +106,26 @@ export default async function MoviesPage({
     const r = await fetchDiscover('movie', params) as TMDBResponse<Movie>
     results = r.results
     total_pages = r.total_pages
+  } else if (!animationSelected) {
+    // Fetch 2 TMDB pages per virtual page so after filtering animation we always have 20 results
+    const tmdbPage1 = page * 2 - 1
+    const tmdbPage2 = page * 2
+    const [r1, r2] = await Promise.all([
+      getByCategory(category, tmdbPage1),
+      getByCategory(category, tmdbPage2).catch(() => ({ results: [] as Movie[], total_pages: 1 })),
+    ])
+    const combined = [...r1.results, ...r2.results].filter(m => !m.genre_ids?.includes(ANIMATION_GENRE))
+    results = combined.slice(0, 20)
+    total_pages = Math.ceil(r1.total_pages / 2)
   } else {
     const r = await getByCategory(category, page)
     results = r.results
     total_pages = r.total_pages
   }
 
-  // Filter out animation from all endpoints (trending/popular/etc don't support without_genres)
-  if (!animationSelected) {
-    results = results.filter(m => !m.genre_ids?.includes(ANIMATION_GENRE))
-  }
-
   const label = hasFilters
     ? q ? tf('resultsFor', { q }) : tf('activeFilters')
-    : (categories.find((c) => c.value === category)?.label || 'Trending') + ' Movies'
+    : (categories.find((c) => c.value === category)?.label || td('trending'))
 
   const baseHref = `/movies?category=${category}${q ? `&q=${q}` : ''}${genres ? `&genres=${genres}` : ''}${sort_by ? `&sort_by=${sort_by}` : ''}${year_from ? `&year_from=${year_from}` : ''}${year_to ? `&year_to=${year_to}` : ''}${min_vote ? `&min_vote=${min_vote}` : ''}${language ? `&language=${language}` : ''}`
 
