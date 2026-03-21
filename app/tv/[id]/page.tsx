@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { fetchTVDetail, fetchCredits, fetchVideos, fetchSimilar } from '@/lib/tmdb'
 import DetailHero from '@/components/detail/DetailHero'
@@ -7,6 +8,24 @@ import SimilarSection from '@/components/detail/SimilarSection'
 import { TVShow } from '@/types/tmdb'
 import UserRating from '@/components/ui/UserRating'
 
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const id = parseInt(params.id)
+  if (isNaN(id)) return { title: 'spacefeel' }
+  try {
+    const show = await fetchTVDetail(id)
+    return {
+      title: `${show.name} — spacefeel`,
+      description: show.overview || undefined,
+      openGraph: {
+        title: show.name,
+        description: show.overview || undefined,
+        images: show.poster_path ? [`https://image.tmdb.org/t/p/w780${show.poster_path}`] : [],
+      },
+    }
+  } catch {
+    return { title: 'spacefeel' }
+  }
+}
 
 export default async function TVDetailPage({ params }: { params: { id: string } }) {
   const id = parseInt(params.id)

@@ -13,7 +13,15 @@ interface Props {
 export async function generateMetadata({ params }: Props) {
   try {
     const title = await fetchYaniTitle(params.id)
-    return { title: `${title.title} — spacefeel` }
+    return {
+      title: `${title.title} — spacefeel`,
+      description: title.description || undefined,
+      openGraph: {
+        title: title.title,
+        description: title.description || undefined,
+        images: title.poster?.big ? [title.poster.big] : [],
+      },
+    }
   } catch {
     return { title: 'spacefeel' }
   }

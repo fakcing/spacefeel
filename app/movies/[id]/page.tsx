@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { fetchMovieDetail, fetchCredits, fetchVideos, fetchSimilar } from '@/lib/tmdb'
 import DetailHero from '@/components/detail/DetailHero'
@@ -7,6 +8,24 @@ import SimilarSection from '@/components/detail/SimilarSection'
 import { Movie } from '@/types/tmdb'
 import UserRating from '@/components/ui/UserRating'
 
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const id = parseInt(params.id)
+  if (isNaN(id)) return { title: 'spacefeel' }
+  try {
+    const movie = await fetchMovieDetail(id)
+    return {
+      title: `${movie.title} — spacefeel`,
+      description: movie.overview || undefined,
+      openGraph: {
+        title: movie.title,
+        description: movie.overview || undefined,
+        images: movie.poster_path ? [`https://image.tmdb.org/t/p/w780${movie.poster_path}`] : [],
+      },
+    }
+  } catch {
+    return { title: 'spacefeel' }
+  }
+}
 
 export default async function MovieDetailPage({ params }: { params: { id: string } }) {
   const id = parseInt(params.id)
