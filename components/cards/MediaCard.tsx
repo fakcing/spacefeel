@@ -29,7 +29,7 @@ export default function MediaCard({ item, mediaType, priority = false }: MediaCa
   const title = 'title' in item ? item.title : item.name
   const year = ('release_date' in item ? item.release_date : item.first_air_date)?.slice(0, 4) || ''
   // Use smaller image for non-priority cards
-  const poster = getPoster(item.poster_path, priority ? 'w342' : 'w185')
+  const poster = getPoster(item.poster_path, priority ? 'w500' : 'w342')
   const [imgError, setImgError] = useState(false)
   const router = useRouter()
 

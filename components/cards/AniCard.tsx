@@ -19,7 +19,7 @@ interface Props {
 export default function AniCard({ item }: Props) {
   const t = useTranslations('player')
   const router = useRouter()
-  const poster = getPosterUrl(item.poster.medium || item.poster.big)
+  const poster = getPosterUrl(item.poster.big || item.poster.medium)
   const href = `/anime/${item.anime_url}`
 
   const watchlistItem: WatchlistItem = {
