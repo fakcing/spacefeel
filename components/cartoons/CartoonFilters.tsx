@@ -3,6 +3,7 @@
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import FilterSelect from '@/components/ui/FilterSelect'
 
 const CURRENT_YEAR = new Date().getFullYear()
 const YEARS = Array.from({ length: CURRENT_YEAR - 1939 }, (_, i) => String(CURRENT_YEAR - i))
@@ -57,6 +58,9 @@ export default function CartoonFilters({ sort_by, year_from, year_to, min_vote, 
     ...LANGUAGE_OPTIONS,
   ]
 
+  const YEAR_FROM_OPTIONS = [{ label: t('yearFrom'), value: '' }, ...YEARS.map(y => ({ label: y, value: y }))]
+  const YEAR_TO_OPTIONS   = [{ label: t('yearTo'),   value: '' }, ...YEARS.map(y => ({ label: y, value: y }))]
+
   const update = (updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString())
     Object.entries(updates).forEach(([key, value]) => {
@@ -75,60 +79,30 @@ export default function CartoonFilters({ sort_by, year_from, year_to, min_vote, 
     router.push(`${pathname}?${params.toString()}`)
   }
 
-  const selectCls = (active: boolean) =>
-    `appearance-none cursor-pointer text-sm px-3 py-2 pr-7 rounded-xl border outline-none transition-all ${
-      active
-        ? 'border-gray-800 dark:border-white/80 bg-gray-900 dark:bg-white text-white dark:text-black font-medium'
-        : 'border-black/12 dark:border-white/12 bg-black/[0.03] dark:bg-white/[0.03] text-gray-700 dark:text-gray-300 hover:border-black/25 dark:hover:border-white/25'
-    }`
-
   return (
     <div className="mb-6 md:mb-8">
-      <p className="text-[10px] font-semibold uppercase tracking-widest mb-2.5 text-gray-400 dark:text-gray-500">
+      <p className="text-[10px] font-semibold uppercase tracking-widest mb-2.5" style={{ color: 'var(--color-text-subtle)' }}>
         {t('params')}
       </p>
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative">
-          <select value={sort_by} onChange={e => update({ sort_by: e.target.value })} className={selectCls(!!sort_by)}>
-            {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-          </select>
-          <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
-        </div>
-
-        <div className="relative">
-          <select value={year_from} onChange={e => update({ year_from: e.target.value })} className={selectCls(!!year_from)}>
-            <option value="">{t('yearFrom')}</option>
-            {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-          </select>
-          <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
-        </div>
-
-        <div className="relative">
-          <select value={year_to} onChange={e => update({ year_to: e.target.value })} className={selectCls(!!year_to)}>
-            <option value="">{t('yearTo')}</option>
-            {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-          </select>
-          <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
-        </div>
-
-        <div className="relative">
-          <select value={min_vote} onChange={e => update({ min_vote: e.target.value })} className={selectCls(!!min_vote)}>
-            {RATINGS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-          </select>
-          <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
-        </div>
-
-        <div className="relative">
-          <select value={language} onChange={e => update({ language: e.target.value })} className={selectCls(!!language)}>
-            {LANGUAGES.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
-          </select>
-          <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
-        </div>
-
+        <FilterSelect label={t('sortDefault')} value={sort_by} options={SORT_OPTIONS} onChange={v => update({ sort_by: v })} />
+        <FilterSelect label={t('yearFrom')} value={year_from} options={YEAR_FROM_OPTIONS} onChange={v => update({ year_from: v })} />
+        <FilterSelect label={t('yearTo')} value={year_to} options={YEAR_TO_OPTIONS} onChange={v => update({ year_to: v })} />
+        <FilterSelect label={t('ratingDefault')} value={min_vote} options={RATINGS} onChange={v => update({ min_vote: v })} />
+        <FilterSelect label={t('languageDefault')} value={language} options={LANGUAGES} onChange={v => update({ language: v })} />
         {hasFilters && (
           <button
             onClick={clearAll}
-            className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl border border-black/10 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-black/25 dark:hover:border-white/25 hover:text-gray-900 dark:hover:text-white transition-all"
+            className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl transition-all"
+            style={{ border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-text-muted)'
+              e.currentTarget.style.color = 'var(--color-text)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-border)'
+              e.currentTarget.style.color = 'var(--color-text-muted)'
+            }}
           >
             <X size={11} />
             {t('reset')}

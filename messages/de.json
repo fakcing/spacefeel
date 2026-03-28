@@ -99,6 +99,7 @@
     }
   },
   "dropdown": {
+    "trending": "Trending",
     "trendingMovies": "Trendfilme",
     "popular": "Beliebt",
     "upcoming": "Demnächst",
@@ -152,7 +153,29 @@
     "typeDefault": "Typ",
     "typeMovie": "Film",
     "typeSpecial": "Special",
-    "yearDefault": "Jahr"
+    "yearDefault": "Jahr",
+    "genre_28": "Action",
+    "genre_12": "Abenteuer",
+    "genre_35": "Komödie",
+    "genre_80": "Krimi",
+    "genre_99": "Dokumentation",
+    "genre_18": "Drama",
+    "genre_10751": "Familie",
+    "genre_14": "Fantasy",
+    "genre_36": "Geschichte",
+    "genre_27": "Horror",
+    "genre_10402": "Musik",
+    "genre_9648": "Mystery",
+    "genre_10749": "Romantik",
+    "genre_878": "Science-Fiction",
+    "genre_53": "Thriller",
+    "genre_10752": "Krieg",
+    "genre_37": "Western",
+    "genre_10759": "Action & Abenteuer",
+    "genre_10762": "Kinder",
+    "genre_10764": "Reality",
+    "genre_10765": "Science-Fiction & Fantasy",
+    "genre_10768": "Krieg & Politik"
   },
   "player": {
     "season": "Staffel",

@@ -99,6 +99,7 @@
     }
   },
   "dropdown": {
+    "trending": "トレンド",
     "trendingMovies": "トレンド映画",
     "popular": "人気",
     "upcoming": "近日公開",
@@ -152,7 +153,29 @@
     "typeDefault": "タイプ",
     "typeMovie": "映画",
     "typeSpecial": "スペシャル",
-    "yearDefault": "年"
+    "yearDefault": "年",
+    "genre_28": "アクション",
+    "genre_12": "アドベンチャー",
+    "genre_35": "コメディ",
+    "genre_80": "犯罪",
+    "genre_99": "ドキュメンタリー",
+    "genre_18": "ドラマ",
+    "genre_10751": "ファミリー",
+    "genre_14": "ファンタジー",
+    "genre_36": "歴史",
+    "genre_27": "ホラー",
+    "genre_10402": "音楽",
+    "genre_9648": "ミステリー",
+    "genre_10749": "ロマンス",
+    "genre_878": "SF",
+    "genre_53": "スリラー",
+    "genre_10752": "戦争",
+    "genre_37": "西部劇",
+    "genre_10759": "アクション&アドベンチャー",
+    "genre_10762": "キッズ",
+    "genre_10764": "リアリティ",
+    "genre_10765": "SF&ファンタジー",
+    "genre_10768": "戦争&政治"
   },
   "player": {
     "season": "シーズン",

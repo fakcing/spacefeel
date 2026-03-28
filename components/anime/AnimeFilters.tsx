@@ -4,6 +4,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Search, X } from 'lucide-react'
 import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
+import FilterSelect from '@/components/ui/FilterSelect'
 
 const CURRENT_YEAR = new Date().getFullYear()
 
@@ -54,27 +55,24 @@ export default function AnimeFilters({ q, year, type }: Props) {
 
   const clearAll = () => router.push(pathname)
 
-  const selectClass = (active: boolean) =>
-    `appearance-none cursor-pointer text-sm px-3 py-2 pr-7 rounded-xl border outline-none transition-colors bg-white dark:bg-[#111] ${
-      active
-        ? 'border-gray-900 dark:border-white text-gray-900 dark:text-white font-medium'
-        : 'border-black/15 dark:border-white/15 text-gray-900/60 dark:text-white/60 hover:border-black/30 dark:hover:border-white/30'
-    }`
-
   return (
     <div className="space-y-3">
       {/* Search bar */}
-      <div className="relative flex items-center border border-black/15 dark:border-white/15 rounded-xl px-4 py-2.5 gap-3 bg-black/[0.02] dark:bg-white/[0.02] focus-within:border-black/30 dark:focus-within:border-white/30 transition-colors">
-        <Search size={16} className="flex-shrink-0 text-gray-900/40 dark:text-white/40" />
+      <div
+        className="flex items-center rounded-xl px-4 py-2.5 gap-3 transition-all"
+        style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
+      >
+        <Search size={15} className="flex-shrink-0" style={{ color: 'var(--color-text-subtle)' }} />
         <input
           type="text"
           defaultValue={q}
           onChange={(e) => handleSearch(e.target.value)}
           placeholder={t('searchAnime')}
-          className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-900/30 dark:placeholder:text-white/30 text-gray-900 dark:text-white"
+          className="flex-1 bg-transparent text-sm outline-none placeholder:opacity-40"
+          style={{ color: 'var(--color-text)' }}
         />
         {q && (
-          <button onClick={() => update('q', '')} className="flex-shrink-0 text-gray-900/40 dark:text-white/40 hover:text-gray-900 dark:hover:text-white transition-colors">
+          <button onClick={() => update('q', '')} className="flex-shrink-0 transition-colors" style={{ color: 'var(--color-text-muted)' }}>
             <X size={14} />
           </button>
         )}
@@ -82,25 +80,23 @@ export default function AnimeFilters({ q, year, type }: Props) {
 
       {/* Filter dropdowns */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative">
-          <select value={year} onChange={e => update('year', e.target.value)} className={selectClass(!!year)}>
-            {YEARS.map(y => <option key={y.value} value={y.value}>{y.label}</option>)}
-          </select>
-          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-900/40 dark:text-white/40 text-xs">▾</span>
-        </div>
-
-        <div className="relative">
-          <select value={type} onChange={e => update('type', e.target.value)} className={selectClass(!!type)}>
-            {TYPES.map(tp => <option key={tp.value} value={tp.value}>{tp.label}</option>)}
-          </select>
-          <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-gray-900/40 dark:text-white/40 text-xs">▾</span>
-        </div>
-
+        <FilterSelect label={t('yearDefault')} value={year} options={YEARS} onChange={v => update('year', v)} />
+        <FilterSelect label={t('typeDefault')} value={type} options={TYPES} onChange={v => update('type', v)} />
         {hasFilters && (
           <button
             onClick={clearAll}
-            className="text-sm px-3 py-2 rounded-xl border border-black/15 dark:border-white/15 text-gray-900/60 dark:text-white/60 hover:border-black/30 dark:hover:border-white/30 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl transition-all"
+            style={{ border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-text-muted)'
+              e.currentTarget.style.color = 'var(--color-text)'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = 'var(--color-border)'
+              e.currentTarget.style.color = 'var(--color-text-muted)'
+            }}
           >
+            <X size={11} />
             {t('reset')}
           </button>
         )}

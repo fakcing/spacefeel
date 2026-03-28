@@ -4,26 +4,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { Search, X } from 'lucide-react'
 import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
-
-const GENRES = [
-  { id: 28,    name: 'Action' },
-  { id: 12,    name: 'Adventure' },
-  { id: 35,    name: 'Comedy' },
-  { id: 80,    name: 'Crime' },
-  { id: 99,    name: 'Documentary' },
-  { id: 18,    name: 'Drama' },
-  { id: 10751, name: 'Family' },
-  { id: 14,    name: 'Fantasy' },
-  { id: 36,    name: 'History' },
-  { id: 27,    name: 'Horror' },
-  { id: 10402, name: 'Music' },
-  { id: 9648,  name: 'Mystery' },
-  { id: 10749, name: 'Romance' },
-  { id: 878,   name: 'Sci-Fi' },
-  { id: 53,    name: 'Thriller' },
-  { id: 10752, name: 'War' },
-  { id: 37,    name: 'Western' },
-]
+import FilterSelect from '@/components/ui/FilterSelect'
 
 const CURRENT_YEAR = new Date().getFullYear()
 const YEARS = Array.from({ length: CURRENT_YEAR - 1899 }, (_, i) => String(CURRENT_YEAR - i))
@@ -60,6 +41,26 @@ export default function MovieFilters({ q, genres, sort_by, year_from, year_to, m
 
   const selectedGenres = genres ? genres.split(',').filter(Boolean).map(Number) : []
 
+  const GENRES = [
+    { id: 28,    name: t('genre_28') },
+    { id: 12,    name: t('genre_12') },
+    { id: 35,    name: t('genre_35') },
+    { id: 80,    name: t('genre_80') },
+    { id: 99,    name: t('genre_99') },
+    { id: 18,    name: t('genre_18') },
+    { id: 10751, name: t('genre_10751') },
+    { id: 14,    name: t('genre_14') },
+    { id: 36,    name: t('genre_36') },
+    { id: 27,    name: t('genre_27') },
+    { id: 10402, name: t('genre_10402') },
+    { id: 9648,  name: t('genre_9648') },
+    { id: 10749, name: t('genre_10749') },
+    { id: 878,   name: t('genre_878') },
+    { id: 53,    name: t('genre_53') },
+    { id: 10752, name: t('genre_10752') },
+    { id: 37,    name: t('genre_37') },
+  ]
+
   const SORT_OPTIONS = [
     { label: t('sortDefault'), value: '' },
     { label: t('sortPopularDesc'), value: 'popularity.desc' },
@@ -84,6 +85,9 @@ export default function MovieFilters({ q, genres, sort_by, year_from, year_to, m
     { label: t('languageDefault'), value: '' },
     ...LANGUAGE_OPTIONS,
   ]
+
+  const YEAR_FROM_OPTIONS = [{ label: t('yearFrom'), value: '' }, ...YEARS.map(y => ({ label: y, value: y }))]
+  const YEAR_TO_OPTIONS   = [{ label: t('yearTo'),   value: '' }, ...YEARS.map(y => ({ label: y, value: y }))]
 
   const update = (updates: Record<string, string>) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -115,33 +119,24 @@ export default function MovieFilters({ q, genres, sort_by, year_from, year_to, m
     router.push(`${pathname}?${params.toString()}`)
   }
 
-  const selectCls = (active: boolean) =>
-    `appearance-none cursor-pointer text-sm px-3 py-2 pr-7 rounded-xl border outline-none transition-all ${
-      active
-        ? 'border-gray-800 dark:border-white/80 bg-gray-900 dark:bg-white text-white dark:text-black font-medium'
-        : 'border-black/12 dark:border-white/12 bg-black/[0.03] dark:bg-white/[0.03] text-gray-700 dark:text-gray-300 hover:border-black/25 dark:hover:border-white/25'
-    }`
-
-  const SectionLabel = ({ children }: { children: string }) => (
-    <p className="text-[10px] font-semibold uppercase tracking-widest mb-2.5 text-gray-400 dark:text-gray-500">
-      {children}
-    </p>
-  )
-
   return (
     <div className="space-y-4 mb-6 md:mb-8">
       {/* Search */}
-      <div className="relative flex items-center border border-black/10 dark:border-white/10 rounded-xl px-4 py-2.5 gap-3 bg-black/[0.02] dark:bg-white/[0.02] focus-within:border-black/25 dark:focus-within:border-white/25 focus-within:bg-black/[0.04] dark:focus-within:bg-white/[0.04] transition-all">
-        <Search size={15} className="flex-shrink-0 text-gray-400 dark:text-gray-500" />
+      <div
+        className="flex items-center rounded-xl px-4 py-2.5 gap-3 transition-all"
+        style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
+      >
+        <Search size={15} className="flex-shrink-0" style={{ color: 'var(--color-text-subtle)' }} />
         <input
           type="text"
           defaultValue={q}
           onChange={(e) => handleSearch(e.target.value)}
           placeholder={t('searchMovies')}
-          className="flex-1 bg-transparent text-sm outline-none placeholder:text-gray-400 dark:placeholder:text-gray-500 text-gray-900 dark:text-white"
+          className="flex-1 bg-transparent text-sm outline-none placeholder:opacity-40"
+          style={{ color: 'var(--color-text)' }}
         />
         {q && (
-          <button onClick={() => update({ q: '' })} className="flex-shrink-0 text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors">
+          <button onClick={() => update({ q: '' })} className="flex-shrink-0 transition-colors" style={{ color: 'var(--color-text-muted)' }}>
             <X size={14} />
           </button>
         )}
@@ -149,73 +144,60 @@ export default function MovieFilters({ q, genres, sort_by, year_from, year_to, m
 
       {/* Genres */}
       <div>
-        <SectionLabel>{t('genres')}</SectionLabel>
+        <p className="text-[10px] font-semibold uppercase tracking-widest mb-2.5" style={{ color: 'var(--color-text-subtle)' }}>
+          {t('genres')}
+        </p>
         <div className="flex flex-wrap gap-1.5">
-          {GENRES.map(g => (
-            <button
-              key={g.id}
-              onClick={() => toggleGenre(g.id)}
-              className={`px-3 py-1 rounded-full text-xs font-medium border transition-all ${
-                selectedGenres.includes(g.id)
-                  ? 'bg-gray-900 dark:bg-white border-gray-900 dark:border-white text-white dark:text-black'
-                  : 'border-black/10 dark:border-white/10 bg-black/[0.03] dark:bg-white/[0.03] text-gray-600 dark:text-gray-400 hover:border-black/25 dark:hover:border-white/25 hover:text-gray-900 dark:hover:text-white'
-              }`}
-            >
-              {g.name}
-            </button>
-          ))}
+          {GENRES.map(g => {
+            const isSelected = selectedGenres.includes(g.id)
+            return (
+              <button
+                key={g.id}
+                onClick={() => toggleGenre(g.id)}
+                className="px-3 py-1 rounded-full text-xs font-medium transition-all"
+                style={
+                  isSelected
+                    ? { backgroundColor: 'var(--color-text)', border: '1px solid transparent', color: 'var(--color-bg)' }
+                    : { backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }
+                }
+                onMouseEnter={(e) => {
+                  if (!isSelected) e.currentTarget.style.borderColor = 'var(--color-text-muted)'
+                }}
+                onMouseLeave={(e) => {
+                  if (!isSelected) e.currentTarget.style.borderColor = 'var(--color-border)'
+                }}
+              >
+                {g.name}
+              </button>
+            )
+          })}
         </div>
       </div>
 
-      {/* Dropdowns */}
+      {/* Params */}
       <div>
-        <SectionLabel>{t('params')}</SectionLabel>
+        <p className="text-[10px] font-semibold uppercase tracking-widest mb-2.5" style={{ color: 'var(--color-text-subtle)' }}>
+          {t('params')}
+        </p>
         <div className="flex flex-wrap items-center gap-2">
-          {[
-            { value: sort_by, key: 'sort_by', options: SORT_OPTIONS },
-          ].map(({ value, key, options }) => (
-            <div key={key} className="relative">
-              <select value={value} onChange={e => update({ [key]: e.target.value })} className={selectCls(!!value)}>
-                {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
-              <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
-            </div>
-          ))}
-
-          <div className="relative">
-            <select value={year_from} onChange={e => update({ year_from: e.target.value })} className={selectCls(!!year_from)}>
-              <option value="">{t('yearFrom')}</option>
-              {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-            </select>
-            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
-          </div>
-
-          <div className="relative">
-            <select value={year_to} onChange={e => update({ year_to: e.target.value })} className={selectCls(!!year_to)}>
-              <option value="">{t('yearTo')}</option>
-              {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
-            </select>
-            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
-          </div>
-
-          <div className="relative">
-            <select value={min_vote} onChange={e => update({ min_vote: e.target.value })} className={selectCls(!!min_vote)}>
-              {RATINGS.map(r => <option key={r.value} value={r.value}>{r.label}</option>)}
-            </select>
-            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
-          </div>
-
-          <div className="relative">
-            <select value={language} onChange={e => update({ language: e.target.value })} className={selectCls(!!language)}>
-              {LANGUAGES.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
-            </select>
-            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] opacity-50">▾</span>
-          </div>
-
+          <FilterSelect label={t('sortDefault')} value={sort_by} options={SORT_OPTIONS} onChange={v => update({ sort_by: v })} />
+          <FilterSelect label={t('yearFrom')} value={year_from} options={YEAR_FROM_OPTIONS} onChange={v => update({ year_from: v })} />
+          <FilterSelect label={t('yearTo')} value={year_to} options={YEAR_TO_OPTIONS} onChange={v => update({ year_to: v })} />
+          <FilterSelect label={t('ratingDefault')} value={min_vote} options={RATINGS} onChange={v => update({ min_vote: v })} />
+          <FilterSelect label={t('languageDefault')} value={language} options={LANGUAGES} onChange={v => update({ language: v })} />
           {hasFilters && (
             <button
               onClick={clearAll}
-              className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl border border-black/10 dark:border-white/10 text-gray-500 dark:text-gray-400 hover:border-black/25 dark:hover:border-white/25 hover:text-gray-900 dark:hover:text-white transition-all"
+              className="flex items-center gap-1.5 text-xs px-3 py-2 rounded-xl transition-all"
+              style={{ border: '1px solid var(--color-border)', color: 'var(--color-text-muted)' }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-text-muted)'
+                e.currentTarget.style.color = 'var(--color-text)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-border)'
+                e.currentTarget.style.color = 'var(--color-text-muted)'
+              }}
             >
               <X size={11} />
               {t('reset')}

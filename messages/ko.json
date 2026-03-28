@@ -99,6 +99,7 @@
     }
   },
   "dropdown": {
+    "trending": "트렌딩",
     "trendingMovies": "트렌딩 영화",
     "popular": "인기",
     "upcoming": "개봉 예정",
@@ -152,7 +153,29 @@
     "typeDefault": "유형",
     "typeMovie": "영화",
     "typeSpecial": "스페셜",
-    "yearDefault": "연도"
+    "yearDefault": "연도",
+    "genre_28": "액션",
+    "genre_12": "모험",
+    "genre_35": "코미디",
+    "genre_80": "범죄",
+    "genre_99": "다큐멘터리",
+    "genre_18": "드라마",
+    "genre_10751": "가족",
+    "genre_14": "판타지",
+    "genre_36": "역사",
+    "genre_27": "공포",
+    "genre_10402": "음악",
+    "genre_9648": "미스터리",
+    "genre_10749": "로맨스",
+    "genre_878": "SF",
+    "genre_53": "스릴러",
+    "genre_10752": "전쟁",
+    "genre_37": "서부극",
+    "genre_10759": "액션 & 모험",
+    "genre_10762": "어린이",
+    "genre_10764": "리얼리티",
+    "genre_10765": "SF & 판타지",
+    "genre_10768": "전쟁 & 정치"
   },
   "player": {
     "season": "시즌",

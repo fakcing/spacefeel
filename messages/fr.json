@@ -99,6 +99,7 @@
     }
   },
   "dropdown": {
+    "trending": "Tendances",
     "trendingMovies": "Films tendance",
     "popular": "Populaire",
     "upcoming": "À venir",
@@ -152,7 +153,29 @@
     "typeDefault": "Type",
     "typeMovie": "Film",
     "typeSpecial": "Spécial",
-    "yearDefault": "Année"
+    "yearDefault": "Année",
+    "genre_28": "Action",
+    "genre_12": "Aventure",
+    "genre_35": "Comédie",
+    "genre_80": "Crime",
+    "genre_99": "Documentaire",
+    "genre_18": "Drame",
+    "genre_10751": "Famille",
+    "genre_14": "Fantastique",
+    "genre_36": "Histoire",
+    "genre_27": "Horreur",
+    "genre_10402": "Musique",
+    "genre_9648": "Mystère",
+    "genre_10749": "Romance",
+    "genre_878": "Science-Fiction",
+    "genre_53": "Thriller",
+    "genre_10752": "Guerre",
+    "genre_37": "Western",
+    "genre_10759": "Action & Aventure",
+    "genre_10762": "Enfants",
+    "genre_10764": "Téléréalité",
+    "genre_10765": "Science-Fiction & Fantastique",
+    "genre_10768": "Guerre & Politique"
   },
   "player": {
     "season": "Saison",

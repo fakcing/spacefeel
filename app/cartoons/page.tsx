@@ -6,16 +6,6 @@ import MediaCard from '@/components/cards/MediaCard'
 import Pagination from '@/components/ui/Pagination'
 import CartoonFilters from '@/components/cartoons/CartoonFilters'
 
-
-const categories = [
-  { value: 'trending',  label: 'Trending' },
-  { value: 'popular',   label: 'Popular' },
-  { value: 'top_rated', label: 'Top Rated' },
-  { value: 'family',    label: 'Family Picks' },
-  { value: 'new',       label: 'New Releases' },
-  { value: 'classics',  label: 'Classics' },
-]
-
 function buildCartoonParams(category: string, page: number, overrides: Record<string, string> = {}): Record<string, string> {
   const base: Record<string, string> = {
     with_genres: '16',
@@ -75,12 +65,22 @@ export default async function CartoonsPage({
 
   const t = await getTranslations('pages.cartoons')
   const tf = await getTranslations('filters')
+  const td = await getTranslations('dropdown')
+
+  const categories = [
+    { value: 'trending',  label: td('trending') },
+    { value: 'popular',   label: td('popular') },
+    { value: 'top_rated', label: td('topRated') },
+    { value: 'family',    label: td('familyPicks') },
+    { value: 'new',       label: td('newReleases') },
+    { value: 'classics',  label: td('classics') },
+  ]
   const params = buildCartoonParams(category, page, overrides)
   const r = await fetchDiscover('tv', params) as TMDBResponse<TVShow>
   const results = r.results
   const total_pages = r.total_pages
 
-  const label = (categories.find(c => c.value === category)?.label || 'Popular') + ' Cartoons'
+  const label = hasFilters ? tf('activeFilters') : (categories.find(c => c.value === category)?.label || td('popular'))
 
   const baseHref = `/cartoons?category=${category}${sort_by ? `&sort_by=${sort_by}` : ''}${year_from ? `&year_from=${year_from}` : ''}${year_to ? `&year_to=${year_to}` : ''}${min_vote ? `&min_vote=${min_vote}` : ''}${language ? `&language=${language}` : ''}`
 

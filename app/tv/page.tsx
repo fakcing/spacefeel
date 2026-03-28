@@ -7,28 +7,12 @@ import MediaCard from '@/components/cards/MediaCard'
 import Pagination from '@/components/ui/Pagination'
 import TVFilters from '@/components/tv/TVFilters'
 
-
-const categories = [
-  { value: 'trending',     label: 'Trending' },
-  { value: 'popular',      label: 'Popular' },
-  { value: 'top_rated',    label: 'Top Rated' },
-  { value: 'on_the_air',   label: 'On The Air' },
-  { value: 'airing_today', label: 'Airing Today' },
-  { value: 'discover',     label: 'Discover' },
-]
-
 const noAnim = { without_genres: '16' }
 
 const getShows = cache(async (category: string, page: number): Promise<{ results: TVShow[]; total_pages: number }> => {
   let r: TMDBResponse<TVShow>
   const p = String(page)
   switch (category) {
-    case 'trending':
-      r = await fetchDiscover('tv', { ...noAnim, sort_by: 'popularity.desc', page: p }) as TMDBResponse<TVShow>
-      break
-    case 'popular':
-      r = await fetchDiscover('tv', { ...noAnim, sort_by: 'popularity.desc', page: p }) as TMDBResponse<TVShow>
-      break
     case 'top_rated':
       r = await fetchDiscover('tv', { ...noAnim, sort_by: 'vote_average.desc', 'vote_count.gte': '200', page: p }) as TMDBResponse<TVShow>
       break
@@ -37,9 +21,6 @@ const getShows = cache(async (category: string, page: number): Promise<{ results
       break
     case 'airing_today':
       r = await fetchAiringToday(page)
-      break
-    case 'discover':
-      r = await fetchDiscover('tv', { ...noAnim, sort_by: 'popularity.desc', page: p }) as TMDBResponse<TVShow>
       break
     default:
       r = await fetchDiscover('tv', { ...noAnim, sort_by: 'popularity.desc', page: p }) as TMDBResponse<TVShow>
@@ -77,6 +58,16 @@ export default async function TVPage({
 
   const t = await getTranslations('pages.tv')
   const tf = await getTranslations('filters')
+  const td = await getTranslations('dropdown')
+
+  const categories = [
+    { value: 'trending',     label: td('trending') },
+    { value: 'popular',      label: td('popular') },
+    { value: 'top_rated',    label: td('topRated') },
+    { value: 'on_the_air',   label: td('onTheAir') },
+    { value: 'airing_today', label: td('airingToday') },
+    { value: 'discover',     label: td('discover') },
+  ]
   const ANIMATION_GENRE = 16
   const selectedGenreIds = genres ? genres.split(',').filter(Boolean).map(Number) : []
   const animationSelected = selectedGenreIds.includes(ANIMATION_GENRE)
@@ -119,7 +110,7 @@ export default async function TVPage({
 
   const label = hasFilters
     ? q ? tf('resultsFor', { q }) : tf('activeFilters')
-    : (categories.find(c => c.value === category)?.label || 'Trending') + ' TV Shows'
+    : (categories.find(c => c.value === category)?.label || td('trending'))
 
   const baseHref = `/tv?category=${category}${q ? `&q=${q}` : ''}${genres ? `&genres=${genres}` : ''}${sort_by ? `&sort_by=${sort_by}` : ''}${year_from ? `&year_from=${year_from}` : ''}${year_to ? `&year_to=${year_to}` : ''}${min_vote ? `&min_vote=${min_vote}` : ''}${language ? `&language=${language}` : ''}`
 
