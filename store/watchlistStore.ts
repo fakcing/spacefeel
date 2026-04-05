@@ -7,7 +7,9 @@ interface WatchlistStore {
   addItem: (item: WatchlistItem, isLoggedIn?: boolean) => Promise<void>
   removeItem: (id: number, mediaType: string, isLoggedIn?: boolean) => Promise<void>
   toggleItem: (item: WatchlistItem, isLoggedIn?: boolean) => Promise<void>
+  updateStatus: (id: number, mediaType: string, status: string, isLoggedIn?: boolean) => Promise<void>
   isInWatchlist: (id: number) => boolean
+  getStatus: (id: number, mediaType: string) => string
   syncFromDB: () => Promise<void>
   clearItems: () => void
 }
@@ -27,12 +29,14 @@ export const useWatchlistStore = create<WatchlistStore>()(
           posterPath: string | null
           voteAverage: number | null
           releaseDate: string | null
+          status: string | null
         }) => ({
           id: d.tmdbId,
-          media_type: d.mediaType as 'movie' | 'tv',
+          media_type: d.mediaType as 'movie' | 'tv' | 'anime',
           poster_path: d.posterPath ?? null,
           vote_average: d.voteAverage ?? 0,
           release_date: d.releaseDate ?? '',
+          status: d.status ?? 'planning',
         }))
         set({ items: mapped })
       },
@@ -69,7 +73,25 @@ export const useWatchlistStore = create<WatchlistStore>()(
         }
       },
 
+      updateStatus: async (id, mediaType, status, isLoggedIn = false) => {
+        set(s => ({
+          items: s.items.map(i =>
+            i.id === id && i.media_type === mediaType ? { ...i, status } : i
+          ),
+        }))
+        if (isLoggedIn) {
+          await fetch('/api/watchlist/status', {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tmdbId: id, mediaType, status }),
+          })
+        }
+      },
+
       isInWatchlist: (id) => get().items.some((i) => i.id === id),
+
+      getStatus: (id, mediaType) =>
+        get().items.find(i => i.id === id && i.media_type === mediaType)?.status ?? 'planning',
 
       clearItems: () => set({ items: [] }),
     }),

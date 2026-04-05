@@ -60,7 +60,12 @@
   "watchlistPage": {
     "title": "マイリスト",
     "empty": "リストは空です",
-    "browse": "映画を探す"
+    "browse": "映画を探す",
+    "filterAll": "すべて",
+    "statusPlanning": "視聴予定",
+    "statusWatching": "視聴中",
+    "statusCompleted": "視聴済み",
+    "statusDropped": "中断"
   },
   "profile": {
     "account": "アカウント",

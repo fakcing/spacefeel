@@ -5,10 +5,11 @@ import { z } from 'zod'
 
 const itemSchema = z.object({
   tmdbId: z.number(),
-  mediaType: z.enum(['movie', 'tv']),
+  mediaType: z.enum(['movie', 'tv', 'anime']),
   posterPath: z.string().nullable().optional(),
   voteAverage: z.number().optional(),
   releaseDate: z.string().optional(),
+  status: z.enum(['planning', 'watching', 'completed', 'dropped']).optional(),
 })
 
 export async function GET() {

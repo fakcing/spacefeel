@@ -60,7 +60,12 @@
   "watchlistPage": {
     "title": "My Watchlist",
     "empty": "Your watchlist is empty",
-    "browse": "Browse Movies"
+    "browse": "Browse Movies",
+    "filterAll": "All",
+    "statusPlanning": "Plan to Watch",
+    "statusWatching": "Watching",
+    "statusCompleted": "Completed",
+    "statusDropped": "Dropped"
   },
   "profile": {
     "account": "Account",

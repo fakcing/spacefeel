@@ -60,7 +60,12 @@
   "watchlistPage": {
     "title": "Мой список",
     "empty": "Ваш список пуст",
-    "browse": "Смотреть фильмы"
+    "browse": "Смотреть фильмы",
+    "filterAll": "Все",
+    "statusPlanning": "Запланировано",
+    "statusWatching": "Смотрю",
+    "statusCompleted": "Просмотрено",
+    "statusDropped": "Брошено"
   },
   "profile": {
     "account": "Аккаунт",

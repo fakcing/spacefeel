@@ -60,7 +60,12 @@
   "watchlistPage": {
     "title": "Meine Merkliste",
     "empty": "Ihre Merkliste ist leer",
-    "browse": "Filme durchsuchen"
+    "browse": "Filme durchsuchen",
+    "filterAll": "Alle",
+    "statusPlanning": "Geplant",
+    "statusWatching": "Schaue ich",
+    "statusCompleted": "Gesehen",
+    "statusDropped": "Abgebrochen"
   },
   "profile": {
     "account": "Konto",

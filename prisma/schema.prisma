@@ -74,6 +74,7 @@ model Watchlist {
   posterPath  String?
   voteAverage Float?
   releaseDate String?
+  status      String   @default("planning")
   addedAt     DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)

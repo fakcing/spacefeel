@@ -60,7 +60,12 @@
   "watchlistPage": {
     "title": "내 목록",
     "empty": "목록이 비어 있습니다",
-    "browse": "영화 탐색"
+    "browse": "영화 탐색",
+    "filterAll": "전체",
+    "statusPlanning": "볼 예정",
+    "statusWatching": "시청 중",
+    "statusCompleted": "완료",
+    "statusDropped": "중단"
   },
   "profile": {
     "account": "계정",

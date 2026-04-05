@@ -60,7 +60,12 @@
   "watchlistPage": {
     "title": "Мій список",
     "empty": "Ваш список порожній",
-    "browse": "Дивитись фільми"
+    "browse": "Дивитись фільми",
+    "filterAll": "Усі",
+    "statusPlanning": "Заплановано",
+    "statusWatching": "Дивлюсь",
+    "statusCompleted": "Переглянуто",
+    "statusDropped": "Покинуто"
   },
   "profile": {
     "account": "Акаунт",

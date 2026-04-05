@@ -60,7 +60,12 @@
   "watchlistPage": {
     "title": "Mi lista",
     "empty": "Tu lista está vacía",
-    "browse": "Explorar películas"
+    "browse": "Explorar películas",
+    "filterAll": "Todo",
+    "statusPlanning": "Planificado",
+    "statusWatching": "Viendo",
+    "statusCompleted": "Visto",
+    "statusDropped": "Abandonado"
   },
   "profile": {
     "account": "Cuenta",
