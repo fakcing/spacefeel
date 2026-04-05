@@ -43,7 +43,8 @@
     "signInToRate": "Sign in to rate",
     "writeReview": "Write a review (optional)",
     "submitRating": "Submit",
-    "deleteRating": "Delete"
+    "deleteRating": "Delete",
+    "continue": "Continue"
   },
   "search": {
     "placeholder": "Search...",

@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { Play, Plus, BookmarkCheck } from 'lucide-react'
+import { Play, Plus, BookmarkCheck, RotateCcw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Movie, TVShow, WatchlistItem } from '@/types/tmdb'
 import { getBackdrop, getPoster } from '@/lib/tmdbImages'
@@ -11,13 +11,15 @@ import { useSession } from 'next-auth/react'
 import { useWatchlistStore } from '@/store/watchlistStore'
 import { useAuthModalStore } from '@/store/authModalStore'
 import { useMediaPlayerStore } from '@/store/mediaPlayerStore'
+import type { WatchProgress } from '@/lib/watchProgress'
 
 interface DetailHeroProps {
   item: Movie | TVShow
   mediaType: 'movie' | 'tv'
+  progress?: WatchProgress | null
 }
 
-export default function DetailHero({ item, mediaType }: DetailHeroProps) {
+export default function DetailHero({ item, mediaType, progress }: DetailHeroProps) {
   const t = useTranslations('detail')
   const title = 'title' in item ? item.title : item.name
   const year = ('release_date' in item ? item.release_date : item.first_air_date)?.slice(0, 4) || ''
@@ -49,14 +51,14 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
     toggleItem(watchlistItem, true)
   }
 
-  const handlePlay = () => {
+  const handlePlay = (fromStart = false) => {
     if (!session) { openAuthModal(); return }
     openPlayer({
       mediaType,
       item,
       tmdbId: item.id,
-      season: 1,
-      episode: 1,
+      season: (!fromStart && progress?.season) || 1,
+      episode: (!fromStart && progress?.episode) || 1,
     })
   }
 
@@ -137,12 +139,23 @@ export default function DetailHero({ item, mediaType }: DetailHeroProps) {
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <button
-              onClick={handlePlay}
+              onClick={() => handlePlay(false)}
               className="flex items-center justify-center gap-2 bg-black dark:bg-white text-white dark:text-black font-semibold rounded-full px-6 py-3 sm:py-2.5 hover:bg-black/80 dark:hover:bg-white/90 transition-colors text-sm w-full sm:w-auto cursor-pointer"
             >
               <Play size={16} className="fill-white dark:fill-black" />
-              {t('playNow')}
+              {progress && mediaType === 'tv'
+                ? `${t('continue')} S${progress.season}E${progress.episode}`
+                : t('playNow')}
             </button>
+            {progress && mediaType === 'tv' && (
+              <button
+                onClick={() => handlePlay(true)}
+                className="flex items-center justify-center gap-2 font-semibold rounded-full px-6 py-3 sm:py-2.5 text-sm transition-colors border border-black/20 dark:border-white/20 text-gray-900 dark:text-white hover:bg-black/10 dark:hover:bg-white/10 w-full sm:w-auto cursor-pointer"
+              >
+                <RotateCcw size={14} />
+                {t('playNow')}
+              </button>
+            )}
             <button
               onClick={handleWatchlist}
               className={`flex items-center justify-center gap-2 font-semibold rounded-full px-6 py-3 sm:py-2.5 text-sm transition-colors border w-full sm:w-auto ${

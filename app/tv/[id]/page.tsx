@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { fetchTVDetail, fetchCredits, fetchVideos, fetchSimilar } from '@/lib/tmdb'
+import { getWatchProgress } from '@/lib/watchProgress'
 import DetailHero from '@/components/detail/DetailHero'
 import DetailTabs from '@/components/detail/DetailTabs'
 import TrailerModal from '@/components/detail/TrailerModal'
@@ -32,18 +33,19 @@ export default async function TVDetailPage({ params }: { params: { id: string } 
   if (isNaN(id)) notFound()
 
   try {
-    const [show, credits, videos, similar] = await Promise.all([
+    const [show, credits, videos, similar, progress] = await Promise.all([
       fetchTVDetail(id),
       fetchCredits('tv', id),
       fetchVideos('tv', id),
       fetchSimilar('tv', id),
+      getWatchProgress(id, 'tv'),
     ])
 
     const trailer = videos.results.find((v) => v.site === 'YouTube' && v.type === 'Trailer') || videos.results[0]
 
     return (
       <div className="min-h-screen">
-        <DetailHero item={show} mediaType="tv" />
+        <DetailHero item={show} mediaType="tv" progress={progress} />
         <div className="max-w-7xl mx-auto">
           <div className="px-4 md:px-12 py-8 grid md:grid-cols-3 gap-8">
             <div className="md:col-span-2">

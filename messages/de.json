@@ -43,7 +43,8 @@
     "signInToRate": "Anmelden zum Bewerten",
     "writeReview": "Rezension schreiben (optional)",
     "submitRating": "Senden",
-    "deleteRating": "Löschen"
+    "deleteRating": "Löschen",
+    "continue": "Fortsetzen"
   },
   "search": {
     "placeholder": "Suchen...",

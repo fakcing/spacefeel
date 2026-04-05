@@ -43,7 +43,8 @@
     "signInToRate": "Увійдіть, щоб оцінити",
     "writeReview": "Написати рецензію (необов'язково)",
     "submitRating": "Надіслати",
-    "deleteRating": "Видалити"
+    "deleteRating": "Видалити",
+    "continue": "Продовжити"
   },
   "search": {
     "placeholder": "Пошук...",

@@ -43,7 +43,8 @@
     "signInToRate": "ログインして評価",
     "writeReview": "レビューを書く（任意）",
     "submitRating": "送信",
-    "deleteRating": "削除"
+    "deleteRating": "削除",
+    "continue": "続きから"
   },
   "search": {
     "placeholder": "検索...",

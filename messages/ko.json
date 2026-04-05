@@ -43,7 +43,8 @@
     "signInToRate": "로그인하여 평가",
     "writeReview": "리뷰 작성 (선택)",
     "submitRating": "제출",
-    "deleteRating": "삭제"
+    "deleteRating": "삭제",
+    "continue": "이어보기"
   },
   "search": {
     "placeholder": "검색...",

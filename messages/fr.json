@@ -43,7 +43,8 @@
     "signInToRate": "Connectez-vous pour noter",
     "writeReview": "Écrire un avis (optionnel)",
     "submitRating": "Envoyer",
-    "deleteRating": "Supprimer"
+    "deleteRating": "Supprimer",
+    "continue": "Continuer"
   },
   "search": {
     "placeholder": "Rechercher...",

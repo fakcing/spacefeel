@@ -43,7 +43,8 @@
     "signInToRate": "Inicia sesión para valorar",
     "writeReview": "Escribe una reseña (opcional)",
     "submitRating": "Enviar",
-    "deleteRating": "Eliminar"
+    "deleteRating": "Eliminar",
+    "continue": "Continuar"
   },
   "search": {
     "placeholder": "Buscar...",
