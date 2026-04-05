@@ -51,7 +51,11 @@
     "movie": "Film",
     "anime": "Anime",
     "noResults": "Nichts gefunden",
-    "typeHint": "Titel eingeben zum Suchen"
+    "typeHint": "Titel eingeben zum Suchen",
+    "pageTitle": "Suche",
+    "all": "Alle",
+    "movies": "Filme",
+    "tvShows": "Serien"
   },
   "watchlistPage": {
     "title": "Meine Merkliste",

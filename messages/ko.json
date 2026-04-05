@@ -51,7 +51,11 @@
     "movie": "영화",
     "anime": "애니메이션",
     "noResults": "결과 없음",
-    "typeHint": "제목을 입력하세요"
+    "typeHint": "제목을 입력하세요",
+    "pageTitle": "검색",
+    "all": "전체",
+    "movies": "영화",
+    "tvShows": "드라마"
   },
   "watchlistPage": {
     "title": "내 목록",

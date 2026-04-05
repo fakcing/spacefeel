@@ -51,7 +51,11 @@
     "movie": "映画",
     "anime": "アニメ",
     "noResults": "見つかりません",
-    "typeHint": "タイトルを入力"
+    "typeHint": "タイトルを入力",
+    "pageTitle": "検索",
+    "all": "すべて",
+    "movies": "映画",
+    "tvShows": "ドラマ"
   },
   "watchlistPage": {
     "title": "マイリスト",
