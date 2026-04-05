@@ -76,7 +76,15 @@
     "theme": "테마",
     "light": "라이트",
     "dark": "다크",
-    "system": "시스템"
+    "system": "시스템",
+    "viewProfile": "내 프로필",
+    "memberSince": "가입일",
+    "watchlistCount": "목록",
+    "ratingsCount": "평가",
+    "historyCount": "시청",
+    "recentHistory": "최근 시청",
+    "noHistory": "기록 없음",
+    "byStatus": "상태별"
   },
   "footer": {
     "rights": "© 2026 spacefeel. 모든 권리 보유."

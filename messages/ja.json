@@ -76,7 +76,15 @@
     "theme": "テーマ",
     "light": "ライト",
     "dark": "ダーク",
-    "system": "システム"
+    "system": "システム",
+    "viewProfile": "マイページ",
+    "memberSince": "登録",
+    "watchlistCount": "リスト",
+    "ratingsCount": "評価数",
+    "historyCount": "視聴済み",
+    "recentHistory": "最近見た作品",
+    "noHistory": "履歴なし",
+    "byStatus": "ステータス別"
   },
   "footer": {
     "rights": "© 2026 spacefeel. 全著作権所有。"

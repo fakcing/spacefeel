@@ -76,7 +76,15 @@
     "theme": "Тема",
     "light": "Светлая",
     "dark": "Тёмная",
-    "system": "Системная"
+    "system": "Системная",
+    "viewProfile": "Мой профиль",
+    "memberSince": "На сайте с",
+    "watchlistCount": "В списке",
+    "ratingsCount": "Оценки",
+    "historyCount": "Просмотрено",
+    "recentHistory": "Недавно смотрел",
+    "noHistory": "История пуста",
+    "byStatus": "По статусу"
   },
   "footer": {
     "rights": "© 2026 spacefeel. Все права защищены."

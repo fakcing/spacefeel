@@ -76,7 +76,15 @@
     "theme": "Design",
     "light": "Hell",
     "dark": "Dunkel",
-    "system": "System"
+    "system": "System",
+    "viewProfile": "Mein Profil",
+    "memberSince": "Mitglied seit",
+    "watchlistCount": "In der Liste",
+    "ratingsCount": "Bewertungen",
+    "historyCount": "Gesehen",
+    "recentHistory": "Zuletzt gesehen",
+    "noHistory": "Noch keine Geschichte",
+    "byStatus": "Nach Status"
   },
   "footer": {
     "rights": "© 2026 spacefeel. Alle Rechte vorbehalten."

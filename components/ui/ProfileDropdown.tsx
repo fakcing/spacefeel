@@ -5,7 +5,8 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from 'next-themes'
 import { useSession, signOut } from 'next-auth/react'
-import { User, ChevronUp, Check, Sun, Moon, Monitor, LogOut } from 'lucide-react'
+import Link from 'next/link'
+import { User, ChevronUp, Check, Sun, Moon, Monitor, LogOut, UserCircle } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
 import { useSettingsStore } from '@/store/settingsStore'
 import { useAuthModalStore } from '@/store/authModalStore'
@@ -116,6 +117,17 @@ export default function ProfileDropdown() {
                     <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>{session.user.email}</p>
                   </div>
                 </div>
+                <Link
+                  href="/profile"
+                  onClick={() => setOpen(false)}
+                  className="w-full rounded-xl py-2.5 px-4 text-sm font-medium transition-colors mb-2 flex items-center gap-2"
+                  style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text)' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-overlay)')}
+                >
+                  <UserCircle size={14} />
+                  {t('viewProfile')}
+                </Link>
                 <button
                   onClick={() => signOut({ callbackUrl: '/' })}
                   className="w-full rounded-xl py-2.5 px-4 text-sm font-semibold transition-colors mb-2 flex items-center justify-center gap-2"
