@@ -1,9 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/navigation'
+import { Film } from 'lucide-react'
 import { YaniAnime } from '@/types/yani'
 import { WatchlistItem } from '@/types/tmdb'
 import { getPosterUrl } from '@/lib/yani'
@@ -20,6 +22,7 @@ export default function AniCard({ item }: Props) {
   const t = useTranslations('player')
   const router = useRouter()
   const poster = getPosterUrl(item.poster.big || item.poster.medium)
+  const [imgError, setImgError] = useState(false)
   const href = `/anime/${item.anime_url}`
 
   const watchlistItem: WatchlistItem = {
@@ -38,16 +41,23 @@ export default function AniCard({ item }: Props) {
       className="group relative block w-full"
     >
       <div className="relative aspect-[2/3] rounded-lg md:rounded-xl overflow-hidden" style={{ backgroundColor: 'var(--color-overlay)' }}>
-        <Image
-          src={poster}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          alt={item.title}
-          placeholder="blur"
-          blurDataURL={BLUR_DATA_URL}
-          sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
-          loading="lazy"
-        />
+        {poster && !imgError ? (
+          <Image
+            src={poster}
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            alt={item.title}
+            placeholder="blur"
+            blurDataURL={BLUR_DATA_URL}
+            sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, (max-width: 1280px) 20vw, 16vw"
+            loading="lazy"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-overlay)' }}>
+            <Film size={24} style={{ color: 'var(--color-text-subtle)' }} />
+          </div>
+        )}
 
         {/* Bookmark button — top right */}
         <BookmarkButton item={watchlistItem} />

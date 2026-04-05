@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 import { fetchPersonDetail, fetchPersonCredits } from '@/lib/tmdb'
-import { getPoster } from '@/lib/tmdbImages'
+import { getPoster, getAvatar } from '@/lib/tmdbImages'
 import { MapPin, Calendar, Film, Tv } from 'lucide-react'
 
 interface Props {
@@ -42,9 +42,7 @@ export default async function ActorPage({ params }: Props) {
   const movies = filmography.filter((c) => c.media_type === 'movie')
   const shows = filmography.filter((c) => c.media_type === 'tv')
 
-  const avatarUrl = p.profile_path
-    ? `https://image.tmdb.org/t/p/w300${p.profile_path}`
-    : null
+  const avatarUrl = getAvatar(p.profile_path)
 
   const formatDate = (d: string | null) => {
     if (!d) return null
@@ -57,14 +55,14 @@ export default async function ActorPage({ params }: Props) {
       <div className="flex flex-col sm:flex-row gap-8 mb-12">
         {/* Avatar */}
         <div className="flex-shrink-0">
-          <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--color-overlay)' }}>
+          <div className="relative w-40 h-40 sm:w-48 sm:h-48 rounded-2xl overflow-hidden" style={{ backgroundColor: 'var(--color-overlay)' }}>
             {avatarUrl ? (
               <Image
                 src={avatarUrl}
                 alt={p.name}
-                width={192}
-                height={192}
-                className="object-cover w-full h-full"
+                fill
+                className="object-cover"
+                sizes="192px"
                 priority
               />
             ) : (
