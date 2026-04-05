@@ -195,6 +195,14 @@
     "genre_10765": "SF & 판타지",
     "genre_10768": "전쟁 & 정치"
   },
+  "actor": {
+    "movies": "영화",
+    "tvShows": "드라마",
+    "biography": "소개",
+    "born": "생년월일",
+    "birthplace": "출생지",
+    "knownFor": "대표작"
+  },
   "player": {
     "season": "시즌",
     "seasons": "시즌 목록",

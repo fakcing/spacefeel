@@ -1,6 +1,6 @@
 import { cache } from 'react'
 import { cookies } from 'next/headers'
-import { Movie, TVShow, Credits, Video, TMDBResponse } from '@/types/tmdb'
+import { Movie, TVShow, Credits, Video, TMDBResponse, PersonDetail, PersonCredits } from '@/types/tmdb'
 import { getTmdbLanguage } from './tmdbLanguage'
 
 const BASE_URL = 'https://api.themoviedb.org/3'
@@ -131,6 +131,14 @@ export const fetchCartoons = cache(async (category = 'trending', page = 1): Prom
     default:
       return tmdbFetch('/discover/tv', { ...base, sort_by: 'popularity.desc' })
   }
+})
+
+export const fetchPersonDetail = cache(async (id: number): Promise<PersonDetail> => {
+  return tmdbFetch<PersonDetail>(`/person/${id}`)
+})
+
+export const fetchPersonCredits = cache(async (id: number): Promise<PersonCredits> => {
+  return tmdbFetch<PersonCredits>(`/person/${id}/combined_credits`)
 })
 
 /**

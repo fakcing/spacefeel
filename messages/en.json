@@ -195,6 +195,14 @@
     "genre_10765": "Sci-Fi & Fantasy",
     "genre_10768": "War & Politics"
   },
+  "actor": {
+    "movies": "Movies",
+    "tvShows": "TV Shows",
+    "biography": "Biography",
+    "born": "Born",
+    "birthplace": "Birthplace",
+    "knownFor": "Known for"
+  },
   "player": {
     "season": "Season",
     "seasons": "Seasons",

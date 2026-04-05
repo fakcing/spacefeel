@@ -195,6 +195,14 @@
     "genre_10765": "Ciencia ficción y fantasía",
     "genre_10768": "Guerra y política"
   },
+  "actor": {
+    "movies": "Películas",
+    "tvShows": "Series",
+    "biography": "Biografía",
+    "born": "Nacimiento",
+    "birthplace": "Lugar de nacimiento",
+    "knownFor": "Conocido por"
+  },
   "player": {
     "season": "Temporada",
     "seasons": "Temporadas",

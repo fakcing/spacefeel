@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import { Person } from '@/types/tmdb'
 import { getAvatar } from '@/lib/tmdbImages'
 
@@ -14,14 +15,18 @@ export default function CastRow({ cast }: CastRowProps) {
         {cast.slice(0, 24).map((person) => {
           const photo = getAvatar(person.profile_path)
           return (
-            <div key={`${person.id}-${person.character}`} className="flex-shrink-0 text-center w-16">
+            <Link
+              key={`${person.id}-${person.character}`}
+              href={`/actors/${person.id}`}
+              className="flex-shrink-0 text-center w-16 group/actor"
+            >
               <div className="relative w-16 h-16 rounded-full overflow-hidden mb-2 group">
                 {photo ? (
                   <Image
                     src={photo}
                     alt={person.name}
                     fill
-                    className="object-cover"
+                    className="object-cover group-hover/actor:scale-105 transition-transform duration-200"
                     sizes="64px"
                     loading="lazy"
                   />
@@ -36,9 +41,9 @@ export default function CastRow({ cast }: CastRowProps) {
                   </div>
                 )}
               </div>
-              <p className="text-xs font-medium text-[var(--text-primary)] line-clamp-2 leading-tight">{person.name}</p>
+              <p className="text-xs font-medium text-[var(--text-primary)] line-clamp-2 leading-tight group-hover/actor:underline">{person.name}</p>
               <p className="text-[10px] text-[var(--text-muted)] line-clamp-1 mt-0.5">{person.character}</p>
-            </div>
+            </Link>
           )
         })}
       </div>

@@ -195,6 +195,14 @@
     "genre_10765": "SF&ファンタジー",
     "genre_10768": "戦争&政治"
   },
+  "actor": {
+    "movies": "映画",
+    "tvShows": "ドラマ",
+    "biography": "プロフィール",
+    "born": "生年月日",
+    "birthplace": "出身地",
+    "knownFor": "代表作"
+  },
   "player": {
     "season": "シーズン",
     "seasons": "シーズン一覧",
