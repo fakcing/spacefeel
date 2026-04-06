@@ -35,6 +35,27 @@ export interface TVShow {
   status?: string
   original_language?: string
   budget?: number
+  seasons?: Season[]
+}
+
+export interface Season {
+  id: number
+  name: string
+  season_number: number
+  episode_count: number
+  air_date: string | null
+  poster_path: string | null
+}
+
+export interface EpisodeItem {
+  id: number
+  name: string
+  episode_number: number
+  air_date: string | null
+  overview: string
+  still_path: string | null
+  vote_average: number
+  runtime: number | null
 }
 
 export interface Genre {

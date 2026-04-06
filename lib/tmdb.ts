@@ -1,6 +1,6 @@
 import { cache } from 'react'
 import { cookies } from 'next/headers'
-import { Movie, TVShow, Credits, Video, TMDBResponse, PersonDetail, PersonCredits } from '@/types/tmdb'
+import { Movie, TVShow, Credits, Video, TMDBResponse, PersonDetail, PersonCredits, EpisodeItem } from '@/types/tmdb'
 import { getTmdbLanguage } from './tmdbLanguage'
 
 const BASE_URL = 'https://api.themoviedb.org/3'
@@ -82,6 +82,10 @@ export const fetchVideos = cache(async (type: 'movie' | 'tv', id: number): Promi
 
 export const fetchSimilar = cache(async (type: 'movie' | 'tv', id: number): Promise<TMDBResponse<Movie | TVShow>> => {
   return tmdbFetch<TMDBResponse<Movie | TVShow>>(`/${type}/${id}/similar`)
+})
+
+export const fetchSeasonDetail = cache(async (tvId: number, season: number): Promise<{ episodes: EpisodeItem[] }> => {
+  return tmdbFetch<{ episodes: EpisodeItem[] }>(`/tv/${tvId}/season/${season}`)
 })
 
 export const fetchDiscover = cache(async (type: 'movie' | 'tv', params: Record<string, string> = {}): Promise<TMDBResponse<Movie | TVShow>> => {
