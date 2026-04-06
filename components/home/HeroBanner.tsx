@@ -83,9 +83,9 @@ export default function HeroBanner({ movies }: HeroBannerProps) {
             animate={{ scale: 1.06 }}
             transition={{ duration: 7, ease: 'linear' }}
           >
-            {getBackdrop(movie.backdrop_path) && (
+            {(() => { const bd = getBackdrop(movie.backdrop_path); return bd ? (
               <Image
-                src={getBackdrop(movie.backdrop_path)!}
+                src={bd}
                 alt={movie.title}
                 fill
                 className="object-cover"
@@ -93,7 +93,7 @@ export default function HeroBanner({ movies }: HeroBannerProps) {
                 quality={85}
                 sizes="100vw"
               />
-            )}
+            ) : null })()}
           </motion.div>
         </motion.div>
       </AnimatePresence>

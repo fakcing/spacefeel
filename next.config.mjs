@@ -9,6 +9,7 @@ const nextConfig = {
 		return config
 	},
 	images: {
+		unoptimized: true,
 		remotePatterns: [
 			{
 				protocol: 'https',
@@ -36,10 +37,6 @@ const nextConfig = {
 				hostname: 'static.yani.tv',
 			},
 		],
-		formats: ['image/webp'],
-		minimumCacheTTL: 604800,
-		deviceSizes: [640, 828, 1080, 1200, 1920],
-		imageSizes: [64, 128, 180, 256, 342],
 	},
 	experimental: {
 		optimisticClientCache: true,
