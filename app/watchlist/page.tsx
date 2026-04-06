@@ -106,7 +106,7 @@ export default function WatchlistPage() {
         ).then(r => r.json())
         return { ...item, title: data.title || '' }
       })
-    ).then(setEnriched)
+    ).then(setEnriched).catch(() => {})
   }, [items, locale])
 
   const filtered = filter === 'all'

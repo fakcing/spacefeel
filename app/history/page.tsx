@@ -27,6 +27,7 @@ export default function HistoryPage() {
     fetch('/api/history')
       .then((r) => r.json())
       .then((data) => {
+        if (!Array.isArray(data)) { setLoading(false); return }
         // Deduplicate: keep latest per tmdbId+mediaType
         const seen = new Set<string>()
         const deduped = (data as HistoryRecord[]).filter((item) => {
