@@ -46,7 +46,7 @@ export default async function SearchPage({
       tvShows = (tvRes.results as TVShow[]).filter(s => !(s.genre_ids ?? []).includes(16))
       tvPages = tvRes.total_pages
     } else if (type === 'anime') {
-      anime = await searchYani(q, 20).catch(() => [])
+      anime = await searchYani(q, 40).catch(() => [])
     }
   }
 
