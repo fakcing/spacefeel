@@ -150,8 +150,21 @@ export default function Navbar() {
     }
     const timeout = setTimeout(async () => {
       try {
-        const data = await fetch(`/api/search?q=${encodeURIComponent(query)}`).then(r => r.json())
-        setResults((data.results as SearchResult[]).slice(0, 8) ?? [])
+        const data = await fetch(`/api/search?q=${encodeURIComponent(query)}&type=all`).then(r => r.json())
+        const combined: SearchResult[] = [
+          ...(data.movies ?? []).map((m: SearchResult) => ({ ...m, media_type: 'movie', source: 'tmdb' as const })),
+          ...(data.tvShows ?? []).map((s: SearchResult) => ({ ...s, media_type: 'tv', source: 'tmdb' as const })),
+          ...(data.anime ?? []).map((a: { anime_id: number; title: string; anime_url: string; year: number; poster: { medium: string } }) => ({
+            id: a.anime_id,
+            name: a.title,
+            media_type: 'anime',
+            source: 'yani' as const,
+            alias: a.anime_url,
+            year: String(a.year),
+            anilibria_poster: a.poster?.medium,
+          })),
+        ]
+        setResults(combined.slice(0, 8))
         setIsOpen(true)
       } catch {
         setResults([])
