@@ -1,4 +1,4 @@
-import { cache } from 'react'
+import { Suspense, cache } from 'react'
 import { getTranslations } from 'next-intl/server'
 import { fetchYaniCatalog } from '@/lib/yani'
 import AniCard from '@/components/cards/AniCard'
@@ -42,7 +42,9 @@ export default async function AnimePage({
       </div>
 
       <div className="mb-6">
-        <AnimeFilters q={q} year={year} type={type} />
+        <Suspense>
+          <AnimeFilters q={q} year={year} type={type} />
+        </Suspense>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">

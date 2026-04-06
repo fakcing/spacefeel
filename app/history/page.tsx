@@ -5,6 +5,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Film, Trash2, X } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { useSession } from 'next-auth/react'
+import { useAuthModalStore } from '@/store/authModalStore'
 import { getPoster } from '@/lib/tmdbImages'
 
 interface HistoryRecord {
@@ -19,11 +21,16 @@ interface HistoryRecord {
 
 export default function HistoryPage() {
   const t = useTranslations('historyPage')
+  const tProfile = useTranslations('profile')
+  const { data: session, status } = useSession()
+  const { open: openAuthModal } = useAuthModalStore()
   const [items, setItems] = useState<HistoryRecord[]>([])
   const [loading, setLoading] = useState(true)
   const [confirmClear, setConfirmClear] = useState(false)
 
   useEffect(() => {
+    if (status === 'loading') return
+    if (!session) { setLoading(false); return }
     fetch('/api/history')
       .then((r) => r.json())
       .then((data) => {
@@ -40,7 +47,7 @@ export default function HistoryPage() {
         setLoading(false)
       })
       .catch(() => setLoading(false))
-  }, [])
+  }, [status, session])
 
   const handleRemove = async (tmdbId: number, mediaType: string) => {
     await fetch(`/api/history?tmdbId=${tmdbId}&mediaType=${mediaType}`, { method: 'DELETE' })
@@ -96,7 +103,19 @@ export default function HistoryPage() {
         )}
       </div>
 
-      {loading ? (
+      {!session && !loading ? (
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <Film size={48} className="mb-4 opacity-20" style={{ color: 'var(--color-text-muted)' }} />
+          <p className="text-lg font-medium mb-4" style={{ color: 'var(--color-text)' }}>{t('empty')}</p>
+          <button
+            onClick={openAuthModal}
+            className="px-6 py-2.5 rounded-full text-sm font-semibold"
+            style={{ backgroundColor: 'var(--color-text)', color: 'var(--color-bg)' }}
+          >
+            {tProfile('login')}
+          </button>
+        </div>
+      ) : loading ? (
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
           {[...Array(16)].map((_, i) => (
             <div key={i} className="aspect-[2/3] rounded-xl animate-pulse" style={{ backgroundColor: 'var(--color-overlay)' }} />

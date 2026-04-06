@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { fetchMovieDetail, fetchCredits, fetchVideos, fetchSimilar } from '@/lib/tmdb'
 import DetailHero from '@/components/detail/DetailHero'
 import DetailTabs from '@/components/detail/DetailTabs'
@@ -31,6 +32,7 @@ export default async function MovieDetailPage({ params }: { params: { id: string
   const id = parseInt(params.id)
   if (isNaN(id)) notFound()
 
+  const t = await getTranslations('detail')
   try {
     const [movie, credits, videos, similar] = await Promise.all([
       fetchMovieDetail(id),
@@ -51,7 +53,7 @@ export default async function MovieDetailPage({ params }: { params: { id: string
             </div>
             {trailer && (
               <div>
-                <h2 className="text-lg md:text-xl font-semibold tracking-tight mb-3 text-[var(--text-primary)]">Trailer</h2>
+                <h2 className="text-lg md:text-xl font-semibold tracking-tight mb-3 text-[var(--text-primary)]">{t('trailer')}</h2>
                 <TrailerModal video={trailer} />
               </div>
             )}

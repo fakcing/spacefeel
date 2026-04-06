@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 import { fetchTVDetail, fetchCredits, fetchVideos, fetchSimilar } from '@/lib/tmdb'
 import { getWatchProgress } from '@/lib/watchProgress'
 import DetailHero from '@/components/detail/DetailHero'
@@ -32,6 +33,7 @@ export default async function TVDetailPage({ params }: { params: { id: string } 
   const id = parseInt(params.id)
   if (isNaN(id)) notFound()
 
+  const t = await getTranslations('detail')
   try {
     const [show, credits, videos, similar, progress] = await Promise.all([
       fetchTVDetail(id),
@@ -44,7 +46,7 @@ export default async function TVDetailPage({ params }: { params: { id: string } 
     const trailer = videos.results.find((v) => v.site === 'YouTube' && v.type === 'Trailer') || videos.results[0]
 
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen pb-20">
         <DetailHero item={show} mediaType="tv" progress={progress} />
         <div className="max-w-7xl mx-auto">
           <div className="px-4 md:px-12 py-8 grid md:grid-cols-3 gap-8">
@@ -53,7 +55,7 @@ export default async function TVDetailPage({ params }: { params: { id: string } 
             </div>
             {trailer && (
               <div>
-                <h2 className="text-xl font-semibold tracking-tight mb-3 text-[var(--text-primary)]">Trailer</h2>
+                <h2 className="text-xl font-semibold tracking-tight mb-3 text-[var(--text-primary)]">{t('trailer')}</h2>
                 <TrailerModal video={trailer} />
               </div>
             )}

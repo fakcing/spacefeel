@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { fetchDiscover } from '@/lib/tmdb'
@@ -111,13 +112,15 @@ export default async function CartoonsPage({
         ))}
       </div>
 
-      <CartoonFilters
-        sort_by={sort_by}
-        year_from={year_from}
-        year_to={year_to}
-        min_vote={min_vote}
-        language={language}
-      />
+      <Suspense>
+        <CartoonFilters
+          sort_by={sort_by}
+          year_from={year_from}
+          year_to={year_to}
+          min_vote={min_vote}
+          language={language}
+        />
+      </Suspense>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
         {results.map((item, index) => (

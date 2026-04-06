@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import Link from 'next/link'
 import { cache } from 'react'
 import { getTranslations } from 'next-intl/server'
@@ -156,15 +157,17 @@ export default async function MoviesPage({
         ))}
       </div>
 
-      <MovieFilters
-        q={q}
-        genres={genres}
-        sort_by={sort_by}
-        year_from={year_from}
-        year_to={year_to}
-        min_vote={min_vote}
-        language={language}
-      />
+      <Suspense>
+        <MovieFilters
+          q={q}
+          genres={genres}
+          sort_by={sort_by}
+          year_from={year_from}
+          year_to={year_to}
+          min_vote={min_vote}
+          language={language}
+        />
+      </Suspense>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-5 gap-3 md:gap-4">
         {results.map((movie, index) => (

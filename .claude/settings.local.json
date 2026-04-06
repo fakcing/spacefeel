@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//d/dev/spacefeel-main/messages/**)",
+      "Bash(done)"
+    ]
+  }
+}
