@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bookmark, ChevronDown } from 'lucide-react'
+import { Bookmark, ChevronDown, Download } from 'lucide-react'
 import { useTranslations, useLocale } from 'next-intl'
 import { useSession } from 'next-auth/react'
 import { useWatchlistStore } from '@/store/watchlistStore'
@@ -120,6 +120,36 @@ export default function WatchlistPage() {
     ))
   }
 
+  const exportJSON = () => {
+    const data = enriched.map(i => ({
+      id: i.id,
+      title: i.title,
+      mediaType: i.media_type,
+      status: i.status ?? 'planning',
+      rating: i.vote_average,
+      releaseDate: i.release_date,
+    }))
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'watchlist.json'
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+
+  const exportCSV = () => {
+    const header = 'id,title,mediaType,status,rating,releaseDate'
+    const rows = enriched.map(i =>
+      [i.id, `"${(i.title ?? '').replace(/"/g, '""')}"`, i.media_type, i.status ?? 'planning', i.vote_average, i.release_date].join(',')
+    )
+    const blob = new Blob([[header, ...rows].join('\n')], { type: 'text/csv' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'watchlist.csv'
+    a.click()
+    URL.revokeObjectURL(a.href)
+  }
+
   const FILTER_TABS: Array<{ value: 'all' | Status; label: string }> = [
     { value: 'all',       label: t('filterAll') },
     { value: 'planning',  label: t('statusPlanning') },
@@ -133,6 +163,28 @@ export default function WatchlistPage() {
       <div className="flex items-center gap-3 mb-6">
         <Bookmark size={28} />
         <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">{t('title')}</h1>
+        {enriched.length > 0 && (
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              onClick={exportJSON}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors"
+              style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text-muted)' }}
+              title="Export JSON"
+            >
+              <Download size={12} />
+              JSON
+            </button>
+            <button
+              onClick={exportCSV}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium transition-colors"
+              style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text-muted)' }}
+              title="Export CSV"
+            >
+              <Download size={12} />
+              CSV
+            </button>
+          </div>
+        )}
       </div>
 
       {items.length > 0 && (
