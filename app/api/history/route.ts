@@ -8,14 +8,19 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json()
 
+  // Remove previous entry for same item so there are no duplicates
+  await prisma.watchHistory.deleteMany({
+    where: { userId: session.user.id, tmdbId: body.tmdbId, mediaType: body.mediaType },
+  })
+
   await prisma.watchHistory.create({
     data: {
       userId: session.user.id,
       tmdbId: body.tmdbId,
       mediaType: body.mediaType,
       posterPath: body.posterPath,
-      season: body.season,
-      episode: body.episode,
+      season: body.season ?? null,
+      episode: body.episode ?? null,
     },
   })
 
