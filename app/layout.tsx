@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { Inter, Bebas_Neue } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { NextIntlClientProvider } from 'next-intl'
-import { getMessages } from 'next-intl/server'
+import { getMessages, getLocale } from 'next-intl/server'
 import Navbar from '@/components/layout/Navbar'
 import MobileNav from '@/components/layout/MobileNav'
 import MobileHeader from '@/components/layout/MobileHeader'
@@ -39,9 +39,9 @@ export const metadata: Metadata = {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const messages = await getMessages()
+  const [messages, locale] = await Promise.all([getMessages(), getLocale()])
   return (
-    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${bebasNeue.variable}`}>
+    <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${bebasNeue.variable}`}>
       <head>
         <link rel="preconnect" href="https://image.tmdb.org" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://api.yani.tv" crossOrigin="anonymous" />
