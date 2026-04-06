@@ -1,9 +1,12 @@
+'use client'
+
 import Link from 'next/link'
 
 interface PaginationProps {
   currentPage: number
   totalPages: number
   baseHref: string
+  onPageChange?: (page: number) => void
 }
 
 function getPageList(current: number, total: number): (number | '...')[] {
@@ -20,46 +23,43 @@ function getPageList(current: number, total: number): (number | '...')[] {
   return [1, '...', current - 1, current, current + 1, '...', total]
 }
 
-export default function Pagination({ currentPage, totalPages, baseHref }: PaginationProps) {
+export default function Pagination({ currentPage, totalPages, baseHref, onPageChange }: PaginationProps) {
   // TMDB caps at 500 pages
   const capped = Math.min(totalPages, 500)
   if (capped <= 1) return null
 
   const pages = getPageList(currentPage, capped)
   const btn = 'flex items-center justify-center w-9 h-9 rounded-full text-sm font-medium transition-colors'
-
-  // Determine if we need to use ? or & for the first page parameter
   const separator = baseHref.includes('?') ? '&' : '?'
+
+  const renderPage = (page: number | '...', i: number) => {
+    if (page === '...') {
+      return (
+        <span key={`ellipsis-${i}`} className="text-gray-900/30 dark:text-white/30 w-9 text-center text-sm select-none">
+          ...
+        </span>
+      )
+    }
+    const active = page === currentPage
+    const className = `${btn} ${active
+      ? 'bg-gray-900 dark:bg-white text-white dark:text-black'
+      : 'bg-black/[0.08] dark:bg-white/[0.08] hover:bg-black/[0.15] dark:hover:bg-white/[0.15] text-gray-900/70 dark:text-white/70'
+    }`
+    if (onPageChange) {
+      return <button key={page} onClick={() => onPageChange(page)} className={className}>{page}</button>
+    }
+    return <Link key={page} href={`${baseHref}${separator}page=${page}`} className={className}>{page}</Link>
+  }
+
+  const nextClassName = 'flex items-center justify-center h-9 px-4 rounded-full text-sm font-medium bg-black/[0.08] dark:bg-white/[0.08] hover:bg-black/[0.15] dark:hover:bg-white/[0.15] text-gray-900/70 dark:text-white/70 transition-colors'
 
   return (
     <div className="flex items-center justify-center gap-1.5 py-10 flex-wrap">
-      {pages.map((page, i) =>
-        page === '...' ? (
-          <span key={`ellipsis-${i}`} className="text-gray-900/30 dark:text-white/30 w-9 text-center text-sm select-none">
-            ...
-          </span>
-        ) : (
-          <Link
-            key={page}
-            href={`${baseHref}${separator}page=${page}`}
-            className={`${btn} ${
-              page === currentPage
-                ? 'bg-gray-900 dark:bg-white text-white dark:text-black'
-                : 'bg-black/[0.08] dark:bg-white/[0.08] hover:bg-black/[0.15] dark:hover:bg-white/[0.15] text-gray-900/70 dark:text-white/70'
-            }`}
-          >
-            {page}
-          </Link>
-        )
-      )}
-
+      {pages.map((page, i) => renderPage(page, i))}
       {currentPage < capped && (
-        <Link
-          href={`${baseHref}${separator}page=${currentPage + 1}`}
-          className="flex items-center justify-center h-9 px-4 rounded-full text-sm font-medium bg-black/[0.08] dark:bg-white/[0.08] hover:bg-black/[0.15] dark:hover:bg-white/[0.15] text-gray-900/70 dark:text-white/70 transition-colors"
-        >
-          Next ›
-        </Link>
+        onPageChange
+          ? <button onClick={() => onPageChange(currentPage + 1)} className={nextClassName}>Next ›</button>
+          : <Link href={`${baseHref}${separator}page=${currentPage + 1}`} className={nextClassName}>Next ›</Link>
       )}
     </div>
   )

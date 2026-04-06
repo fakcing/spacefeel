@@ -2,60 +2,81 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { getTmdbLanguage } from '@/lib/tmdbLanguage'
 
-const YANI_HEADERS = { 'X-Application': process.env.YANI_TV_TOKEN! }
+const TMDB_KEY = process.env.NEXT_PUBLIC_TMDB_API_KEY
+const YANI_BASE = 'https://api.yani.tv'
+
+async function tmdbSearch(endpoint: string, q: string, page: number, language: string) {
+  const url = `https://api.themoviedb.org/3/search/${endpoint}?api_key=${TMDB_KEY}&query=${encodeURIComponent(q)}&page=${page}&language=${language}`
+  const res = await fetch(url, { next: { revalidate: 60 } })
+  if (!res.ok) return { results: [], total_pages: 1 }
+  return res.json()
+}
+
+async function yaniSearch(q: string, limit: number) {
+  const res = await fetch(
+    `${YANI_BASE}/anime?q=${encodeURIComponent(q)}&limit=${limit}`,
+    { headers: { 'X-Application': process.env.YANI_TV_TOKEN! }, next: { revalidate: 300 } }
+  )
+  if (!res.ok) return []
+  const data = await res.json()
+  return data.response ?? []
+}
 
 export async function GET(req: NextRequest) {
-  const q = req.nextUrl.searchParams.get('q') ?? ''
+  const { searchParams } = req.nextUrl
+  const q = (searchParams.get('q') || '').trim()
+  const type = searchParams.get('type') || 'all'
+  const page = Math.max(1, parseInt(searchParams.get('page') || '1') || 1)
+
   const cookieStore = cookies()
-  const locale = cookieStore.get('locale')?.value ?? 'en'
+  const locale = searchParams.get('locale') || cookieStore.get('locale')?.value || 'en'
   const language = getTmdbLanguage(locale)
 
-  const [tmdbData, yaniData] = await Promise.all([
-    fetch(
-      `https://api.themoviedb.org/3/search/multi?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=${encodeURIComponent(q)}&language=${language}`
-    ).then((r) => r.json()),
-    fetch(
-      `https://api.yani.tv/anime?q=${encodeURIComponent(q)}&limit=5`,
-      { headers: YANI_HEADERS }
-    )
-      .then((r) => r.json())
-      .catch(() => ({ response: [] })),
-  ])
+  if (q.length < 2) {
+    return NextResponse.json({ movies: [], tvShows: [], anime: [], moviePages: 1, tvPages: 1 })
+  }
 
-  const aniResults = ((yaniData.response ?? []) as Array<{
-    anime_id: number
-    anime_url: string
-    title: string
-    poster: { medium: string; big: string }
-    type: { name: string }
-    year: number
-  }>).map((t) => {
-    const posterPath = t.poster.medium || t.poster.big
-    const posterUrl = posterPath.startsWith('//') ? `https:${posterPath}` : posterPath
-    return {
-      id: t.anime_id,
-      title: t.title,
-      poster_path: null,
-      anilibria_poster: posterUrl,
-      media_type: 'anime',
-      alias: t.anime_url,
-      year: String(t.year ?? ''),
-      source: 'yani',
-    }
-  })
+  if (type === 'all') {
+    const [movieRes, tvRes, anime] = await Promise.all([
+      tmdbSearch('movie', q, 1, language).catch(() => ({ results: [], total_pages: 1 })),
+      tmdbSearch('tv', q, 1, language).catch(() => ({ results: [], total_pages: 1 })),
+      yaniSearch(q, 8).catch(() => []),
+    ])
+    return NextResponse.json({
+      movies: (movieRes.results ?? []).filter((m: { genre_ids?: number[] }) => !(m.genre_ids ?? []).includes(16)).slice(0, 6),
+      tvShows: (tvRes.results ?? []).filter((s: { genre_ids?: number[] }) => !(s.genre_ids ?? []).includes(16)).slice(0, 6),
+      anime,
+      moviePages: 1,
+      tvPages: 1,
+    })
+  }
 
-  // Exclude animation (genre 16) and persons from TMDB — anime comes from yani.tv
-  const tmdbFiltered = ((tmdbData.results ?? []) as Array<{
-    media_type: string
-    genre_ids?: number[]
-  }>)
-    .filter((item) =>
-      item.media_type !== 'person' &&
-      !(item.genre_ids ?? []).includes(16)
-    )
-    .slice(0, 6)
+  if (type === 'movie') {
+    const movieRes = await tmdbSearch('movie', q, page, language).catch(() => ({ results: [], total_pages: 1 }))
+    return NextResponse.json({
+      movies: (movieRes.results ?? []).filter((m: { genre_ids?: number[] }) => !(m.genre_ids ?? []).includes(16)),
+      tvShows: [],
+      anime: [],
+      moviePages: movieRes.total_pages ?? 1,
+      tvPages: 1,
+    })
+  }
 
-  return NextResponse.json({
-    results: [...tmdbFiltered, ...aniResults],
-  })
+  if (type === 'tv') {
+    const tvRes = await tmdbSearch('tv', q, page, language).catch(() => ({ results: [], total_pages: 1 }))
+    return NextResponse.json({
+      movies: [],
+      tvShows: (tvRes.results ?? []).filter((s: { genre_ids?: number[] }) => !(s.genre_ids ?? []).includes(16)),
+      anime: [],
+      moviePages: 1,
+      tvPages: tvRes.total_pages ?? 1,
+    })
+  }
+
+  if (type === 'anime') {
+    const anime = await yaniSearch(q, 40).catch(() => [])
+    return NextResponse.json({ movies: [], tvShows: [], anime, moviePages: 1, tvPages: 1 })
+  }
+
+  return NextResponse.json({ movies: [], tvShows: [], anime: [], moviePages: 1, tvPages: 1 })
 }
