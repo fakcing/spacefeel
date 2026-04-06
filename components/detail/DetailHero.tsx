@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { Play, Plus, BookmarkCheck, RotateCcw } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { Movie, TVShow, WatchlistItem } from '@/types/tmdb'
@@ -129,7 +130,12 @@ export default function DetailHero({ item, mediaType, progress }: DetailHeroProp
           )}
           <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-4">
             {item.genres?.map((g) => (
-              <Badge key={g.id}>{g.name}</Badge>
+              <Link
+                key={g.id}
+                href={`/${mediaType === 'movie' ? 'movies' : 'tv'}?genres=${g.id}`}
+              >
+                <Badge className="hover:bg-black/20 dark:hover:bg-white/20 transition-colors cursor-pointer">{g.name}</Badge>
+              </Link>
             ))}
           </div>
           <div className="flex items-center justify-center sm:justify-start gap-4 flex-wrap mb-4">
