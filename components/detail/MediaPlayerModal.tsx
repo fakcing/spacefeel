@@ -65,11 +65,11 @@ export default function MediaPlayerModal() {
   // Fetch servers
   useEffect(() => {
     if (!isOpen || !tmdbId) return
-    const t = mediaType === 'cartoon' ? 'movie' : mediaType === 'anime' ? 'tv' : mediaType
+    const apiType = mediaType === 'cartoon' ? 'movie' : mediaType === 'anime' ? 'tv' : mediaType
     setServersLoading(true)
     setServers([])
     setActiveServer(0)
-    fetch(`/api/player/${tmdbId}?type=${t}`)
+    fetch(`/api/player/${tmdbId}?type=${apiType}`)
       .then(r => r.json())
       .then(data => {
         if (data.servers && data.servers.length > 0) {
@@ -170,6 +170,9 @@ export default function MediaPlayerModal() {
 
   const title = item ? ('title' in item ? item.title : item.name) : 'Media Player'
   const totalSeasons = item && !('title' in item) ? (item.number_of_seasons ?? 1) : 1
+  const totalEpisodes = item && !('title' in item)
+    ? (item.seasons?.find(s => s.season_number === selectedSeason)?.episode_count ?? item.number_of_episodes ?? 50)
+    : 1
 
   return (
     <AnimatePresence>
@@ -301,7 +304,7 @@ export default function MediaPlayerModal() {
                         {t('episodes')}
                       </p>
                       <div className="grid grid-cols-5 gap-1 max-h-52 overflow-y-auto">
-                        {Array.from({ length: 50 }, (_, i) => i + 1).map(ep => (
+                        {Array.from({ length: totalEpisodes }, (_, i) => i + 1).map(ep => (
                           <button
                             key={ep}
                             onClick={() => { setEpisode(ep); setEpPickerOpen(false) }}
@@ -418,7 +421,7 @@ export default function MediaPlayerModal() {
                     color: 'var(--color-text)',
                   }}
                 >
-                  {Array.from({ length: 50 }, (_, i) => i + 1).map(ep => (
+                  {Array.from({ length: totalEpisodes }, (_, i) => i + 1).map(ep => (
                     <option key={ep} value={ep} style={{ backgroundColor: 'var(--color-surface)' }}>{t('episode')} {ep}</option>
                   ))}
                 </select>

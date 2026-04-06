@@ -35,15 +35,15 @@ export const useMediaPlayerStore = create<MediaPlayerStore>((set) => ({
     set({
       isOpen: true,
       mediaType,
-      item: item || null,
-      tmdbId: tmdbId || (item ? (item as Movie | TVShow).id : undefined) || null,
-      shikimoriId: shikimoriId || null,
-      season: season || 1,
-      episode: episode || 1,
+      item: item ?? null,
+      tmdbId: tmdbId ?? (item ? (item as Movie | TVShow).id : null) ?? null,
+      shikimoriId: shikimoriId ?? null,
+      season: season ?? 1,
+      episode: episode ?? 1,
     })
   },
 
-  closePlayer: () => set({ isOpen: false }),
+  closePlayer: () => set({ isOpen: false, item: null, tmdbId: null, shikimoriId: null, season: 1, episode: 1 }),
 
   setSeason: (season) => set({ season }),
 

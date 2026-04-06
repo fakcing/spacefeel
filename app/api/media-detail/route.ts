@@ -4,11 +4,14 @@ import { getTmdbLanguage } from '@/lib/tmdbLanguage'
 
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get('id')
-  const type = req.nextUrl.searchParams.get('type')
+  const rawType = req.nextUrl.searchParams.get('type')
   const localeParam = req.nextUrl.searchParams.get('locale')
   const cookieStore = cookies()
   const locale = localeParam || cookieStore.get('locale')?.value || 'en'
   const language = getTmdbLanguage(locale)
+
+  // Map app-internal types to TMDB endpoint types
+  const type = rawType === 'anime' || rawType === 'cartoon' ? 'tv' : rawType === 'movie' ? 'movie' : rawType
 
   const res = await fetch(
     `https://api.themoviedb.org/3/${type}/${id}?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&language=${language}`
