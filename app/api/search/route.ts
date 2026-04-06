@@ -19,7 +19,9 @@ function sortByPopularity(items: TmdbItem[]) {
 }
 
 function filterAndSort(items: TmdbItem[]) {
-  return sortByPopularity(items.filter(m => !(m.genre_ids ?? []).includes(16)))
+  return sortByPopularity(
+    items.filter(m => !(m.genre_ids ?? []).includes(16) && m.poster_path)
+  )
 }
 
 async function yaniSearch(q: string, limit: number) {

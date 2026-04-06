@@ -161,7 +161,7 @@ export default function Navbar() {
             source: 'yani' as const,
             alias: a.anime_url,
             year: String(a.year),
-            anilibria_poster: a.poster?.medium,
+            anilibria_poster: a.poster?.medium?.startsWith('//') ? `https:${a.poster.medium}` : a.poster?.medium,
           })),
         ]
         setResults(combined.slice(0, 8))
