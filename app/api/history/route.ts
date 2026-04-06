@@ -31,8 +31,29 @@ export async function GET() {
   const history = await prisma.watchHistory.findMany({
     where: { userId: session.user.id },
     orderBy: { watchedAt: 'desc' },
-    take: 20,
+    take: 200,
   })
 
   return NextResponse.json(history)
+}
+
+export async function DELETE(req: NextRequest) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { searchParams } = new URL(req.url)
+  const tmdbId = searchParams.get('tmdbId')
+  const mediaType = searchParams.get('mediaType')
+
+  if (tmdbId && mediaType) {
+    await prisma.watchHistory.deleteMany({
+      where: { userId: session.user.id, tmdbId: Number(tmdbId), mediaType },
+    })
+  } else {
+    await prisma.watchHistory.deleteMany({ where: { userId: session.user.id } })
+  }
+
+  return NextResponse.json({ deleted: true })
 }

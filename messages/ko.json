@@ -85,7 +85,8 @@
     "historyCount": "시청",
     "recentHistory": "최근 시청",
     "noHistory": "기록 없음",
-    "byStatus": "상태별"
+    "byStatus": "상태별",
+    "history": "기록"
   },
   "footer": {
     "rights": "© 2026 spacefeel. 모든 권리 보유."
@@ -246,5 +247,14 @@
     "noVideo": "사용 가능한 동영상이 없습니다",
     "searching": "서버에서 동영상 검색 중...",
     "episodeCount": "에피소드 · {count}화"
+  },
+  "historyPage": {
+    "title": "시청 기록",
+    "empty": "아직 시청한 항목이 없습니다",
+    "browse": "영화 탐색",
+    "clearAll": "모두 삭제",
+    "confirmClear": "기록을 삭제하시겠습니까?",
+    "remove": "제거",
+    "watchedOn": "시청일"
   }
 }

@@ -85,7 +85,8 @@
     "historyCount": "Просмотрено",
     "recentHistory": "Недавно смотрел",
     "noHistory": "История пуста",
-    "byStatus": "По статусу"
+    "byStatus": "По статусу",
+    "history": "История"
   },
   "footer": {
     "rights": "© 2026 spacefeel. Все права защищены."
@@ -246,5 +247,14 @@
     "noVideo": "Нет доступного видео",
     "searching": "Поиск видео на сервере...",
     "episodeCount": "Серии · {count} эп."
+  },
+  "historyPage": {
+    "title": "История просмотров",
+    "empty": "Вы ещё ничего не смотрели",
+    "browse": "Смотреть фильмы",
+    "clearAll": "Очистить всё",
+    "confirmClear": "Очистить историю?",
+    "remove": "Удалить",
+    "watchedOn": "Просмотрено"
   }
 }

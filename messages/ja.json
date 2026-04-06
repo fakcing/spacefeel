@@ -85,7 +85,8 @@
     "historyCount": "視聴済み",
     "recentHistory": "最近見た作品",
     "noHistory": "履歴なし",
-    "byStatus": "ステータス別"
+    "byStatus": "ステータス別",
+    "history": "履歴"
   },
   "footer": {
     "rights": "© 2026 spacefeel. 全著作権所有。"
@@ -246,5 +247,14 @@
     "noVideo": "利用可能な動画がありません",
     "searching": "サーバーで動画を検索中...",
     "episodeCount": "エピソード · {count}話"
+  },
+  "historyPage": {
+    "title": "視聴履歴",
+    "empty": "まだ何も視聴していません",
+    "browse": "映画を探す",
+    "clearAll": "すべて削除",
+    "confirmClear": "履歴を削除しますか？",
+    "remove": "削除",
+    "watchedOn": "視聴日"
   }
 }

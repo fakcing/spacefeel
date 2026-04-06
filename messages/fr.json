@@ -85,7 +85,8 @@
     "historyCount": "Vu",
     "recentHistory": "Récemment regardé",
     "noHistory": "Pas d'historique",
-    "byStatus": "Par statut"
+    "byStatus": "Par statut",
+    "history": "Historique"
   },
   "footer": {
     "rights": "© 2026 spacefeel. Tous droits réservés."
@@ -246,5 +247,14 @@
     "noVideo": "Aucune vidéo disponible",
     "searching": "Recherche de vidéo sur le serveur...",
     "episodeCount": "Épisodes · {count} ép."
+  },
+  "historyPage": {
+    "title": "Historique",
+    "empty": "Vous n'avez encore rien regardé",
+    "browse": "Parcourir les films",
+    "clearAll": "Tout effacer",
+    "confirmClear": "Effacer l'historique ?",
+    "remove": "Supprimer",
+    "watchedOn": "Regardé"
   }
 }

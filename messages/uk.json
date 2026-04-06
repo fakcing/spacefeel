@@ -85,7 +85,8 @@
     "historyCount": "Переглянуто",
     "recentHistory": "Нещодавно дивився",
     "noHistory": "Немає історії",
-    "byStatus": "За статусом"
+    "byStatus": "За статусом",
+    "history": "Історія"
   },
   "footer": {
     "rights": "© 2026 spacefeel. Всі права захищені."
@@ -246,5 +247,14 @@
     "noVideo": "Немає доступного відео",
     "searching": "Пошук відео на сервері...",
     "episodeCount": "Серії · {count} еп."
+  },
+  "historyPage": {
+    "title": "Історія переглядів",
+    "empty": "Ви ще нічого не дивились",
+    "browse": "Дивитися фільми",
+    "clearAll": "Очистити все",
+    "confirmClear": "Очистити історію?",
+    "remove": "Видалити",
+    "watchedOn": "Переглянуто"
   }
 }
