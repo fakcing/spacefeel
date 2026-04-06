@@ -54,12 +54,19 @@ export default function DetailHero({ item, mediaType, progress }: DetailHeroProp
 
   const handlePlay = (fromStart = false) => {
     if (!session) { openAuthModal(); return }
-    openPlayer({
-      mediaType,
-      item,
-      tmdbId: item.id,
-      season: (!fromStart && progress?.season) || 1,
-      episode: (!fromStart && progress?.episode) || 1,
+    const season = (!fromStart && progress?.season) || 1
+    const episode = (!fromStart && progress?.episode) || 1
+    openPlayer({ mediaType, item, tmdbId: item.id, season, episode })
+    fetch('/api/history', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tmdbId: item.id,
+        mediaType,
+        posterPath: item.poster_path,
+        season: mediaType === 'tv' ? season : null,
+        episode: mediaType === 'tv' ? episode : null,
+      }),
     })
   }
 

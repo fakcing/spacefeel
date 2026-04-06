@@ -86,7 +86,11 @@
     "recentHistory": "最近見た作品",
     "noHistory": "履歴なし",
     "byStatus": "ステータス別",
-    "history": "履歴"
+    "history": "履歴",
+    "statusPlanning": "視聴予定",
+    "statusWatching": "視聴中",
+    "statusCompleted": "視聴済み",
+    "statusDropped": "中断"
   },
   "footer": {
     "rights": "© 2026 spacefeel. 全著作権所有。"

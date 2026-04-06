@@ -85,6 +85,21 @@ export default function MediaPlayerModal() {
   useEffect(() => { setSelectedSeason(storeSeason) }, [storeSeason])
   useEffect(() => { setSelectedEpisode(storeEpisode) }, [storeEpisode])
 
+  const recordHistory = useCallback((season: number, episode: number) => {
+    if (!tmdbId || !isTV) return
+    fetch('/api/history', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tmdbId,
+        mediaType: 'tv',
+        posterPath: item && !('title' in item) ? item.poster_path : null,
+        season,
+        episode,
+      }),
+    })
+  }, [tmdbId, isTV, item])
+
   const setSeason = (s: number) => {
     setSelectedSeason(s)
     setStoreSeason(s)
@@ -93,6 +108,7 @@ export default function MediaPlayerModal() {
   const setEpisode = (e: number) => {
     setSelectedEpisode(e)
     setStoreEpisode(e)
+    recordHistory(selectedSeason, e)
   }
 
   const iframeSrc = useMemo(() => {

@@ -86,7 +86,11 @@
     "recentHistory": "Zuletzt gesehen",
     "noHistory": "Noch keine Geschichte",
     "byStatus": "Nach Status",
-    "history": "Verlauf"
+    "history": "Verlauf",
+    "statusPlanning": "Geplant",
+    "statusWatching": "Schaue ich",
+    "statusCompleted": "Gesehen",
+    "statusDropped": "Abgebrochen"
   },
   "footer": {
     "rights": "© 2026 spacefeel. Alle Rechte vorbehalten."

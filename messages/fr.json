@@ -86,7 +86,11 @@
     "recentHistory": "Récemment regardé",
     "noHistory": "Pas d'historique",
     "byStatus": "Par statut",
-    "history": "Historique"
+    "history": "Historique",
+    "statusPlanning": "Prévu",
+    "statusWatching": "En cours",
+    "statusCompleted": "Terminé",
+    "statusDropped": "Abandonné"
   },
   "footer": {
     "rights": "© 2026 spacefeel. Tous droits réservés."

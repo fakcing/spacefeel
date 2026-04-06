@@ -1,8 +1,8 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { Search, X } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { Search, X, Loader2 } from 'lucide-react'
+import { useRef, useState, useTransition } from 'react'
 import { useTranslations } from 'next-intl'
 
 interface Props {
@@ -15,6 +15,7 @@ export default function SearchPageInput({ initialQ, type }: Props) {
   const router = useRouter()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [value, setValue] = useState(initialQ)
+  const [isPending, startTransition] = useTransition()
 
   const handleChange = (v: string) => {
     setValue(v)
@@ -23,7 +24,9 @@ export default function SearchPageInput({ initialQ, type }: Props) {
       const params = new URLSearchParams()
       if (v) params.set('q', v)
       if (type && type !== 'all') params.set('type', type)
-      router.push(`/search?${params.toString()}`)
+      startTransition(() => {
+        router.replace(`/search?${params.toString()}`)
+      })
     }, 400)
   }
 
@@ -32,7 +35,10 @@ export default function SearchPageInput({ initialQ, type }: Props) {
       className="flex items-center rounded-xl px-4 py-3 gap-3 transition-all"
       style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
     >
-      <Search size={16} className="flex-shrink-0" style={{ color: 'var(--color-text-subtle)' }} />
+      {isPending
+        ? <Loader2 size={16} className="flex-shrink-0 animate-spin" style={{ color: 'var(--color-text-subtle)' }} />
+        : <Search size={16} className="flex-shrink-0" style={{ color: 'var(--color-text-subtle)' }} />
+      }
       <input
         type="text"
         value={value}

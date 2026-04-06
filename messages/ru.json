@@ -86,7 +86,11 @@
     "recentHistory": "Недавно смотрел",
     "noHistory": "История пуста",
     "byStatus": "По статусу",
-    "history": "История"
+    "history": "История",
+    "statusPlanning": "Запланировано",
+    "statusWatching": "Смотрю",
+    "statusCompleted": "Просмотрено",
+    "statusDropped": "Брошено"
   },
   "footer": {
     "rights": "© 2026 spacefeel. Все права защищены."

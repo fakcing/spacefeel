@@ -86,7 +86,11 @@
     "recentHistory": "최근 시청",
     "noHistory": "기록 없음",
     "byStatus": "상태별",
-    "history": "기록"
+    "history": "기록",
+    "statusPlanning": "볼 예정",
+    "statusWatching": "시청 중",
+    "statusCompleted": "완료",
+    "statusDropped": "중단"
   },
   "footer": {
     "rights": "© 2026 spacefeel. 모든 권리 보유."

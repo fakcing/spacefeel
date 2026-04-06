@@ -17,6 +17,19 @@ const LANGUAGES = [
   { code: 'es', label: 'Spanish',   badge: 'ES' },
 ]
 
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mb-8">
+      <p className="text-xs uppercase tracking-widest font-semibold mb-4" style={{ color: 'var(--color-text-subtle)' }}>
+        {title}
+      </p>
+      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--color-border)' }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
 export default function SettingsPage() {
   const { data: session, update: updateSession } = useSession()
   const { theme, setTheme } = useTheme()
@@ -79,17 +92,6 @@ export default function SettingsPage() {
       setDeleteConfirm(false)
     }
   }
-
-  const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
-    <div className="mb-8">
-      <p className="text-xs uppercase tracking-widest font-semibold mb-4" style={{ color: 'var(--color-text-subtle)' }}>
-        {title}
-      </p>
-      <div className="rounded-2xl overflow-hidden" style={{ border: '1px solid var(--color-border)' }}>
-        {children}
-      </div>
-    </div>
-  )
 
   return (
     <div className="min-h-screen pt-20 pb-20 px-4 md:px-8 max-w-2xl mx-auto">

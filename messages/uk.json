@@ -86,7 +86,11 @@
     "recentHistory": "Нещодавно дивився",
     "noHistory": "Немає історії",
     "byStatus": "За статусом",
-    "history": "Історія"
+    "history": "Історія",
+    "statusPlanning": "Заплановано",
+    "statusWatching": "Дивлюсь",
+    "statusCompleted": "Переглянуто",
+    "statusDropped": "Покинуто"
   },
   "footer": {
     "rights": "© 2026 spacefeel. Всі права захищені."
