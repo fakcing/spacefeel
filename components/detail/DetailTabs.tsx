@@ -16,7 +16,6 @@ interface DetailTabsProps {
 }
 
 function EpisodesTab({ tvId, seasons }: { tvId: number; seasons: Season[] }) {
-  const t = useTranslations('detail')
   const visibleSeasons = seasons.filter((s) => s.season_number > 0)
   const [selectedSeason, setSelectedSeason] = useState(
     visibleSeasons[0]?.season_number ?? 1
