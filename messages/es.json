@@ -5,7 +5,10 @@
     "tvShows": "Series",
     "anime": "Anime",
     "cartoons": "Dibujos animados",
-    "watchlist": "Mi lista"
+    "watchlist": "Mi lista",
+    "more": "Más",
+    "history": "Historial",
+    "settings": "Configuración"
   },
   "home": {
     "trendingMovies": "Películas en tendencia",
@@ -56,7 +59,8 @@
     "pageTitle": "Búsqueda",
     "all": "Todo",
     "movies": "Películas",
-    "tvShows": "Series"
+    "tvShows": "Series",
+    "viewAll": "Ver todos los resultados"
   },
   "watchlistPage": {
     "title": "Mi lista",

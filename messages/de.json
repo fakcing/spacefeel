@@ -5,7 +5,10 @@
     "tvShows": "Serien",
     "anime": "Anime",
     "cartoons": "Zeichentrick",
-    "watchlist": "Merkliste"
+    "watchlist": "Merkliste",
+    "more": "Mehr",
+    "history": "Verlauf",
+    "settings": "Einstellungen"
   },
   "home": {
     "trendingMovies": "Trendfilme",
@@ -56,7 +59,8 @@
     "pageTitle": "Suche",
     "all": "Alle",
     "movies": "Filme",
-    "tvShows": "Serien"
+    "tvShows": "Serien",
+    "viewAll": "Alle Ergebnisse"
   },
   "watchlistPage": {
     "title": "Meine Merkliste",

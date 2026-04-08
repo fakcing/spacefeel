@@ -5,7 +5,10 @@
     "tvShows": "드라마",
     "anime": "애니메이션",
     "cartoons": "만화",
-    "watchlist": "목록"
+    "watchlist": "목록",
+    "more": "더보기",
+    "history": "기록",
+    "settings": "설정"
   },
   "home": {
     "trendingMovies": "트렌딩 영화",
@@ -56,7 +59,8 @@
     "pageTitle": "검색",
     "all": "전체",
     "movies": "영화",
-    "tvShows": "드라마"
+    "tvShows": "드라마",
+    "viewAll": "모든 결과 보기"
   },
   "watchlistPage": {
     "title": "내 목록",

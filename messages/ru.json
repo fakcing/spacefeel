@@ -5,7 +5,10 @@
     "tvShows": "Сериалы",
     "anime": "Аниме",
     "cartoons": "Мультфильмы",
-    "watchlist": "Список"
+    "watchlist": "Список",
+    "more": "Ещё",
+    "history": "История",
+    "settings": "Настройки"
   },
   "home": {
     "trendingMovies": "В тренде",
@@ -56,7 +59,8 @@
     "pageTitle": "Поиск",
     "all": "Все",
     "movies": "Фильмы",
-    "tvShows": "Сериалы"
+    "tvShows": "Сериалы",
+    "viewAll": "Все результаты"
   },
   "watchlistPage": {
     "title": "Мой список",
