@@ -44,8 +44,8 @@ export default function AniCarouselSection({
 
         {/* Left: title + View All */}
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-semibold tracking-tight text-[var(--text-primary)]">{title}</h2>
-          {subtitle && <p className="text-xs text-[var(--text-muted)]">{subtitle}</p>}
+          <h2 className="text-xl font-semibold tracking-tight" style={{ color: 'var(--color-text)' }}>{title}</h2>
+          {subtitle && <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{subtitle}</p>}
           {viewAllHref && (
             <>
               <span style={{ color: 'var(--color-border-strong)' }}>|</span>
@@ -62,37 +62,52 @@ export default function AniCarouselSection({
           )}
         </div>
 
-        {/* Right: page counter + arrows */}
-        <div className="flex items-center gap-2">
+        {/* Right: page counter + arrows (desktop only) */}
+        <div className="hidden md:flex items-center gap-2">
           <span className="text-sm text-[var(--color-text-muted)]">
             {currentIndex + 1} / {maxIndex + 1}
           </span>
           <button
             onClick={scrollPrev}
             disabled={currentIndex <= 0}
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-              currentIndex <= 0 ? 'opacity-30 cursor-not-allowed' : ''
-            }`}
-            style={{ backgroundColor: 'var(--color-overlay)' }}
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110"
+            style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
+            onMouseEnter={e => { if (currentIndex > 0) (e.currentTarget.style.backgroundColor = 'var(--color-hover)') }}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-overlay)')}
             aria-label="Scroll left"
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={16} style={{ color: 'var(--color-text-muted)' }} />
           </button>
           <button
             onClick={scrollNext}
             disabled={currentIndex >= maxIndex}
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-              currentIndex >= maxIndex ? 'opacity-30 cursor-not-allowed' : ''
-            }`}
-            style={{ backgroundColor: 'var(--color-overlay)' }}
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110"
+            style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
+            onMouseEnter={e => { if (currentIndex < maxIndex) (e.currentTarget.style.backgroundColor = 'var(--color-hover)') }}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-overlay)')}
             aria-label="Scroll right"
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={16} style={{ color: 'var(--color-text-muted)' }} />
           </button>
         </div>
       </div>
 
-      <div className="overflow-hidden py-3 -my-3">
+      {/* Mobile: 2-column grid */}
+      <div className="md:hidden grid grid-cols-2 gap-3">
+        {items.slice(0, 8).map((item, index) => (
+          <motion.div
+            key={item.anime_id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: index * 0.04, duration: 0.3 }}
+          >
+            <AniCard item={item} />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Desktop: carousel */}
+      <div className="hidden md:block overflow-hidden py-3 -my-3">
         <div
           ref={trackRef}
           className="flex gap-3 transition-transform duration-300 ease-out"

@@ -35,7 +35,7 @@ export default function Pagination({ currentPage, totalPages, baseHref, onPageCh
   const renderPage = (page: number | '...', i: number) => {
     if (page === '...') {
       return (
-        <span key={`ellipsis-${i}`} className="text-gray-900/30 dark:text-white/30 w-9 text-center text-sm select-none">
+        <span key={`ellipsis-${i}`} className="w-9 text-center text-sm select-none" style={{ color: 'var(--color-text-subtle)' }}>
           ...
         </span>
       )

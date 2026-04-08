@@ -47,8 +47,8 @@ export default function CarouselSection({
 
         {/* Left: title + View All */}
         <div className="flex items-center gap-3">
-          <h2 className="text-xl font-semibold tracking-tight text-[var(--text-primary)]">{title}</h2>
-          {subtitle && <p className="text-xs text-[var(--text-muted)]">{subtitle}</p>}
+          <h2 className="text-xl font-semibold tracking-tight" style={{ color: 'var(--color-text)' }}>{title}</h2>
+          {subtitle && <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{subtitle}</p>}
           {viewAllHref && (
             <>
               <span style={{ color: 'var(--color-border-strong)' }}>|</span>
@@ -73,24 +73,24 @@ export default function CarouselSection({
           <button
             onClick={scrollPrev}
             disabled={currentIndex <= 0}
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-              currentIndex <= 0 ? 'opacity-30 cursor-not-allowed' : ''
-            }`}
-            style={{ backgroundColor: 'var(--color-overlay)' }}
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110"
+            style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
+            onMouseEnter={e => { if (currentIndex > 0) (e.currentTarget.style.backgroundColor = 'var(--color-hover)') }}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-overlay)')}
             aria-label="Scroll left"
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft size={16} style={{ color: 'var(--color-text-muted)' }} />
           </button>
           <button
             onClick={scrollNext}
             disabled={currentIndex >= maxIndex}
-            className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
-              currentIndex >= maxIndex ? 'opacity-30 cursor-not-allowed' : ''
-            }`}
-            style={{ backgroundColor: 'var(--color-overlay)' }}
+            className="w-8 h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110"
+            style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
+            onMouseEnter={e => { if (currentIndex < maxIndex) (e.currentTarget.style.backgroundColor = 'var(--color-hover)') }}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-overlay)')}
             aria-label="Scroll right"
           >
-            <ChevronRight size={16} />
+            <ChevronRight size={16} style={{ color: 'var(--color-text-muted)' }} />
           </button>
         </div>
       </div>

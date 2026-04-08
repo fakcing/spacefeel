@@ -159,7 +159,7 @@ export default function WatchlistPage() {
   ]
 
   return (
-    <div className="min-h-screen pt-20 px-4 md:px-8 max-w-7xl mx-auto">
+    <div className="min-h-screen pt-20 pb-24 px-4 md:px-8 max-w-7xl mx-auto">
       <div className="flex items-center gap-3 mb-6">
         <Bookmark size={28} />
         <h1 className="text-3xl font-bold tracking-tight text-[var(--text-primary)]">{t('title')}</h1>

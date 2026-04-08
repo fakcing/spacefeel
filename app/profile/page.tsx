@@ -50,7 +50,7 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen pt-14 pb-20 px-4 md:px-8 lg:px-12 max-w-4xl mx-auto">
+    <div className="min-h-screen pt-20 pb-24 px-4 md:px-8 max-w-4xl mx-auto">
       <div className="pt-10 mb-10">
         {/* Avatar + Info */}
         <div className="flex items-center gap-5 mb-8">
@@ -76,7 +76,7 @@ export default async function ProfilePage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-3 mb-8">
+        <div className="grid grid-cols-3 sm:grid-cols-3 gap-3 mb-8">
           {[
             { icon: <Bookmark size={18} />, value: watchlistItems.length, label: t('watchlistCount') },
             { icon: <Star size={18} />,     value: ratingsCount,          label: t('ratingsCount') },
@@ -122,7 +122,7 @@ export default async function ProfilePage() {
               <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('noHistory')}</p>
             </div>
           ) : (
-            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+            <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-8 gap-2">
               {historyItems.map((item, i) => {
                 const href = item.mediaType === 'movie' ? `/movies/${item.tmdbId}` : `/tv/${item.tmdbId}`
                 const poster = item.posterPath ? getPoster(item.posterPath, 'w185') : null

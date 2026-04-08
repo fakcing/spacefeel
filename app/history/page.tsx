@@ -65,7 +65,7 @@ export default function HistoryPage() {
   }
 
   return (
-    <main className="min-h-screen pt-20 pb-16 px-4 md:px-12 max-w-6xl mx-auto">
+    <main className="min-h-screen pt-20 pb-24 px-4 md:px-8 max-w-7xl mx-auto">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text)' }}>
           {t('title')}

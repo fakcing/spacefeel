@@ -83,7 +83,7 @@ export default function SearchPage() {
   ]
 
   return (
-    <div className="min-h-screen pt-14 pb-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto">
+    <div className="min-h-screen pt-20 pb-24 px-4 md:px-8 max-w-7xl mx-auto">
       <div className="mb-6 pt-6">
         <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-4" style={{ color: 'var(--color-text)' }}>
           {t('pageTitle')}
@@ -135,11 +135,11 @@ export default function SearchPage() {
       {/* Results */}
       {query.trim().length < 2 ? (
         <div className="text-center py-24">
-          <p className="text-lg text-gray-500 dark:text-gray-400">{t('typeHint')}</p>
+          <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>{t('typeHint')}</p>
         </div>
       ) : !loading && total === 0 ? (
         <div className="text-center py-24">
-          <p className="text-lg text-gray-500 dark:text-gray-400">{t('noResults')}</p>
+          <p className="text-lg" style={{ color: 'var(--color-text-muted)' }}>{t('noResults')}</p>
         </div>
       ) : (
         <>
