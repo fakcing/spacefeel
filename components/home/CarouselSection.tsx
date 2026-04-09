@@ -3,7 +3,7 @@
 import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { MediaItem } from '@/types/tmdb'
 import MediaCard from '@/components/cards/MediaCard'
@@ -16,13 +16,7 @@ interface CarouselSectionProps {
   viewAllHref?: string
 }
 
-export default function CarouselSection({
-  title,
-  subtitle,
-  items,
-  mediaType,
-  viewAllHref,
-}: CarouselSectionProps) {
+export default function CarouselSection({ title, subtitle, items, mediaType, viewAllHref }: CarouselSectionProps) {
   const trackRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const filteredItems = items.filter(item => item.poster_path)
@@ -31,73 +25,55 @@ export default function CarouselSection({
   const maxIndex = Math.max(0, totalCards - visibleCount)
   const t = useTranslations('home')
 
-  const scrollNext = () => {
-    if (currentIndex >= maxIndex) return
-    setCurrentIndex((prev) => prev + 1)
-  }
-
-  const scrollPrev = () => {
-    if (currentIndex <= 0) return
-    setCurrentIndex((prev) => prev - 1)
-  }
+  const scrollNext = () => { if (currentIndex < maxIndex) setCurrentIndex(p => p + 1) }
+  const scrollPrev = () => { if (currentIndex > 0) setCurrentIndex(p => p - 1) }
 
   return (
-    <section className="px-4 md:px-8 py-6">
+    <section className="px-4 md:px-8 py-4">
       <div className="flex items-center justify-between mb-4">
-
-        {/* Left: title + View All */}
-        <div className="flex items-center gap-3">
-          <h2 className="text-xl font-semibold tracking-tight" style={{ color: 'var(--color-text)' }}>{title}</h2>
-          {subtitle && <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{subtitle}</p>}
+        <div className="flex items-center gap-3 min-w-0">
+          <h2 className="text-base md:text-lg font-semibold tracking-tight truncate" style={{ color: 'var(--color-text)' }}>{title}</h2>
+          {subtitle && <p className="text-xs hidden sm:block" style={{ color: 'var(--color-text-subtle)' }}>{subtitle}</p>}
           {viewAllHref && (
-            <>
-              <span style={{ color: 'var(--color-border-strong)' }}>|</span>
-              <Link
-                href={viewAllHref}
-                className="text-sm transition-colors"
-                style={{ color: 'var(--color-text-muted)' }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = 'var(--color-text)')}
-                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--color-text-muted)')}
-              >
-                {t('viewAll')}
-              </Link>
-            </>
+            <Link
+              href={viewAllHref}
+              className="flex items-center gap-1 text-xs font-medium flex-shrink-0 transition-opacity hover:opacity-70"
+              style={{ color: 'var(--color-text-subtle)' }}
+            >
+              {t('viewAll')}
+              <ArrowRight size={11} />
+            </Link>
           )}
         </div>
 
-        {/* Right: page counter + arrows (desktop only) */}
-        <div className="hidden md:flex items-center gap-2">
-          <span className="text-sm text-[var(--color-text-muted)]">
-            {currentIndex + 1} / {maxIndex + 1}
+        <div className="hidden md:flex items-center gap-1.5 flex-shrink-0">
+          <span className="text-xs tabular-nums" style={{ color: 'var(--color-text-subtle)' }}>
+            {currentIndex + 1}<span className="mx-0.5 opacity-40">/</span>{maxIndex + 1}
           </span>
           <button
             onClick={scrollPrev}
             disabled={currentIndex <= 0}
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110"
+            className="w-7 h-7 rounded-full flex items-center justify-center transition-all disabled:opacity-25 disabled:cursor-not-allowed"
             style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
-            onMouseEnter={e => { if (currentIndex > 0) (e.currentTarget.style.backgroundColor = 'var(--color-hover)') }}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-overlay)')}
-            aria-label="Scroll left"
+            aria-label="Previous"
           >
-            <ChevronLeft size={16} style={{ color: 'var(--color-text-muted)' }} />
+            <ChevronLeft size={14} style={{ color: 'var(--color-text-muted)' }} />
           </button>
           <button
             onClick={scrollNext}
             disabled={currentIndex >= maxIndex}
-            className="w-8 h-8 rounded-full flex items-center justify-center transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:scale-110"
+            className="w-7 h-7 rounded-full flex items-center justify-center transition-all disabled:opacity-25 disabled:cursor-not-allowed"
             style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
-            onMouseEnter={e => { if (currentIndex < maxIndex) (e.currentTarget.style.backgroundColor = 'var(--color-hover)') }}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-overlay)')}
-            aria-label="Scroll right"
+            aria-label="Next"
           >
-            <ChevronRight size={16} style={{ color: 'var(--color-text-muted)' }} />
+            <ChevronRight size={14} style={{ color: 'var(--color-text-muted)' }} />
           </button>
         </div>
       </div>
 
-      {/* Mobile: 2-column grid showing first 8 */}
-      <div className="md:hidden grid grid-cols-2 gap-3">
-        {filteredItems.slice(0, 8).map((item, index) => (
+      {/* Mobile grid */}
+      <div className="md:hidden grid grid-cols-3 gap-2">
+        {filteredItems.slice(0, 6).map((item, index) => (
           <motion.div
             key={item.id}
             initial={{ opacity: 0 }}
@@ -109,17 +85,17 @@ export default function CarouselSection({
         ))}
       </div>
 
-      {/* Desktop: carousel */}
-      <div className="hidden md:block overflow-hidden py-3 -my-3">
+      {/* Desktop carousel */}
+      <div className="hidden md:block overflow-hidden">
         <div
           ref={trackRef}
-          className="flex gap-3 transition-transform duration-300 ease-out"
+          className="flex gap-3 transition-transform duration-350 ease-out"
           style={{ transform: `translateX(calc(-${currentIndex} * (100% / 6 + 2px)))` }}
         >
           {filteredItems.map((item, index) => (
             <motion.div
               key={item.id}
-              className="w-[calc((100%-60px)/6)] min-w-[calc((100%-60px)/6)] flex-shrink-0 flex-grow-0"
+              className="w-[calc((100%-60px)/6)] min-w-[calc((100%-60px)/6)] flex-shrink-0"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: index * 0.03, duration: 0.3 }}

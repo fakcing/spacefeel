@@ -132,7 +132,7 @@ export default function MobileHeader() {
     <>
       <header
         className="fixed top-0 left-0 right-0 z-40 h-14 md:hidden flex items-center justify-between px-4 border-b"
-        style={{ backgroundColor: 'var(--color-bg)', borderColor: 'var(--color-border)' }}
+        style={{ borderColor: 'var(--nav-border)' }}
       >
         <Link href="/" className="select-none">
           <span

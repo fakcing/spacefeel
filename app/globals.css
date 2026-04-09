@@ -3,47 +3,51 @@
 @tailwind utilities;
 
 :root {
-  /* Legacy variable names (backward compat) */
-  --bg-primary: #ffffff;
-  --bg-surface: #f5f5f5;
-  --bg-card: #eeeeee;
-  --text-primary: #0d0d0d;
-  --text-muted: rgba(0, 0, 0, 0.50);
-  --border: rgba(0, 0, 0, 0.08);
-
-  /* New semantic variables */
   --color-bg: #ffffff;
-  --color-surface: #f5f5f5;
-  --color-card: #eeeeee;
-  --color-text: #0d0d0d;
-  --color-text-muted: rgba(0, 0, 0, 0.50);
-  --color-text-subtle: rgba(0, 0, 0, 0.30);
-  --color-border: rgba(0, 0, 0, 0.08);
-  --color-border-strong: rgba(0, 0, 0, 0.20);
-  --color-hover: rgba(0, 0, 0, 0.06);
-  --color-overlay: rgba(0, 0, 0, 0.08);
+  --color-surface: #f7f7f7;
+  --color-card: #efefef;
+  --color-text: #0a0a0a;
+  --color-text-muted: rgba(0, 0, 0, 0.48);
+  --color-text-subtle: rgba(0, 0, 0, 0.28);
+  --color-border: rgba(0, 0, 0, 0.07);
+  --color-border-strong: rgba(0, 0, 0, 0.18);
+  --color-hover: rgba(0, 0, 0, 0.05);
+  --color-overlay: rgba(0, 0, 0, 0.06);
+
+  --nav-bg: rgba(255, 255, 255, 0.82);
+  --nav-border: rgba(0, 0, 0, 0.06);
+
+  /* Legacy backward compat */
+  --bg-primary: #ffffff;
+  --bg-surface: #f7f7f7;
+  --bg-card: #efefef;
+  --text-primary: #0a0a0a;
+  --text-muted: rgba(0, 0, 0, 0.48);
+  --border: rgba(0, 0, 0, 0.07);
 }
 
 .dark {
-  /* Legacy variable names (backward compat) */
-  --bg-primary: #0d0d0d;
-  --bg-surface: #111111;
-  --bg-card: #161616;
-  --text-primary: #ffffff;
-  --text-muted: rgba(255, 255, 255, 0.50);
-  --border: rgba(255, 255, 255, 0.08);
-
-  /* New semantic variables */
-  --color-bg: #0d0d0d;
-  --color-surface: #111111;
+  --color-bg: #080808;
+  --color-surface: #101010;
   --color-card: #161616;
-  --color-text: #ffffff;
-  --color-text-muted: rgba(255, 255, 255, 0.50);
-  --color-text-subtle: rgba(255, 255, 255, 0.30);
-  --color-border: rgba(255, 255, 255, 0.08);
-  --color-border-strong: rgba(255, 255, 255, 0.20);
-  --color-hover: rgba(255, 255, 255, 0.06);
-  --color-overlay: rgba(255, 255, 255, 0.08);
+  --color-text: #f2f2f2;
+  --color-text-muted: rgba(255, 255, 255, 0.46);
+  --color-text-subtle: rgba(255, 255, 255, 0.26);
+  --color-border: rgba(255, 255, 255, 0.07);
+  --color-border-strong: rgba(255, 255, 255, 0.18);
+  --color-hover: rgba(255, 255, 255, 0.05);
+  --color-overlay: rgba(255, 255, 255, 0.07);
+
+  --nav-bg: rgba(8, 8, 8, 0.82);
+  --nav-border: rgba(255, 255, 255, 0.06);
+
+  /* Legacy backward compat */
+  --bg-primary: #080808;
+  --bg-surface: #101010;
+  --bg-card: #161616;
+  --text-primary: #f2f2f2;
+  --text-muted: rgba(255, 255, 255, 0.46);
+  --border: rgba(255, 255, 255, 0.07);
 }
 
 body {
@@ -53,7 +57,7 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Safe area inset for mobile devices with notches */
+/* Safe area inset for notched devices */
 @supports (padding-bottom: env(safe-area-inset-bottom)) {
   .safe-area-inset-bottom {
     padding-bottom: env(safe-area-inset-bottom);
@@ -65,25 +69,20 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
 
-/* Smooth page transitions */
+/* Page transition */
 .page-transition {
-  animation: fadeIn 0.3s ease-in-out;
+  animation: fadeIn 0.25s ease-in-out;
 }
-
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Subtle noise texture overlay */
 body::before {
   content: '';
   position: fixed;
@@ -91,63 +90,42 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 0;
-  opacity: 0.03;
+  opacity: 0.025;
 }
 
+/* Shimmer skeleton */
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
 }
-
 .shimmer {
-  background: linear-gradient(90deg, var(--color-overlay) 25%, rgba(128,128,128,0.12) 50%, var(--color-overlay) 75%);
+  background: linear-gradient(90deg, var(--color-overlay) 25%, rgba(128,128,128,0.10) 50%, var(--color-overlay) 75%);
   background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  animation: shimmer 1.6s infinite;
 }
 
-/* Vertical scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: rgba(128, 128, 128, 0.20);
-  border-radius: 100px;
-  transition: background 0.2s;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(128, 128, 128, 0.35);
-}
+/* Scrollbar */
+::-webkit-scrollbar       { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(128,128,128,0.18); border-radius: 100px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(128,128,128,0.32); }
+* { scrollbar-width: thin; scrollbar-color: rgba(128,128,128,0.18) transparent; }
 
-/* Firefox */
-* {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(128, 128, 128, 0.20) transparent;
-}
-
-.scrollbar-hide::-webkit-scrollbar { display: none; }
-.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-
-/* ── Navbar adaptive ─────────────────────────────────────────────────── */
+/* Nav glass */
 nav {
-  background-color: var(--color-bg);
-  border-color: var(--color-border);
+  background-color: var(--nav-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-color: var(--nav-border);
 }
 
-/* ── Mobile: reserve space for fixed bottom nav (MobileNav h-16 = 64px) ─ */
+/* Mobile bottom nav space */
 @media (max-width: 767px) {
-  body {
-    padding-bottom: 4rem;
-  }
+  body { padding-bottom: 4rem; }
 }
 
-/* ── Light theme: text on poster/backdrop overlays stays white ───────── */
-/* Only override text that sits on the page background, not on dark images */
+/* Light theme: text on dark overlays stays white */
 .light .poster-overlay-text { color: #ffffff !important; }
 
-/* ── Footer links ────────────────────────────────────────────────────── */
+/* Footer links */
 .footer-link:hover { color: var(--color-text) !important; }
-
-/* ── Light search focus ──────────────────────────────────────────────── */
