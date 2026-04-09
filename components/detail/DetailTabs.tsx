@@ -161,28 +161,23 @@ export default function DetailTabs({ item, cast }: DetailTabsProps) {
 
   return (
     <div>
-      {/* Tab bar */}
-      <div className="flex gap-1 mb-6 flex-wrap">
-        {TABS.map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className="px-4 py-2 rounded-xl text-sm font-medium transition-colors"
-            style={
-              activeTab === tab
-                ? { backgroundColor: 'var(--color-text)', color: 'var(--color-bg)' }
-                : { color: 'var(--color-text-muted)' }
-            }
-            onMouseEnter={(e) => {
-              if (activeTab !== tab) e.currentTarget.style.backgroundColor = 'var(--color-overlay)'
-            }}
-            onMouseLeave={(e) => {
-              if (activeTab !== tab) e.currentTarget.style.backgroundColor = ''
-            }}
-          >
-            {tab}
-          </button>
-        ))}
+      <div className="flex gap-1 mb-6 border-b overflow-x-auto scrollbar-hide" style={{ borderColor: 'var(--color-border)' }}>
+        {TABS.map((tab) => {
+          const isActive = activeTab === tab
+          return (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className="flex-shrink-0 px-4 py-2.5 text-sm font-medium transition-colors relative"
+              style={{ color: isActive ? 'var(--color-text)' : 'var(--color-text-muted)' }}
+            >
+              {tab}
+              {isActive && (
+                <span className="absolute bottom-0 left-2 right-2 h-0.5 rounded-full" style={{ backgroundColor: 'var(--color-text)' }} />
+              )}
+            </button>
+          )
+        })}
       </div>
 
       {/* Tab content */}
@@ -195,7 +190,7 @@ export default function DetailTabs({ item, cast }: DetailTabsProps) {
           transition={{ duration: 0.2 }}
         >
           {activeTab === t('overview') && (
-            <p className="text-[var(--text-muted)] leading-relaxed">{item.overview}</p>
+            <p className="leading-relaxed" style={{ color: 'var(--color-text-muted)' }}>{item.overview}</p>
           )}
 
           {activeTab === t('cast') && (

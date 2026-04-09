@@ -29,7 +29,7 @@ export default function DetailHero({ item, mediaType, progress }: DetailHeroProp
       ? `${item.runtime} min`
       : 'number_of_seasons' in item && item.number_of_seasons
       ? `${item.number_of_seasons} Season${item.number_of_seasons !== 1 ? 's' : ''}${
-          item.number_of_episodes ? ` \u00b7 ${item.number_of_episodes} Episodes` : ''
+          item.number_of_episodes ? ` · ${item.number_of_episodes} ep.` : ''
         }`
       : null
 
@@ -75,9 +75,8 @@ export default function DetailHero({ item, mediaType, progress }: DetailHeroProp
 
   return (
     <>
-      {/* Backdrop */}
-      <div className="relative w-full h-[50vh] sm:h-[65vh] overflow-hidden">
-        {backdrop && (
+      <div className="relative w-full h-[50vh] sm:h-[60vh] overflow-hidden">
+        {backdrop ? (
           <Image
             src={backdrop}
             alt={title || ''}
@@ -87,75 +86,58 @@ export default function DetailHero({ item, mediaType, progress }: DetailHeroProp
             quality={85}
             sizes="100vw"
           />
+        ) : (
+          <div className="absolute inset-0" style={{ backgroundColor: 'var(--color-overlay)' }} />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-primary)] via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, var(--color-bg) 0%, transparent 60%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.3) 0%, transparent 60%)' }} />
       </div>
 
-      {/* Info block */}
-      <div className="max-w-7xl mx-auto px-4 md:px-12 -mt-20 sm:-mt-24 relative z-10 flex flex-col sm:flex-row gap-6 sm:gap-8 items-start sm:items-end pb-6 sm:pb-8">
-        {/* Mobile poster - shown only on mobile */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 -mt-20 sm:-mt-28 relative z-10 flex flex-col sm:flex-row gap-6 sm:gap-8 items-start sm:items-end pb-6 sm:pb-10">
         <div className="sm:hidden w-full flex justify-center">
-          <div className="w-40 rounded-xl overflow-hidden shadow-2xl">
+          <div className="w-36 rounded-xl overflow-hidden shadow-2xl ring-1 ring-black/10">
             <div className="relative aspect-[2/3]">
               {poster && (
-                <Image
-                  src={poster}
-                  alt={title || ''}
-                  fill
-                  className="object-cover"
-                  priority
-                  sizes="160px"
-                />
+                <Image src={poster} alt={title || ''} fill className="object-cover" priority sizes="144px" />
               )}
             </div>
           </div>
         </div>
 
-        {/* Desktop poster - hidden on mobile */}
-        <div className="hidden sm:block flex-shrink-0 w-40 rounded-2xl overflow-hidden shadow-2xl">
+        <div className="hidden sm:block flex-shrink-0 w-44 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-black/10">
           <div className="relative aspect-[2/3]">
             {poster && (
-              <Image
-                src={poster}
-                alt={title || ''}
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 40vw, 160px"
-              />
+              <Image src={poster} alt={title || ''} fill className="object-cover" priority sizes="176px" />
             )}
           </div>
         </div>
 
         <div className="flex-1 min-w-0 pb-2 w-full">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-1 text-[var(--text-primary)] text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-1 text-center sm:text-left" style={{ color: 'var(--color-text)' }}>
             {title}
           </h1>
           {item.tagline && (
-            <p className="text-[var(--text-muted)] italic text-sm mb-3 text-center sm:text-left">{item.tagline}</p>
+            <p className="text-sm italic mb-3 text-center sm:text-left" style={{ color: 'var(--color-text-muted)' }}>{item.tagline}</p>
           )}
           <div className="flex flex-wrap justify-center sm:justify-start gap-2 mb-4">
-            {item.genres?.map((g) => (
-              <Link
-                key={g.id}
-                href={`/${mediaType === 'movie' ? 'movies' : 'tv'}?genres=${g.id}`}
-              >
-                <Badge className="hover:bg-black/20 dark:hover:bg-white/20 transition-colors cursor-pointer">{g.name}</Badge>
+            {item.genres?.map(g => (
+              <Link key={g.id} href={`/${mediaType === 'movie' ? 'movies' : 'tv'}?genres=${g.id}`}>
+                <Badge className="hover:border-[var(--color-border-strong)] cursor-pointer">{g.name}</Badge>
               </Link>
             ))}
           </div>
-          <div className="flex items-center justify-center sm:justify-start gap-4 flex-wrap mb-4">
+          <div className="flex items-center justify-center sm:justify-start gap-4 flex-wrap mb-5">
             <Rating value={item.vote_average} count={item.vote_count} />
-            {year && <span className="text-[var(--text-muted)] text-sm">{year}</span>}
-            {extra && <span className="text-[var(--text-muted)] text-sm">{extra}</span>}
+            {year && <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{year}</span>}
+            {extra && <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{extra}</span>}
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <button
               onClick={() => handlePlay(false)}
-              className="flex items-center justify-center gap-2 bg-black dark:bg-white text-white dark:text-black font-semibold rounded-full px-6 py-3 sm:py-2.5 hover:bg-black/80 dark:hover:bg-white/90 transition-colors text-sm w-full sm:w-auto cursor-pointer"
+              className="flex items-center justify-center gap-2 font-semibold rounded-full px-6 py-3 sm:py-2.5 transition-all text-sm w-full sm:w-auto cursor-pointer hover:opacity-90 active:scale-95"
+              style={{ backgroundColor: 'var(--color-text)', color: 'var(--color-bg)' }}
             >
-              <Play size={16} className="fill-white dark:fill-black" />
+              <Play size={16} style={{ fill: 'var(--color-bg)' }} />
               {progress && mediaType === 'tv'
                 ? `${t('continue')} S${progress.season}E${progress.episode}`
                 : t('playNow')}
@@ -163,7 +145,8 @@ export default function DetailHero({ item, mediaType, progress }: DetailHeroProp
             {progress && mediaType === 'tv' && (
               <button
                 onClick={() => handlePlay(true)}
-                className="flex items-center justify-center gap-2 font-semibold rounded-full px-6 py-3 sm:py-2.5 text-sm transition-colors border border-black/20 dark:border-white/20 text-gray-900 dark:text-white hover:bg-black/10 dark:hover:bg-white/10 w-full sm:w-auto cursor-pointer"
+                className="flex items-center justify-center gap-2 font-semibold rounded-full px-6 py-3 sm:py-2.5 text-sm transition-all w-full sm:w-auto cursor-pointer hover:opacity-80 active:scale-95"
+                style={{ border: '1px solid var(--color-border-strong)', color: 'var(--color-text-muted)' }}
               >
                 <RotateCcw size={14} />
                 {t('playNow')}
@@ -171,11 +154,12 @@ export default function DetailHero({ item, mediaType, progress }: DetailHeroProp
             )}
             <button
               onClick={handleWatchlist}
-              className={`flex items-center justify-center gap-2 font-semibold rounded-full px-6 py-3 sm:py-2.5 text-sm transition-colors border w-full sm:w-auto ${
-                isBookmarked
-                  ? 'bg-black/15 dark:bg-white/15 border-black/30 dark:border-white/30 text-gray-900 dark:text-white'
-                  : 'bg-transparent border-black/20 dark:border-white/20 text-gray-900 dark:text-white hover:bg-black/10 dark:hover:bg-white/10'
-              }`}
+              className="flex items-center justify-center gap-2 font-semibold rounded-full px-6 py-3 sm:py-2.5 text-sm transition-all w-full sm:w-auto cursor-pointer hover:opacity-80 active:scale-95"
+              style={{
+                backgroundColor: isBookmarked ? 'var(--color-overlay)' : 'transparent',
+                border: '1px solid var(--color-border-strong)',
+                color: 'var(--color-text)',
+              }}
             >
               {isBookmarked ? (
                 <><BookmarkCheck size={16} /> {t('inWatchlist')}</>

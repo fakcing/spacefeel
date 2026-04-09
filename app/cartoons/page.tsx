@@ -86,55 +86,57 @@ export default async function CartoonsPage({
   const baseHref = `/cartoons?category=${category}${sort_by ? `&sort_by=${sort_by}` : ''}${year_from ? `&year_from=${year_from}` : ''}${year_to ? `&year_to=${year_to}` : ''}${min_vote ? `&min_vote=${min_vote}` : ''}${language ? `&language=${language}` : ''}`
 
   return (
-    <div className="min-h-screen pt-14 pb-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto">
-      <div className="mb-4 md:mb-6 pt-6">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[var(--text-primary)] mb-1">
-          {hasFilters ? label : t('title')}
-        </h1>
-        {!hasFilters && (
-          <p className="text-sm text-gray-900/50 dark:text-white/50 max-w-xl">{t('description')}</p>
-        )}
-      </div>
-
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide mb-6 pb-2 -mx-4 px-4 md:mx-0 md:px-0">
-        {categories.map((cat) => (
-          <Link
-            key={cat.value}
-            href={`/cartoons?category=${cat.value}`}
-            className={`flex-shrink-0 px-4 py-2 rounded-full text-sm transition-colors ${
-              category === cat.value && !hasFilters
-                ? 'bg-gray-900 dark:bg-white text-white dark:text-black font-semibold'
-                : 'bg-black/[0.08] dark:bg-white/[0.08] hover:bg-black/[0.15] dark:hover:bg-white/[0.15] text-[var(--text-muted)]'
-            }`}
-          >
-            {cat.label}
-          </Link>
-        ))}
-      </div>
-
-      <Suspense>
-        <CartoonFilters
-          sort_by={sort_by}
-          year_from={year_from}
-          year_to={year_to}
-          min_vote={min_vote}
-          language={language}
-        />
-      </Suspense>
-
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-        {results.map((item, index) => (
-          <MediaCard key={item.id} item={item} mediaType="tv" priority={index < 6} />
-        ))}
-      </div>
-
-      {results.length === 0 && (
-        <div className="text-center py-20 text-gray-500 dark:text-gray-400">
-          {tf('noResults')}
+    <div className="min-h-screen">
+      <div className="relative pt-20 pb-6 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, var(--color-overlay) 0%, transparent 100%)' }} />
+        <div className="relative px-4 md:px-8 max-w-7xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-1" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-bebas), sans-serif', letterSpacing: '0.05em' }}>
+            {hasFilters ? label : t('title')}
+          </h1>
+          {!hasFilters && (
+            <p className="text-sm mb-5" style={{ color: 'var(--color-text-muted)' }}>{t('description')}</p>
+          )}
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide mt-4 -mx-4 px-4 md:mx-0 md:px-0">
+            {categories.map((cat) => {
+              const isActive = category === cat.value && !hasFilters
+              return (
+                <Link
+                  key={cat.value}
+                  href={`/cartoons?category=${cat.value}`}
+                  className="flex-shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all"
+                  style={{
+                    backgroundColor: isActive ? 'var(--color-text)' : 'var(--color-overlay)',
+                    color: isActive ? 'var(--color-bg)' : 'var(--color-text-muted)',
+                    border: '1px solid var(--color-border)',
+                  }}
+                >
+                  {cat.label}
+                </Link>
+              )
+            })}
+          </div>
         </div>
-      )}
+      </div>
 
-      <Pagination currentPage={page} totalPages={total_pages} baseHref={baseHref} />
+      <div className="px-4 md:px-8 max-w-7xl mx-auto pb-24">
+        <Suspense>
+          <CartoonFilters sort_by={sort_by} year_from={year_from} year_to={year_to} min_vote={min_vote} language={language} />
+        </Suspense>
+
+        {results.length === 0 ? (
+          <div className="text-center py-24">
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{tf('noResults')}</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+            {results.map((item, index) => (
+              <MediaCard key={item.id} item={item} mediaType="tv" priority={index < 6} />
+            ))}
+          </div>
+        )}
+
+        <Pagination currentPage={page} totalPages={total_pages} baseHref={baseHref} />
+      </div>
     </div>
   )
 }

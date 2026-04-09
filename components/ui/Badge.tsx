@@ -5,7 +5,10 @@ interface BadgeProps {
 
 export default function Badge({ children, className = '' }: BadgeProps) {
   return (
-    <span className={`bg-black/10 dark:bg-white/10 rounded-full text-xs px-3 py-1 ${className}`}>
+    <span
+      className={`inline-flex items-center rounded-full text-xs px-3 py-1 font-medium transition-colors ${className}`}
+      style={{ backgroundColor: 'var(--color-overlay)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)' }}
+    >
       {children}
     </span>
   )

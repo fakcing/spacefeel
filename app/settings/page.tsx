@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { useTheme } from 'next-themes'
 import { useLocale, useTranslations } from 'next-intl'
-import { Sun, Moon, Monitor, Check, Trash2, Save, User } from 'lucide-react'
+import { Sun, Moon, Monitor, Check, Trash2, Save, User, Settings } from 'lucide-react'
 
 const LANGUAGES = [
   { code: 'en', label: 'English',   badge: 'US' },
@@ -94,10 +94,22 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-20 px-4 md:px-8 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold tracking-tight mb-8" style={{ color: 'var(--color-text)' }}>
-        {t('title')}
-      </h1>
+    <div className="min-h-screen">
+      <div className="relative pt-20 pb-8 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, var(--color-overlay) 0%, transparent 100%)' }} />
+        <div className="relative px-4 md:px-8 max-w-2xl mx-auto">
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-8 h-8 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}>
+              <Settings size={16} style={{ color: 'var(--color-text-subtle)' }} />
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-bebas), sans-serif', letterSpacing: '0.05em' }}>
+              {t('title')}
+            </h1>
+          </div>
+        </div>
+      </div>
+
+      <div className="px-4 md:px-8 max-w-2xl mx-auto pb-24">
 
       {/* Appearance */}
       <Section title={t('appearance')}>
@@ -155,7 +167,6 @@ export default function SettingsPage() {
       {session?.user && (
         <Section title={t('account')}>
           <div className="p-4" style={{ backgroundColor: 'var(--color-surface)' }}>
-            {/* Display name */}
             <p className="text-xs font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>{t('displayName')}</p>
             <div className="flex gap-2 mb-1">
               <div className="flex-1 relative">
@@ -223,6 +234,7 @@ export default function SettingsPage() {
           </div>
         </Section>
       )}
+      </div>
     </div>
   )
 }

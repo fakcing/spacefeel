@@ -35,25 +35,38 @@ export default async function AnimePage({
   const baseHref = `/anime${filterParams.toString() ? `?${filterParams.toString()}` : ''}`
 
   return (
-    <div className="min-h-screen pt-14 pb-20 px-4 md:px-8 lg:px-12 max-w-7xl mx-auto">
-      <div className="mb-6 md:mb-8 pt-6">
-        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-[var(--text-primary)] mb-1">{t('title')}</h1>
-        <p className="text-sm text-gray-900/50 dark:text-white/50 max-w-xl">{t('description')}</p>
+    <div className="min-h-screen">
+      <div className="relative pt-20 pb-6 overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, var(--color-overlay) 0%, transparent 100%)' }} />
+        <div className="relative px-4 md:px-8 max-w-7xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-1" style={{ color: 'var(--color-text)', fontFamily: 'var(--font-bebas), sans-serif', letterSpacing: '0.05em' }}>
+            {t('title')}
+          </h1>
+          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{t('description')}</p>
+        </div>
       </div>
 
-      <div className="mb-6">
-        <Suspense>
-          <AnimeFilters q={q} year={year} type={type} />
-        </Suspense>
-      </div>
+      <div className="px-4 md:px-8 max-w-7xl mx-auto pb-24">
+        <div className="mb-6">
+          <Suspense>
+            <AnimeFilters q={q} year={year} type={type} />
+          </Suspense>
+        </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
-        {items.map((item) => (
-          <AniCard key={item.anime_id} item={item} />
-        ))}
-      </div>
+        {items.length === 0 ? (
+          <div className="text-center py-24">
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}></p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 md:gap-4">
+            {items.map((item) => (
+              <AniCard key={item.anime_id} item={item} />
+            ))}
+          </div>
+        )}
 
-      <Pagination currentPage={page} totalPages={totalPages} baseHref={baseHref} />
+        <Pagination currentPage={page} totalPages={totalPages} baseHref={baseHref} />
+      </div>
     </div>
   )
 }
