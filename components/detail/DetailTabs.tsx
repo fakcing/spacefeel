@@ -194,29 +194,32 @@ export default function DetailTabs({ item, cast }: DetailTabsProps) {
           )}
 
           {activeTab === t('cast') && (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {cast.slice(0, 12).map((person) => (
                 <Link
                   key={`${person.id}-${person.character}`}
                   href={`/actors/${person.id}`}
-                  className="flex items-center gap-3 group"
+                  className="flex items-center gap-3 p-3 rounded-xl transition-colors group"
+                  style={{ border: '1px solid var(--color-border)' }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
                 >
                   {person.profile_path ? (
                     <Image
                       src={`https://image.tmdb.org/t/p/w185${person.profile_path}`}
-                      width={48}
-                      height={48}
+                      width={44}
+                      height={44}
                       className="rounded-full object-cover flex-shrink-0"
                       alt={person.name}
                     />
                   ) : (
-                    <div className="w-12 h-12 rounded-full flex-shrink-0 flex items-center justify-center" style={{ backgroundColor: 'var(--color-overlay)' }}>
-                      <User size={20} style={{ color: 'var(--color-text-subtle)' }} />
+                    <div className="w-11 h-11 rounded-full flex-shrink-0 flex items-center justify-center" style={{ backgroundColor: 'var(--color-overlay)' }}>
+                      <User size={18} style={{ color: 'var(--color-text-subtle)' }} />
                     </div>
                   )}
                   <div className="min-w-0">
-                    <p className="text-sm font-medium truncate group-hover:underline" style={{ color: 'var(--color-text)' }}>{person.name}</p>
-                    <p className="text-xs truncate" style={{ color: 'var(--color-text-muted)' }}>{person.character}</p>
+                    <p className="text-sm font-medium truncate" style={{ color: 'var(--color-text)' }}>{person.name}</p>
+                    <p className="text-xs truncate mt-0.5" style={{ color: 'var(--color-text-muted)' }}>{person.character}</p>
                   </div>
                 </Link>
               ))}
@@ -224,7 +227,7 @@ export default function DetailTabs({ item, cast }: DetailTabsProps) {
           )}
 
           {activeTab === t('details') && (
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
               {item.status && (
                 <div>
                   <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--color-text-subtle)' }}>{t('status')}</p>

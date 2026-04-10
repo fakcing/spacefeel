@@ -203,13 +203,13 @@ export default function MediaPlayerModal() {
         >
           {/* ── Desktop Header ── */}
           <div
-            className="hidden sm:flex items-center gap-2 px-3 py-2.5 flex-shrink-0 border-b flex-nowrap overflow-visible"
-            style={{ borderColor: 'var(--color-border)' }}
+            className="hidden sm:flex items-center gap-2 px-4 py-2.5 flex-shrink-0 border-b flex-nowrap overflow-visible"
+            style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-surface)' }}
           >
             {/* Title */}
             <span
-              className="text-sm font-medium truncate max-w-[200px] flex-shrink-0"
-              style={{ color: 'var(--color-text-muted)' }}
+              className="text-sm font-semibold truncate max-w-[240px] flex-shrink-0"
+              style={{ color: 'var(--color-text)' }}
             >
               {title}
             </span>
@@ -362,13 +362,13 @@ export default function MediaPlayerModal() {
           {/* ── Mobile Header ── */}
           <div
             className="sm:hidden flex-shrink-0"
-            style={{ borderBottom: '1px solid var(--color-border)' }}
+            style={{ borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}
           >
             {/* Row 1: title + close */}
             <div className="flex items-center gap-2 px-3 pt-2.5 pb-1.5">
               <span
-                className="text-sm font-medium truncate flex-1 min-w-0"
-                style={{ color: 'var(--color-text-muted)' }}
+                className="text-sm font-semibold truncate flex-1 min-w-0"
+                style={{ color: 'var(--color-text)' }}
               >
                 {title}
               </span>
@@ -446,8 +446,8 @@ export default function MediaPlayerModal() {
           </div>
 
           {/* ── Video ── */}
-          <div className="flex-1 flex items-center justify-center px-2 sm:px-4 py-3 min-h-0">
-            <div className="w-full max-w-5xl aspect-video rounded-lg sm:rounded-xl overflow-hidden bg-black relative">
+          <div className="flex-1 flex items-center justify-center px-2 sm:px-6 py-4 min-h-0">
+            <div className="w-full max-w-5xl aspect-video rounded-xl overflow-hidden bg-black relative" style={{ boxShadow: '0 0 0 1px rgba(255,255,255,0.05)' }}>
 
               {/* Loading */}
               {isLoading && !loadTimeout && iframeSrc && (
