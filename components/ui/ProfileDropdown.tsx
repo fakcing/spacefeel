@@ -157,50 +157,44 @@ export default function ProfileDropdown() {
 
             {/* Language */}
             <div className="px-3 pt-3 pb-2">
-              <p className="text-[10px] uppercase tracking-widest mb-2 font-semibold" style={{ color: 'var(--color-text-subtle)' }}>{t('language')}</p>
-              <div className="relative">
-                <button
-                  onClick={() => setLangOpen(v => !v)}
-                  className="w-full flex items-center justify-between rounded-xl px-3 py-2.5 transition-colors"
-                  style={{ backgroundColor: 'var(--color-overlay)', border: '1px solid var(--color-border)' }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
-                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'var(--color-overlay)')}
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-[10px] font-bold w-5 text-left" style={{ color: 'var(--color-text-subtle)' }}>{currentLanguage.badge}</span>
-                    <span className="text-sm" style={{ color: 'var(--color-text)' }}>{currentLanguage.label}</span>
-                  </div>
-                  <ChevronDown size={12} className={`transition-transform duration-150 ${langOpen ? 'rotate-180' : ''}`} style={{ color: 'var(--color-text-subtle)' }} />
-                </button>
-                <AnimatePresence>
-                  {langOpen && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -4 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -4 }}
-                      transition={{ duration: 0.12 }}
-                      className="absolute left-0 right-0 top-full mt-1 rounded-xl overflow-hidden shadow-2xl z-[60]"
-                      style={{ backgroundColor: 'var(--color-card)', border: '1px solid var(--color-border)' }}
-                    >
-                      {LANGUAGES.map(lang => (
-                        <button
-                          key={lang.code}
-                          onClick={() => handleLanguageChange(lang)}
-                          className="w-full flex items-center justify-between px-3 py-2.5 text-sm transition-colors"
-                          onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
-                          onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <span className="text-[10px] font-bold w-5 text-left" style={{ color: 'var(--color-text-subtle)' }}>{lang.badge}</span>
-                            <span style={{ color: locale === lang.code ? 'var(--color-text)' : 'var(--color-text-muted)' }}>{lang.label}</span>
-                          </div>
-                          {locale === lang.code && <Check size={13} style={{ color: 'var(--color-text-subtle)' }} />}
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+              <button
+                onClick={() => setLangOpen(v => !v)}
+                className="w-full flex items-center justify-between mb-2"
+              >
+                <p className="text-[10px] uppercase tracking-widest font-semibold" style={{ color: 'var(--color-text-subtle)' }}>{t('language')}</p>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-bold" style={{ color: 'var(--color-text-muted)' }}>{currentLanguage.badge}</span>
+                  <ChevronDown size={11} className={`transition-transform duration-150 ${langOpen ? 'rotate-180' : ''}`} style={{ color: 'var(--color-text-subtle)' }} />
+                </div>
+              </button>
+              <AnimatePresence>
+                {langOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="overflow-hidden rounded-xl"
+                    style={{ border: '1px solid var(--color-border)' }}
+                  >
+                    {LANGUAGES.map(lang => (
+                      <button
+                        key={lang.code}
+                        onClick={() => handleLanguageChange(lang)}
+                        className="w-full flex items-center justify-between px-3 py-2.5 text-sm transition-colors"
+                        onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'var(--color-hover)')}
+                        onMouseLeave={e => (e.currentTarget.style.backgroundColor = '')}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-[10px] font-bold w-5 text-left" style={{ color: 'var(--color-text-subtle)' }}>{lang.badge}</span>
+                          <span style={{ color: locale === lang.code ? 'var(--color-text)' : 'var(--color-text-muted)' }}>{lang.label}</span>
+                        </div>
+                        {locale === lang.code && <Check size={13} style={{ color: 'var(--color-text-subtle)' }} />}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
 
             {/* Theme */}
